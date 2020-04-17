@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import { componentFactory } from './YvanRender'
+
 /**
  * 扩展 grid 组件
  */
@@ -175,7 +177,7 @@ export type BaseModuleType<M, Refs, INP> = typeof BaseModule
  */
 export function BizModule<M, Refs, INP>(option?: any): Function {
   return function(Component: BaseModule<M, Refs, INP>) {
-    // return componentFactory(Component, option)
+    return componentFactory(Component, option)
   }
 
   // const option = {
