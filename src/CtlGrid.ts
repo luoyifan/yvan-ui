@@ -1114,7 +1114,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
         } else if (easyuiCol.editMode === 'combo') {
           //下拉框编辑
           formatable = false
-          Object.assign(col, {
+          _.assign(col, {
             editable: true,
             cellEditor: 'CtlGridEditorCombo',
             cellEditorParams: {
@@ -1157,7 +1157,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
         } else if (easyuiCol.editMode === 'area') {
           //大型富文本框编辑
           formatable = true
-          Object.assign(col, {
+          _.assign(col, {
             editable: true,
             cellEditor: 'agLargeTextCellEditor',
             cellEditorParams: {
@@ -1171,7 +1171,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
         ) {
           //普通文本框编辑
           formatable = true
-          Object.assign(col, {
+          _.assign(col, {
             editable: true,
             cellEditor: 'CtlGridEditorText',
             cellEditorParams: {
@@ -1199,7 +1199,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
           easyuiCol.editMode === 'datetime'
         ) {
           formatable = true
-          // Object.assign(col, {
+          // _.assign(col, {
           //     editable: true,
           //     cellEditor: "YvGridEditorDate",
           //     cellEditorParams: {

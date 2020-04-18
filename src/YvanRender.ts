@@ -88,7 +88,7 @@ function deepTrav1(
     if (key === 'on' && _.isObject(value)) {
       return
     }
-    if (key.startsWith('on') && _.size(key) > 2) {
+    if (_.startsWith(key, 'on') && _.size(key) > 2) {
       return
     }
     const isMarkerChild = deepTrav1(value, resolver, marker)
@@ -319,7 +319,7 @@ const $internalHooks = ['data', 'destory', 'watches', 'computed']
 function collectDataFromConstructor(vm: Vue, Component: any) {
   // override _init to prevent to init as Vue instance
   const originalInit = Component.prototype._init
-  Component.prototype._init = function(this: Vue) {
+  Component.prototype._init = function (this: Vue) {
     // proxy to actual vm
     const keys = Object.getOwnPropertyNames(vm)
     // 2.2.0 compat (props are no longer exposed as self properties)
@@ -426,7 +426,7 @@ function collectMethods(proto: any, options: any) {
       // 且描述符具有get或者set方法，则认为是计算属性。不理解的参考我上面关于class转换成构造函数的例子
       // 这里可能和普通的计算属性不太一样，因为一般计算属性只是用来获取值的，但这里却有setter。
       // 不过如果不使用setter，与非class方式开发无异，但有这一步处理，在某些场景会有特效。
-      ;(options.computed || (options.computed = {}))[key] = {
+      ; (options.computed || (options.computed = {}))[key] = {
         get: descriptor.get,
         set: descriptor.set
       }
@@ -637,7 +637,7 @@ export function componentFactory<M, Refs, INP>(
         })
       }
     },
-    destroyed() {},
+    destroyed() { },
     methods: {
       onLoad(this: Vue) {
         _.each(options.onLoads, load => {
@@ -706,7 +706,7 @@ export function componentFactory<M, Refs, INP>(
         }
 
         // layer 打开后的回调
-        layerConfig.success = function(layero: any) {
+        layerConfig.success = function (layero: any) {
           module.layero = layero
           layer.setTop(layero)
           // 默认焦点在关闭上
@@ -745,7 +745,7 @@ export function componentFactory<M, Refs, INP>(
         }
 
         // layer 大小改变后的回调
-        layerConfig.restore = layerConfig.full = layerConfig.resizing = function(
+        layerConfig.restore = layerConfig.full = layerConfig.resizing = function (
           layero: any
         ) {
           //$$(module._webixId).resize();
@@ -759,7 +759,7 @@ export function componentFactory<M, Refs, INP>(
         }
 
         // layer 关闭后的回调
-        layerConfig.end = function() {
+        layerConfig.end = function () {
           module.onClose()
 
           webix.$$(module._webixId).destructor()
