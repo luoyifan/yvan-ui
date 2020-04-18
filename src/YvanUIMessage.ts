@@ -47,6 +47,40 @@ const escKeyboardOption: any = {
 }
 
 /**
+ * 显示正在读取
+ */
+export function loading(msg?: string) {
+  clearLoading();
+  if (!msg) {
+    msg = '请稍后'
+  }
+  const $body = $('body');
+  const $w = $(`<div class="load-view"><div class="load-an-view"><div class="fading-circle">
+  <div class="sk-circle1 sk-circle"></div>
+  <div class="sk-circle2 sk-circle"></div>
+  <div class="sk-circle3 sk-circle"></div>
+  <div class="sk-circle4 sk-circle"></div>
+  <div class="sk-circle5 sk-circle"></div>
+  <div class="sk-circle6 sk-circle"></div>
+  <div class="sk-circle7 sk-circle"></div> 
+  <div class="sk-circle8 sk-circle"></div>
+  <div class="sk-circle9 sk-circle"></div>
+  <div class="sk-circle10 sk-circle"></div>
+  <div class="sk-circle11 sk-circle"></div>
+  <div class="sk-circle12 sk-circle"></div>
+</div></div><div class="load-tip">${msg}</div></div>`)
+  $body.append($w)
+}
+
+/**
+ * 清空正在读取
+ */
+export function clearLoading() {
+  const $body = $('body');
+  $body.find('.load-view').remove();
+}
+
+/**
  * 中间灰底白字提示
  */
 export function msg(message: string): void {
@@ -55,9 +89,9 @@ export function msg(message: string): void {
   $body.find('[xtype=msg]').remove()
   const $w = $(
     '<div xtype="msg" class="yvan-msg yvan-anim yvan-anim-00">' +
-      '  <div class="yvan-msg-content">' +
-      message +
-      '</div></div>'
+    '  <div class="yvan-msg-content">' +
+    message +
+    '</div></div>'
   )
   $body.append($w)
 
@@ -98,7 +132,7 @@ export function prompt(
   defValue: string = ''
 ): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    ;(layer.prompt as any)(
+    ; (layer.prompt as any)(
       {
         formType: 0,
         value: defValue,
@@ -116,7 +150,7 @@ export function prompt(
 }
 
 export function alert(content: string): void {
-  ;(layer.alert as any)(content, {
+  ; (layer.alert as any)(content, {
     isOutAnim: false,
     zIndex: layer.zIndex,
     ...baseKeyboardOption
@@ -124,7 +158,7 @@ export function alert(content: string): void {
 }
 
 export function error(content: string): void {
-  ;(layer.alert as any)(content, {
+  ; (layer.alert as any)(content, {
     icon: 2,
     isOutAnim: false,
     zIndex: layer.zIndex,
@@ -134,7 +168,7 @@ export function error(content: string): void {
 
 export function confirm(content: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    ;(layer.confirm as any)(
+    ; (layer.confirm as any)(
       content,
       {
         icon: 3,
