@@ -1,4 +1,6 @@
-import webix from 'webix'
+import webix, { $$ } from 'webix'
+import { wrapperWebixConfig } from './YvanRender'
+import { idText } from 'typescript'
 
 // eslint-disable-next-line
 const baseKeyboardOption: any = {
@@ -52,11 +54,11 @@ const escKeyboardOption: any = {
  * 显示正在读取
  */
 export function loading(msg?: string) {
-  clearLoading();
+  clearLoading()
   if (!msg) {
     msg = '请稍后'
   }
-  const $body = $('body');
+  const $body = $('body')
   const $w = $(`<div class="load-view"><div class="load-an-view"><div class="fading-circle">
   <div class="sk-circle1 sk-circle"></div>
   <div class="sk-circle2 sk-circle"></div>
@@ -78,8 +80,8 @@ export function loading(msg?: string) {
  * 清空正在读取
  */
 export function clearLoading() {
-  const $body = $('body');
-  $body.find('.load-view').remove();
+  const $body = $('body')
+  $body.find('.load-view').remove()
 }
 
 /**
@@ -91,9 +93,9 @@ export function msg(message: string): void {
   $body.find('[xtype=msg]').remove()
   const $w = $(
     '<div xtype="msg" class="yvan-msg yvan-anim yvan-anim-00">' +
-    '  <div class="yvan-msg-content">' +
-    message +
-    '</div></div>'
+      '  <div class="yvan-msg-content">' +
+      message +
+      '</div></div>'
   )
   $body.append($w)
 
@@ -122,55 +124,169 @@ export function prompt(
   defValue: string = ''
 ): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    ; (layer.prompt as any)(
-      {
-        formType: 0,
-        value: defValue,
-        isOutAnim: false,
-        title: title,
-        zIndex: layer.zIndex,
-        ...escKeyboardOption
-      },
-      (value: any, index: any) => {
-        resolve(value)
-        layer.close(index)
+    const tid = webix.uid()
+    let dialog: any
+    let vj = {
+      view: 'window',
+      head: title,
+      close: true,
+      move: true,
+      modal: true,
+      position: 'center',
+      resize: true,
+      body: {
+        rows: [
+          { view: 'text', id: tid },
+          {
+            cols: [
+              {},
+              {},
+              {
+                view: 'button',
+                value: '确定',
+                width: 100,
+                css: 'yvan_primary',
+                click: () => {
+                  const value = (<webix.ui.text>$$(tid.toString())).getValue()
+                  if (value && value.length > 0) {
+                    resolve(value)
+                    dialog.close()
+                  }
+                }
+              },
+              {
+                view: 'button',
+                value: '取消',
+                width: 100,
+                css: 'default',
+                click: () => {
+                  dialog.close()
+                }
+              }
+            ]
+          }
+        ]
       }
-    )
+    }
+    dialog = webix.ui(vj)
+    dialog.show()
   })
 }
 
 export function alert(content: string): void {
-  ; (layer.alert as any)(content, {
-    isOutAnim: false,
-    zIndex: layer.zIndex,
-    ...baseKeyboardOption
-  })
+  let dialog: any
+  let vj = {
+    view: 'window',
+    head: '信息',
+    close: true,
+    move: true,
+    modal: true,
+    position: 'center',
+    resize: true,
+    body: {
+      rows: [
+        { view: 'template', template: content },
+        {
+          cols: [
+            {},
+            {
+              view: 'button',
+              value: '确定',
+              width: 100,
+              css: 'yvan_primary',
+              click: () => {
+                dialog.close()
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+  dialog = webix.ui(vj)
+  dialog.show()
 }
 
 export function error(content: string): void {
-  ; (layer.alert as any)(content, {
-    icon: 2,
-    isOutAnim: false,
-    zIndex: layer.zIndex,
-    ...baseKeyboardOption
-  })
+  const c = `<div id="" class="layui-layer-content layui-layer-padding"><i class="layui-layer-ico layui-layer-ico2"></i>${content}</div>`
+  let dialog: any
+  let vj = {
+    view: 'window',
+    head: '信息',
+    close: true,
+    move: true,
+    modal: true,
+    position: 'center',
+    resize: true,
+    body: {
+      rows: [
+        { view: 'template', template: c },
+        {
+          cols: [
+            {},
+            {
+              view: 'button',
+              value: '确定',
+              width: 100,
+              css: 'yvan_primary',
+              click: () => {
+                dialog.close()
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+  dialog = webix.ui(vj)
+  dialog.show()
 }
 
 export function confirm(content: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    ; (layer.confirm as any)(
-      content,
-      {
-        icon: 3,
-        isOutAnim: false,
-        zIndex: layer.zIndex,
-        ...escKeyboardOption
-      },
-      (index: any) => {
-        layer.close(index)
-        resolve()
+    const c = `<div id="" class="layui-layer-content layui-layer-padding"><i class="layui-layer-ico layui-layer-ico3"></i>${content}</div>`
+    let dialog: any
+    let vj = {
+      view: 'window',
+      head: '信息',
+      close: true,
+      move: true,
+      modal: true,
+      position: 'center',
+      resize: true,
+      body: {
+        rows: [
+          { view: 'template', template: c },
+          {
+            cols: [
+              {},
+              {
+                view: 'button',
+                value: '确定',
+                width: 100,
+                css: 'yvan_primary',
+                click: () => {
+                  resolve()
+                  dialog.close()
+                }
+              },
+              {
+                view: 'button',
+                value: '取消',
+                width: 100,
+                css: 'default',
+                click: () => {
+                  reject()
+                  dialog.close()
+                }
+              }
+            ]
+          }
+        ]
       }
-    )
+    }
+    dialog = webix.ui(vj)
+    dialog.show()
   })
 }
 

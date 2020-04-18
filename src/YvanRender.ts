@@ -320,7 +320,7 @@ const $internalHooks = ['data', 'destory', 'watches', 'computed']
 function collectDataFromConstructor(vm: Vue, Component: any) {
   // override _init to prevent to init as Vue instance
   const originalInit = Component.prototype._init
-  Component.prototype._init = function (this: Vue) {
+  Component.prototype._init = function(this: Vue) {
     // proxy to actual vm
     const keys = Object.getOwnPropertyNames(vm)
     // 2.2.0 compat (props are no longer exposed as self properties)
@@ -427,7 +427,7 @@ function collectMethods(proto: any, options: any) {
       // 且描述符具有get或者set方法，则认为是计算属性。不理解的参考我上面关于class转换成构造函数的例子
       // 这里可能和普通的计算属性不太一样，因为一般计算属性只是用来获取值的，但这里却有setter。
       // 不过如果不使用setter，与非class方式开发无异，但有这一步处理，在某些场景会有特效。
-      ; (options.computed || (options.computed = {}))[key] = {
+      ;(options.computed || (options.computed = {}))[key] = {
         get: descriptor.get,
         set: descriptor.set
       }
@@ -619,7 +619,7 @@ export function componentFactory<M, Refs, INP>(
     data(this: Vue) {
       const data: any = {
         refs: {},
-        _layerIndex: undefined,
+        dialog: undefined,
         inParamter: undefined,
         dialogParent: undefined,
         instanceId: _.uniqueId('_mins_id_'),
@@ -638,7 +638,7 @@ export function componentFactory<M, Refs, INP>(
         })
       }
     },
-    destroyed() { },
+    destroyed() {},
     methods: {
       onLoad(this: Vue) {
         _.each(options.onLoads, load => {
@@ -659,10 +659,10 @@ export function componentFactory<M, Refs, INP>(
         return vjson
       },
       closeDialog(this: Vue & any) {
-        layer.close(this._layerIndex)
+        this.dialog.close()
       },
       showDialog(
-        this: Vue & BaseModule<M, Refs, INP>,
+        this: Vue & BaseModule<M, Refs, INP> & any,
         inParamter: INP,
         container: any,
         isFromSearchBox: boolean = false
@@ -681,6 +681,45 @@ export function componentFactory<M, Refs, INP>(
           }
         }
 
+        const head = {
+          view: 'toolbar',
+          elements: [
+            {
+              view: 'icon'
+            },
+            {
+              view: 'icon'
+            },
+            { view: 'label', label: vjson.title, align: 'center' },
+            {
+              view: 'icon',
+              icon: 'wxi-checkbox-blank',
+              click: () => {
+                this.dialog.adjust()
+              }
+            },
+            {
+              view: 'icon',
+              icon: 'wxi-close',
+              click: () => {
+                this.dialog.close()
+              }
+            }
+          ]
+        }
+        // 与 yvan 组件进行交换，使 vjson 能被 webix 使用
+        wrapperWebixConfig(module, vjson.body)
+        _.merge(vjson, {
+          view: 'window',
+          head: vjson.title,
+          close: vjson.close === undefined ? true : vjson.close,
+          move: vjson.move === undefined ? true : vjson.move,
+          position: 'center',
+          resize: vjson.resize === undefined ? true : vjson.resize
+        })
+        this.dialog = webix.ui(vjson)
+        this.dialog.show()
+        /** 
         const {
           title = '未命名对话框',
           width = 500,
@@ -689,9 +728,6 @@ export function componentFactory<M, Refs, INP>(
           body,
           btn
         } = vjson
-
-        // 与 yvan 组件进行交换，使 vjson 能被 webix 使用
-        wrapperWebixConfig(module, body)
 
         const layerConfig: any = {
           id: _.uniqueId('layerno_'),
@@ -707,7 +743,7 @@ export function componentFactory<M, Refs, INP>(
         }
 
         // layer 打开后的回调
-        layerConfig.success = function (layero: any) {
+        layerConfig.success = function(layero: any) {
           module.layero = layero
           layer.setTop(layero)
           // 默认焦点在关闭上
@@ -746,7 +782,7 @@ export function componentFactory<M, Refs, INP>(
         }
 
         // layer 大小改变后的回调
-        layerConfig.restore = layerConfig.full = layerConfig.resizing = function (
+        layerConfig.restore = layerConfig.full = layerConfig.resizing = function(
           layero: any
         ) {
           //$$(module._webixId).resize();
@@ -760,7 +796,7 @@ export function componentFactory<M, Refs, INP>(
         }
 
         // layer 关闭后的回调
-        layerConfig.end = function () {
+        layerConfig.end = function() {
           module.onClose()
 
           webix.$$(module._webixId).destructor()
@@ -768,6 +804,7 @@ export function componentFactory<M, Refs, INP>(
         }
 
         module._layerIndex = layer.open(layerConfig)
+        */
       }
     }
   })
