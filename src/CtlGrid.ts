@@ -8,6 +8,7 @@ import {
   YvGridProp
 } from './CtlGridDefault'
 import CtlGridCellCheckbox from './CtlGridCellCheckbox'
+import CtlGridHeadCheckbox from './CtlGridHeadCheckbox'
 import { CtlBase } from './CtlBase'
 import { parseYvanPropChangeVJson } from './CtlUtils'
 import { GridDataSource } from './YvanDataSourceGrid'
@@ -60,7 +61,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       view: 'grid',
       template: `<div role="yvGrid" class="ag-theme-blue"></div>`,
       on: {
-        onAfterRender: function(this: any) {
+        onAfterRender: function (this: any) {
           that.attachHandle(this)
           that._resetGrid()
         },
@@ -352,6 +353,23 @@ export class CtlGrid extends CtlBase<CtlGrid> {
     }
   }
 
+  /**
+   * 设置勾选的数据行集合
+   */
+  setCheckedIds(ids: Array<any>) {
+    // 清空所有元素
+    this.checkedIds = ids;
+
+    // 刷新勾选单元格
+    this.gridApi.refreshCells({
+      columns: ['__CB__'],
+      force: true
+    })
+  }
+
+  /**
+   * 获取被勾选的所有行
+   */
   getCheckedRows() {
     const selected: any[] = []
     this._findNode((node: any) => {
@@ -448,6 +466,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
         resizable: false,
         sortable: false,
         cellRenderer: 'CtlGridCellCheckbox',
+        headerComponent: 'CtlGridHeadCheckbox',
         cellRendererParams: {
           isCheckedIds: true
         }
@@ -538,6 +557,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       components: {
         CtlGridCellButton: CtlGridCellButton,
         CtlGridCellCheckbox: CtlGridCellCheckbox,
+        CtlGridHeadCheckbox: CtlGridHeadCheckbox,
         CtlGridEditorText: CtlGridEditorText,
         CtlGridEditorCombo: CtlGridEditorCombo,
         // // YvGridEditorDate: YvGridEditorDate,
@@ -607,7 +627,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
         } else {
           console.error(
             '没有发现全局函数 YvanUI.formatter[dict].' +
-              easyuiCol.editParams.data
+            easyuiCol.editParams.data
           )
         }
       } else if (easyuiCol.editParams.data.constructor === Array) {
@@ -735,7 +755,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
           throw Error()
         }
       })
-    } catch (e) {}
+    } catch (e) { }
     return findNode
   }
 
@@ -1045,7 +1065,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
         col.maxWidth = easyuiCol.maxwidth
 
       if (typeof easyuiCol.align !== 'undefined') {
-        col.cellClass = function(params: any) {
+        col.cellClass = function (params: any) {
           return ['yv-align-' + easyuiCol.align]
         }
       }
@@ -1313,7 +1333,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
               clearButton: true,
               filterOptions: ['inRange'],
               suppressAndOrCondition: true,
-              comparator: function(
+              comparator: function (
                 filterLocalDateAtMidnight: any,
                 cellValue: any
               ) {
@@ -1348,7 +1368,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
               clearButton: true,
               filterOptions: ['startsWith', 'equals', 'contains'],
               suppressAndOrCondition: true,
-              textFormatter: function(r: any) {
+              textFormatter: function (r: any) {
                 if (r == null) return null
                 r = r.replace(new RegExp('[àáâãäå]', 'g'), 'a')
                 r = r.replace(new RegExp('æ', 'g'), 'ae')

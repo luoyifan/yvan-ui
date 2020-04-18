@@ -35,7 +35,6 @@ export class CtlTree extends CtlBase<CtlTree> {
       filterMode: {
         showSubItems: false
       },
-      threeState: that.showCheckbox,
       on: {
         onInited(this: any) {
           that.attachHandle(this)
@@ -52,7 +51,7 @@ export class CtlTree extends CtlBase<CtlTree> {
           YvEventDispatch(that.onNodeDblClick, that, item)
         }
       },
-      template: function(obj: any, common: any) {
+      template: function (obj: any, common: any) {
         let t = ''
         if (that.showCheckbox) {
           t += common.checkbox(obj, common)
@@ -68,7 +67,7 @@ export class CtlTree extends CtlBase<CtlTree> {
       },
       // 树的左侧图标
       type: {
-        folder: function(obj: any) {
+        folder: function (obj: any) {
           if (obj.icon) {
             return (
               "<span style='padding-left: 5px; padding-right: 5px; color: #5fa2dd; font-size: 16px' class='" +
@@ -80,6 +79,12 @@ export class CtlTree extends CtlBase<CtlTree> {
         }
       }
     })
+
+    if (vjson.threeState !== false && that.showCheckbox) {
+      vjson.threeState = true;
+    } else {
+      vjson.threeState = false;
+    }
 
     return that
   }

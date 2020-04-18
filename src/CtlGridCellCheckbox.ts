@@ -13,6 +13,11 @@ export default class CtlGridCellCheckbox {
                 vue.checkedIds.push(id)
                 childSpan.classList.add('checked')
             }
+
+            // 观测，是否显示"全选"框的函数
+            if (vue.allCheckedBoxStateChanged) {
+                vue.allCheckedBoxStateChanged();
+            }
         }
     }
 
@@ -33,7 +38,10 @@ export default class CtlGridCellCheckbox {
                 childSpan.classList.remove('checked')
             }
 
-            this.$el.addEventListener('click', this.checkedToggle(vue, childSpan, id))
+            // 观测，是否显示"全选"框的函数
+            if (vue.allCheckedBoxStateChanged) {
+                vue.allCheckedBoxStateChanged();
+            }
 
         } else {
             //用来做数据展示用
@@ -65,6 +73,12 @@ export default class CtlGridCellCheckbox {
             '<span class="yvan-checkbox-switch"><span class="yvan-checkbox-status"></span></span>'
 
         this.innerRefresh(gridOptions)
+
+        const vue = gridOptions.api.vue;
+        const childSpan = this.$el.querySelectorAll('.yvan-checkbox-switch')[0];
+        const data = gridOptions.data
+        const id = vue._getIdByRow(data)
+        this.$el.addEventListener('click', this.checkedToggle(vue, childSpan, id))
     }
 
     getGui(this: any) {
