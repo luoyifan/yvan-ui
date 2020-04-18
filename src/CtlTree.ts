@@ -1,10 +1,10 @@
-import * as pinyin from './pinyin/pinyin'
 import { CtlBase } from './CtlBase'
 import { parseYvanPropChangeVJson } from './CtlUtils'
 import { YvDataSource } from './YvanDataSourceImp'
 import { YvEvent, YvEventDispatch } from './YvanEvent'
 import { DataSource } from './YvanDataSource'
 import { CtlTreeDefault } from './CtlDefaultValue'
+import { getFirstPinyin } from './Utils'
 
 export class CtlTree extends CtlBase<CtlTree> {
   static create(vjson: any): CtlTree {
@@ -100,7 +100,7 @@ export class CtlTree extends CtlBase<CtlTree> {
 
     this._webix.filter((node: any) => {
       const value = node.value
-      const nodePy = pinyin.getCamelChars(value).toLowerCase()
+      const nodePy = getFirstPinyin(value).toLowerCase()
       return nodePy.indexOf(nv.toLowerCase()) >= 0 || value.indexOf(nv) >= 0
     })
   }

@@ -1,7 +1,7 @@
 import { CtlInput } from '../input/CtlInput'
 import { parseYvanPropChangeVJson } from '../../CtlUtils'
 import { CtlComboDefault } from '../../CtlDefaultValue'
-import pinyin from '../../pinyin/pinyin'
+import { getFirstPinyin } from '../../Utils'
 import { DataSource } from '../../YvanDataSource'
 import { YvEvent } from '../../YvanEvent'
 import { YvDataSource } from '../../YvanDataSourceImp'
@@ -42,7 +42,7 @@ export class CtlCombo extends CtlInput<CtlCombo> {
         if (_.size(filterWord) <= 0) {
           return true
         }
-        const nodePy = pinyin.getCamelChars(item.text).toLowerCase()
+        const nodePy = getFirstPinyin(item.text).toLowerCase()
         return (
           nodePy.indexOf(filterWord.toLowerCase()) >= 0 ||
           item.text.indexOf(filterWord) >= 0

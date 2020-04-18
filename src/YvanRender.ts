@@ -21,6 +21,7 @@ import { CtlSwitch } from './form/other/CtlSwitch'
 import { CtlNumber } from './form/input/CtlNumber'
 import { CtlRadio } from './form/other/CtlRadio'
 import { CtlCodeMirror } from './CtlCodeMirror'
+import webix from 'webix'
 
 // export const webix = require("../webix/webix");
 webix.i18n.setLocale('zh-CN')
@@ -794,7 +795,7 @@ export function render<M, Refs, INP>(
   baseModule._webixId = webix.ui(cfg)
   baseModule.onLoad()
 
-  webix.event(window, 'resize', () => {
+  webix.event(<any>window, 'resize', () => {
     // $$(baseModule._webixId).resize();
     baseModule._webixId.resize()
   })

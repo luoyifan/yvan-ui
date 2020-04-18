@@ -1,6 +1,7 @@
 import * as YvanUI from './YvanUIExtend'
 import CtlGridLocale from './CtlGridLocale'
 import { CtlGridPage } from './CtlGridPage'
+import agGrid from 'ag-grid'
 import CtlGridIdRender from './CtlGridIdRender'
 import {
   YvGridColumnEditProp,
@@ -597,7 +598,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
     this.isGridReadReady = false
     const gridOptions = this._gridOptions()
     const $el = $(this._webix._viewobj).find('[role="yvGrid"]')[0]
-    const grid = new agGrid.Grid($el, gridOptions)
+    const grid: any = new agGrid.Grid($el, gridOptions)
     grid.gridOptions.api.vue = this
     this.gridApi = grid.gridOptions.api
     this.columnApi = grid.gridOptions.columnApi

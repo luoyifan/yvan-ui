@@ -1,6 +1,5 @@
 import { YvEventDispatch } from './YvanEvent'
-
-webix.i18n.setLocale('zh-CN')
+import webix from 'webix'
 
 /**
  * 创建快捷菜单

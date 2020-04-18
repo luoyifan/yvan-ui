@@ -6,9 +6,9 @@ declare module '*.vue' {
   export default Vue
 }
 declare global {
-  const agGrid: any
+  // const agGrid: any
   const layer: any
-  const webix: any
+  // const webix: any
   const _: typeof lodash
   export function addTab<M, Refs, INP>(
     text: string,

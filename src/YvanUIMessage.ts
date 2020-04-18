@@ -1,3 +1,5 @@
+import webix from 'webix'
+
 // eslint-disable-next-line
 const baseKeyboardOption: any = {
   success(layero: any, layerIndex: any) {
@@ -115,18 +117,6 @@ export function msg(message: string): void {
   }, 3000)
 }
 
-/**
- * 右上角弹出错误消息
- * @param content 消息内容
- */
-export function msgError(content: string): void {
-  webix.message({
-    type: 'error',
-    text: content,
-    expire: -1
-  })
-}
-
 export function prompt(
   title: string = '请输入',
   defValue: string = ''
@@ -185,15 +175,31 @@ export function confirm(content: string): Promise<void> {
 }
 
 /**
+ * 右上角弹出错误消息
+ * @param content 消息内容
+ */
+export function msgError(content: string): void {
+  const toastr = _.get(window, 'toastr')
+  toastr.error(content, '错误')
+  // webix.message({
+  //   type: 'error',
+  //   text: content,
+  //   expire: -1
+  // })
+}
+
+/**
  * 右上角弹出成功消息
  * @param content 消息内容
  */
 export function msgSuccess(content: string): void {
-  webix.message({
-    type: 'success',
-    text: content,
-    expire: 2000
-  })
+  const toastr = _.get(window, 'toastr')
+  toastr.success(content, '成功')
+  // webix.message({
+  //   type: 'success',
+  //   text: content,
+  //   expire: 2000
+  // })
 }
 
 /**
@@ -201,10 +207,12 @@ export function msgSuccess(content: string): void {
  * @param content 消息内容
  */
 export function msgInfo(content: string): void {
+  const toastr = _.get(window, 'toastr')
+  toastr.info(content)
   // https://docs.webix.com/desktop__message_boxes.html
-  webix.message({
-    type: 'info',
-    text: content,
-    expire: 2000
-  })
+  // webix.message({
+  //   type: 'info',
+  //   text: content,
+  //   expire: 2000
+  // })
 }

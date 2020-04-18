@@ -3,6 +3,7 @@ import { parseYvanPropChangeVJson } from './CtlUtils'
 import { YvEvent, YvEventDispatch } from './YvanEvent'
 import { wrapperWebixConfig } from './YvanRender'
 import { createContextMenu } from './CtlContextMenu'
+import webix from 'webix'
 
 export class CtlTab extends CtlBase<CtlTab> {
   static create(vjson: any): CtlTab {
