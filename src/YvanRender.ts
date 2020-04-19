@@ -25,6 +25,7 @@ import webix from 'webix'
 
 // export const webix = require("../webix/webix");
 webix.i18n.setLocale('zh-CN')
+_.set(window, 'webix', webix);
 
 /**
  * 深度遍历 vjson
@@ -320,7 +321,7 @@ const $internalHooks = ['data', 'destory', 'watches', 'computed']
 function collectDataFromConstructor(vm: Vue, Component: any) {
   // override _init to prevent to init as Vue instance
   const originalInit = Component.prototype._init
-  Component.prototype._init = function(this: Vue) {
+  Component.prototype._init = function (this: Vue) {
     // proxy to actual vm
     const keys = Object.getOwnPropertyNames(vm)
     // 2.2.0 compat (props are no longer exposed as self properties)
@@ -427,7 +428,7 @@ function collectMethods(proto: any, options: any) {
       // 且描述符具有get或者set方法，则认为是计算属性。不理解的参考我上面关于class转换成构造函数的例子
       // 这里可能和普通的计算属性不太一样，因为一般计算属性只是用来获取值的，但这里却有setter。
       // 不过如果不使用setter，与非class方式开发无异，但有这一步处理，在某些场景会有特效。
-      ;(options.computed || (options.computed = {}))[key] = {
+      ; (options.computed || (options.computed = {}))[key] = {
         get: descriptor.get,
         set: descriptor.set
       }
@@ -638,7 +639,7 @@ export function componentFactory<M, Refs, INP>(
         })
       }
     },
-    destroyed() {},
+    destroyed() { },
     methods: {
       onLoad(this: Vue) {
         _.each(options.onLoads, load => {
@@ -661,12 +662,7 @@ export function componentFactory<M, Refs, INP>(
       closeDialog(this: Vue & any) {
         this.dialog.close()
       },
-      showDialog(
-        this: Vue & BaseModule<M, Refs, INP> & any,
-        inParamter: INP,
-        container: any,
-        isFromSearchBox: boolean = false
-      ): void {
+      showDialog(this: Vue & BaseModule<M, Refs, INP> & any, inParamter: INP, container: any, isFromSearchBox: boolean = false): void {
         // 显示对话框
         const module: any = this
         module.inParamter = inParamter
@@ -681,44 +677,74 @@ export function componentFactory<M, Refs, INP>(
           }
         }
 
-        const head = {
-          view: 'toolbar',
-          elements: [
-            {
-              view: 'icon'
-            },
-            {
-              view: 'icon'
-            },
-            { view: 'label', label: vjson.title, align: 'center' },
-            {
-              view: 'icon',
-              icon: 'wxi-checkbox-blank',
-              click: () => {
-                this.dialog.adjust()
-              }
-            },
-            {
-              view: 'icon',
-              icon: 'wxi-close',
-              click: () => {
-                this.dialog.close()
-              }
-            }
-          ]
-        }
         // 与 yvan 组件进行交换，使 vjson 能被 webix 使用
         wrapperWebixConfig(module, vjson.body)
+
+        // 构建 window
         _.merge(vjson, {
           view: 'window',
-          head: vjson.title,
           close: vjson.close === undefined ? true : vjson.close,
           move: vjson.move === undefined ? true : vjson.move,
           position: 'center',
-          resize: vjson.resize === undefined ? true : vjson.resize
+          resize: vjson.resize === undefined ? true : vjson.resize,
+          head: {
+            view: "toolbar", margin: -4, cols: [
+              { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
+              {
+                view: "icon", icon: "wxi-plus-square", click: function (this: any) {
+                  dialog.config.fullscreen = !dialog.config.fullscreen;
+                  if (dialog.config.fullscreen) {
+                    dialog.config.oldtop = dialog.config.top;
+                    dialog.config.oldleft = dialog.config.left;
+                    dialog.config.left = 0;
+                    dialog.config.top = 0;
+                    this.define({ icon: 'wxi-minus-square' });
+                  } else {
+                    dialog.config.top = dialog.config.oldtop;
+                    dialog.config.left = dialog.config.oldleft;
+                    this.define({ icon: 'wxi-plus-square' });
+                  }
+                  dialog.resize();
+                  this.refresh();
+                }
+              },
+              {
+                view: "icon", icon: "wxi-close", click: function () {
+                  dialog.close();
+                }
+              }
+            ]
+          },
+          on: {
+            onShow() {
+              module.onLoad()
+            },
+            onDestruct() {
+              module.onClose()
+            }
+          },
         })
-        this.dialog = webix.ui(vjson)
-        this.dialog.show()
+        const dialog: any = webix.ui(vjson)
+        module._webixId = this.dialog = dialog
+        this.dialog.show();
+
+        $(this.dialog.$view).keypress((event) => {
+          if (event.keyCode === 27) {
+            module.onEsc()
+            event.stopPropagation()
+            event.preventDefault()
+            return;
+          }
+          if (event.keyCode === 13) {
+            module.onEnter()
+            if (isFromSearchBox) {
+              event.stopPropagation()
+            }
+            event.preventDefault()
+            return;
+          }
+        })
+
         /** 
         const {
           title = '未命名对话框',

@@ -59,7 +59,7 @@ export function loading(msg?: string) {
     msg = '请稍后'
   }
   const $body = $('body')
-  const $w = $(`<div class="load-view"><div class="load-an-view"><div class="fading-circle">
+  $body.append(`<div class="load-view" style="z-index: 19850224;"><div class="load-an-view"><div class="fading-circle">
   <div class="sk-circle1 sk-circle"></div>
   <div class="sk-circle2 sk-circle"></div>
   <div class="sk-circle3 sk-circle"></div>
@@ -73,7 +73,8 @@ export function loading(msg?: string) {
   <div class="sk-circle11 sk-circle"></div>
   <div class="sk-circle12 sk-circle"></div>
 </div></div><div class="load-tip">${msg}</div></div>`)
-  $body.append($w)
+
+  $body.append($(`<div class="webix_modal load-view-masker" style="z-index: 19850223;"></div>`))
 }
 
 /**
@@ -82,6 +83,7 @@ export function loading(msg?: string) {
 export function clearLoading() {
   const $body = $('body')
   $body.find('.load-view').remove()
+  $body.find('.load-view-masker').remove();
 }
 
 /**
@@ -93,9 +95,9 @@ export function msg(message: string): void {
   $body.find('[xtype=msg]').remove()
   const $w = $(
     '<div xtype="msg" class="yvan-msg yvan-anim yvan-anim-00">' +
-      '  <div class="yvan-msg-content">' +
-      message +
-      '</div></div>'
+    '  <div class="yvan-msg-content">' +
+    message +
+    '</div></div>'
   )
   $body.append($w)
 
@@ -119,40 +121,53 @@ export function msg(message: string): void {
   }, 3000)
 }
 
-export function prompt(
-  title: string = '请输入',
-  defValue: string = ''
-): Promise<string> {
+/**
+ * 弹出输入框
+ * @param title 输入框标题
+ * @param defValue 默认值
+ */
+export function prompt(title: string = '请输入内容', defValue: string = ''): Promise<string> {
+  const tid: any = webix.uid()
+  let dialog: any = undefined;
   return new Promise<string>((resolve, reject) => {
-    const tid = webix.uid()
-    let dialog: any
-    let vj = {
-      view: 'window',
+
+    function onConfirm() {
+      const value = (<any>webix.$$(tid.toString())).getValue()
+      if (value) {
+        resolve(value);
+        dialog.close();
+        return;
+      }
+
+      msg('请输入内容');
+    }
+
+    function onCancel() {
+      reject();
+      dialog.close();
+    }
+
+    const vjson = {
+      view: 'window', close: false, move: true, modal: true, position: 'center', resize: true, fullscreen: false,
       head: title,
-      close: true,
-      move: true,
-      modal: true,
-      position: 'center',
-      resize: true,
+      on: {
+        onShow() {
+          // 进入后立刻获得焦点
+          (<any>webix.$$(tid)).focus();
+        }
+      },
       body: {
         rows: [
-          { view: 'text', id: tid },
+          { view: 'text', id: tid, placeholder: '请输入', value: defValue },
           {
             cols: [
-              {},
               {},
               {
                 view: 'button',
                 value: '确定',
                 width: 100,
                 css: 'yvan_primary',
-                click: () => {
-                  const value = (<webix.ui.text>$$(tid.toString())).getValue()
-                  if (value && value.length > 0) {
-                    resolve(value)
-                    dialog.close()
-                  }
-                }
+                click: onConfirm,
               },
               {
                 view: 'button',
@@ -160,133 +175,67 @@ export function prompt(
                 width: 100,
                 css: 'default',
                 click: () => {
-                  dialog.close()
+                  onCancel()
                 }
               }
             ]
           }
         ]
       }
-    }
-    dialog = webix.ui(vj)
-    dialog.show()
-  })
+
+    };
+    dialog = webix.ui(vjson);
+    dialog.show();
+    $(webix.$$(tid).$view).keydown((e) => {
+      // 必须借助 jquery 拦截 keydown 事件
+      if (e.keyCode === 27) {
+        onCancel();
+        e.preventDefault();
+        return;
+      }
+      if (e.keyCode === 13) {
+        onConfirm();
+        e.preventDefault();
+        return;
+      }
+    })
+
+  });
 }
 
+/**
+ * 弹出提示框
+ * @param content 提示框内容
+ */
 export function alert(content: string): void {
-  let dialog: any
-  let vj = {
-    view: 'window',
-    head: '信息',
-    close: true,
-    move: true,
-    modal: true,
-    position: 'center',
-    resize: true,
-    body: {
-      rows: [
-        { view: 'template', template: content },
-        {
-          cols: [
-            {},
-            {
-              view: 'button',
-              value: '确定',
-              width: 100,
-              css: 'yvan_primary',
-              click: () => {
-                dialog.close()
-              }
-            }
-          ]
-        }
-      ]
-    }
-  }
-  dialog = webix.ui(vj)
-  dialog.show()
+  webix.alert({ title: "提示", text: content, });
 }
 
+/**
+ * 弹出错误框
+ * @param content 错误的提示内容
+ */
 export function error(content: string): void {
-  const c = `<div id="" class="layui-layer-content layui-layer-padding"><i class="layui-layer-ico layui-layer-ico2"></i>${content}</div>`
-  let dialog: any
-  let vj = {
-    view: 'window',
-    head: '信息',
-    close: true,
-    move: true,
-    modal: true,
-    position: 'center',
-    resize: true,
-    body: {
-      rows: [
-        { view: 'template', template: c },
-        {
-          cols: [
-            {},
-            {
-              view: 'button',
-              value: '确定',
-              width: 100,
-              css: 'yvan_primary',
-              click: () => {
-                dialog.close()
-              }
-            }
-          ]
-        }
-      ]
-    }
-  }
-  dialog = webix.ui(vj)
-  dialog.show()
+  webix.modalbox({ title: "错误", text: content, buttons: ["确认"], type: "confirm-error" });
 }
 
+/**
+ * 弹出确认框
+ * @param content 需要确认的文字内容
+ */
 export function confirm(content: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    const c = `<div id="" class="layui-layer-content layui-layer-padding"><i class="layui-layer-ico layui-layer-ico3"></i>${content}</div>`
-    let dialog: any
-    let vj = {
-      view: 'window',
-      head: '信息',
-      close: true,
-      move: true,
-      modal: true,
-      position: 'center',
-      resize: true,
-      body: {
-        rows: [
-          { view: 'template', template: c },
-          {
-            cols: [
-              {},
-              {
-                view: 'button',
-                value: '确定',
-                width: 100,
-                css: 'yvan_primary',
-                click: () => {
-                  resolve()
-                  dialog.close()
-                }
-              },
-              {
-                view: 'button',
-                value: '取消',
-                width: 100,
-                css: 'default',
-                click: () => {
-                  reject()
-                  dialog.close()
-                }
-              }
-            ]
-          }
-        ]
-      }
-    }
-    dialog = webix.ui(vj)
-    dialog.show()
+    webix.confirm({
+      title: "提示",
+      text: content,
+      ok: "确认", cancel: "取消",
+
+    }).then(() => {
+      resolve();
+
+    }).catch(() => {
+      reject();
+    });
   })
 }
 
@@ -296,12 +245,11 @@ export function confirm(content: string): Promise<void> {
  */
 export function msgError(content: string): void {
   const toastr = _.get(window, 'toastr')
-  toastr.error(content, '错误')
-  // webix.message({
-  //   type: 'error',
-  //   text: content,
-  //   expire: -1
-  // })
+  if (!toastr) {
+    webix.message({ type: 'error', text: content, expire: -1 })
+  } else {
+    toastr.error(content, '错误')
+  }
 }
 
 /**
@@ -310,12 +258,11 @@ export function msgError(content: string): void {
  */
 export function msgSuccess(content: string): void {
   const toastr = _.get(window, 'toastr')
-  toastr.success(content, '成功')
-  // webix.message({
-  //   type: 'success',
-  //   text: content,
-  //   expire: 2000
-  // })
+  if (!toastr) {
+    webix.message({ type: 'success', text: content, expire: 2000 })
+  } else {
+    toastr.success(content, '成功')
+  }
 }
 
 /**
@@ -324,11 +271,10 @@ export function msgSuccess(content: string): void {
  */
 export function msgInfo(content: string): void {
   const toastr = _.get(window, 'toastr')
-  toastr.info(content)
+  if (!toastr) {
+    webix.message({ type: 'info', text: content, expire: 2000 })
+  } else {
+    toastr.info(content)
+  }
   // https://docs.webix.com/desktop__message_boxes.html
-  // webix.message({
-  //   type: 'info',
-  //   text: content,
-  //   expire: 2000
-  // })
 }
