@@ -1,5 +1,6 @@
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import Qs from 'qs'
+import { YvanDataSourceGrid } from './YvanDataSourceGridImp';
 
 export function invokeApi<T>(apiId: string, args: IArguments, entity: T): Promise<T> {
     return new Promise<T>((resolve, reject) => {
@@ -43,6 +44,11 @@ export namespace Ajax {
         url: string,
 
         /**
+         * 下载文件名
+         */
+        fileName?: string,
+
+        /**
          * 请求方法
          */
         method: MethodType,
@@ -80,6 +86,52 @@ export namespace Ajax {
     export type Function = (option: Option) => Promise<Ajax.Response>
 }
 
+export function downLoad(downLoadUrl: string, filename: string, data: any, header: any) {
+    const YvanUI: any = _.get(window, 'YvanUI');
+    YvanUI.loading();
+    const createObjectURL = (object: any) => {
+        return (window.URL) ? window.URL.createObjectURL(object) : _.get(window, 'webkitURL').createObjectURL(object)
+    };
+
+    // const formData = new FormData();
+    // _.forOwn(data, (v, k) => {
+    //     formData.append(k, v);
+    // });
+    const formData = data ? Qs.stringify(data) : '';
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', downLoadUrl);
+    xhr.responseType = 'blob';
+    //xhr.setRequestHeader('Authorization', $.cookie('auth'))
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    if (header) {
+        _.forOwn(header, (v, k) => {
+            xhr.setRequestHeader(k, v);
+        })
+    }
+    xhr.onload = function (e: any) {
+        if (this.status === 200) {
+            const blob = this.response;
+            if (_.has(window, 'navigator.msSaveOrOpenBlob')) {
+                navigator.msSaveBlob(blob, filename)
+                YvanUI.clearLoading();
+
+            } else {
+                const a = document.createElement('a');
+                const url = createObjectURL(blob);
+                a.href = url;
+                a.download = filename;
+                $('body').append(a);
+                a.click();
+                $(a).remove();
+                window.URL.revokeObjectURL(url)
+                YvanUI.clearLoading();
+            }
+        }
+    };
+    xhr.send(formData);
+}
+
 /**
  * 创建一个 Ajax 客户端
  */
@@ -94,6 +146,13 @@ export function createAjax(createOption: Ajax.CreateAjaxOption): Ajax.Function {
         const ax: AxiosRequestConfig = {
             url: option.url
         };
+
+        if (option.method === 'DOWNLOAD') {
+            downLoad(createOption.baseUrl + option.url, option.fileName || 'file',
+                option.data, option.headers);
+            return new Promise<Ajax.Response>((resolver, reject) => {
+            });
+        }
 
         if (option.method === 'POST-JSON') {
             ax.method = 'POST';
