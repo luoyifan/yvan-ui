@@ -43,8 +43,9 @@ interface WidgetOption {
 }
 
 export class CtlSearch extends CtlInput<CtlSearch> {
-  static create(vjson: any): CtlSearch {
+  static create(module: any, vjson: any): CtlSearch {
     const that = new CtlSearch(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlSearchDefault)
 
@@ -220,7 +221,7 @@ export class CtlSearch extends CtlInput<CtlSearch> {
 
     widgetParamter.existObject = queryObj
 
-    widgetParamter.onWidgetConfirm = function(data: any) {
+    widgetParamter.onWidgetConfirm = function (data: any) {
       if (!searchCtl.widget) {
         console.error('没有设置 widget 属性')
         return
@@ -236,7 +237,7 @@ export class CtlSearch extends CtlInput<CtlSearch> {
       this.closeDialog()
       searchCtl.focus()
     }
-    widgetParamter.onClose = function() {
+    widgetParamter.onClose = function () {
       //弹窗关闭后恢复原值，并开启还原
       searchCtl.value = restoreValue
       searchCtl.suppressRestore = false

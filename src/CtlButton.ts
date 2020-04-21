@@ -17,8 +17,9 @@ type CtlButtonType =
  * @author yvan
  */
 export class CtlButton extends CtlBase<CtlButton> {
-  static create(vjson: any): CtlButton {
+  static create(module: any, vjson: any): CtlButton {
     const that = new CtlButton(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlButtonDefault)
 
@@ -41,13 +42,13 @@ export class CtlButton extends CtlBase<CtlButton> {
     _.merge(vjson, that._webixConfig, {
       type: 'text',
       on: {
-        onInited: function(this: any) {
+        onInited: function (this: any) {
           that.attachHandle(this)
         },
         onDestruct() {
           that.removeHandle()
         },
-        onItemClick: function(this: any) {
+        onItemClick: function (this: any) {
           if (isDesignMode()) {
             return
           }

@@ -1,0 +1,303 @@
+/*== layer提示框==*/
+.yvan-msg {
+  min-width: 100px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 2px;
+  position: fixed;
+  pointer-events: auto;
+  z-index: 10000;
+}
+
+.yvan-msg-content {
+  pointer-events: auto;
+  color: #fff;
+  padding: 12px 25px;
+  text-align: center;
+  position: relative;
+  line-height: 24px;
+  word-break: break-all;
+  overflow: hidden;
+  font-size: 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/*== 动画 ==*/
+.yvan-anim {
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+}
+
+@-webkit-keyframes yvan-bounceIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes yvan-bounceIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+.yvan-anim-00 {
+  -webkit-animation-name: yvan-bounceIn;
+  animation-name: yvan-bounceIn;
+}
+
+@-webkit-keyframes yvan-zoomInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.1) translatey(-2000px);
+    transform: scale(0.1) translatey(-2000px);
+    -webkit-animation-timing-function: ease-in-out;
+    animation-timing-function: ease-in-out;
+  }
+  60% {
+    opacity: 1;
+    -webkit-transform: scale(0.475) translatey(60px);
+    transform: scale(0.475) translatey(60px);
+    -webkit-animation-timing-function: ease-out;
+    animation-timing-function: ease-out;
+  }
+}
+
+@keyframes yvan-zoomInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.1) translatey(-2000px);
+    -ms-transform: scale(0.1) translatey(-2000px);
+    transform: scale(0.1) translatey(-2000px);
+    -webkit-animation-timing-function: ease-in-out;
+    animation-timing-function: ease-in-out;
+  }
+  60% {
+    opacity: 1;
+    -webkit-transform: scale(0.475) translatey(60px);
+    -ms-transform: scale(0.475) translatey(60px);
+    transform: scale(0.475) translatey(60px);
+    -webkit-animation-timing-function: ease-out;
+    animation-timing-function: ease-out;
+  }
+}
+
+.yvan-anim-01 {
+  -webkit-animation-name: yvan-zoomInDown;
+  animation-name: yvan-zoomInDown;
+}
+
+@-webkit-keyframes yvan-fadeInUpBig {
+  0% {
+    opacity: 0;
+    -webkit-transform: translatey(2000px);
+    transform: translatey(2000px);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translatey(0);
+    transform: translatey(0);
+  }
+}
+
+@keyframes yvan-fadeInUpBig {
+  0% {
+    opacity: 0;
+    -webkit-transform: translatey(2000px);
+    -ms-transform: translatey(2000px);
+    transform: translatey(2000px);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translatey(0);
+    -ms-transform: translatey(0);
+    transform: translatey(0);
+  }
+}
+
+.yvan-anim-02 {
+  -webkit-animation-name: yvan-fadeInUpBig;
+  animation-name: yvan-fadeInUpBig;
+}
+
+@-webkit-keyframes yvan-zoomInLeft {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.1) translatex(-2000px);
+    transform: scale(0.1) translatex(-2000px);
+    -webkit-animation-timing-function: ease-in-out;
+    animation-timing-function: ease-in-out;
+  }
+  60% {
+    opacity: 1;
+    -webkit-transform: scale(0.475) translatex(48px);
+    transform: scale(0.475) translatex(48px);
+    -webkit-animation-timing-function: ease-out;
+    animation-timing-function: ease-out;
+  }
+}
+
+@keyframes yvan-zoomInLeft {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.1) translatex(-2000px);
+    -ms-transform: scale(0.1) translatex(-2000px);
+    transform: scale(0.1) translatex(-2000px);
+    -webkit-animation-timing-function: ease-in-out;
+    animation-timing-function: ease-in-out;
+  }
+  60% {
+    opacity: 1;
+    -webkit-transform: scale(0.475) translatex(48px);
+    -ms-transform: scale(0.475) translatex(48px);
+    transform: scale(0.475) translatex(48px);
+    -webkit-animation-timing-function: ease-out;
+    animation-timing-function: ease-out;
+  }
+}
+
+.yvan-anim-03 {
+  -webkit-animation-name: yvan-zoomInLeft;
+  animation-name: yvan-zoomInLeft;
+}
+
+@-webkit-keyframes yvan-rollIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: translatex(-100%) rotate(-120deg);
+    transform: translatex(-100%) rotate(-120deg);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translatex(0) rotate(0);
+    transform: translatex(0) rotate(0);
+  }
+}
+
+@keyframes yvan-rollIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: translatex(-100%) rotate(-120deg);
+    -ms-transform: translatex(-100%) rotate(-120deg);
+    transform: translatex(-100%) rotate(-120deg);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translatex(0) rotate(0);
+    -ms-transform: translatex(0) rotate(0);
+    transform: translatex(0) rotate(0);
+  }
+}
+
+.yvan-anim-04 {
+  -webkit-animation-name: yvan-rollIn;
+  animation-name: yvan-rollIn;
+}
+
+@keyframes yvan-fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.yvan-anim-05 {
+  -webkit-animation-name: yvan-fadeIn;
+  animation-name: yvan-fadeIn;
+}
+
+@-webkit-keyframes yvan-shake {
+  0%,
+  100% {
+    -webkit-transform: translatex(0);
+    transform: translatex(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    -webkit-transform: translatex(-10px);
+    transform: translatex(-10px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    -webkit-transform: translatex(10px);
+    transform: translatex(10px);
+  }
+}
+
+@keyframes yvan-shake {
+  0%,
+  100% {
+    -webkit-transform: translatex(0);
+    -ms-transform: translatex(0);
+    transform: translatex(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    -webkit-transform: translatex(-10px);
+    -ms-transform: translatex(-10px);
+    transform: translatex(-10px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    -webkit-transform: translatex(10px);
+    -ms-transform: translatex(10px);
+    transform: translatex(10px);
+  }
+}
+
+.yvan-anim-06 {
+  -webkit-animation-name: yvan-shake;
+  animation-name: yvan-shake;
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.webix_template {
+  padding: 0 !important;
+}
+
+.input_validate_false {
+  background-color: #ffdedb;
+  border-color: #ff8d82;
+}

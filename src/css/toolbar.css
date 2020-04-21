@@ -1,0 +1,15 @@
+/*======================== toolbar =======================*/
+.webix_toolbar .webix_el_label .webix_el_box {
+  color: #4b4c4c;
+  padding-left: 5px;
+  font: 400 18px/21px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif;
+}
+
+.webix_toolbar.dark {
+  background-color: #5fa2dd;
+}
+
+.webix_toolbar.dark .webix_el_label .webix_el_box {
+  color: #f0f0f0;
+}

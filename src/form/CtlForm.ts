@@ -2,8 +2,9 @@ import { CtlBase } from '../CtlBase'
 import { parseYvanPropChangeVJson } from '../CtlUtils'
 
 export class CtlForm extends CtlBase<CtlForm> {
-  static create(vjson: any): CtlForm {
+  static create(module: any, vjson: any): CtlForm {
     const that = new CtlForm(vjson)
+    that._module = module
 
     if (vjson.hasOwnProperty('debugger')) {
       debugger
@@ -20,22 +21,22 @@ export class CtlForm extends CtlBase<CtlForm> {
     // 将 yvanProxy 版的 _webix 合并至 webixProp, 最终合并至 vjson
     _.merge(vjson, that._webixConfig, {
       on: {
-        onInited: function(this: any) {
+        onInited: function (this: any) {
           that.attachHandle(this)
         },
-        onAfterLoad: function(this: any) {
+        onAfterLoad: function (this: any) {
           that.attachHandle(this)
         },
-        onBeforeLoad: function(this: any) {
+        onBeforeLoad: function (this: any) {
           that.attachHandle(this)
         },
-        onChange: function(this: any) {
+        onChange: function (this: any) {
           that.attachHandle(this)
         },
-        onViewShow: function(this: any) {
+        onViewShow: function (this: any) {
           that.attachHandle(this)
         },
-        onDestruct: function() {
+        onDestruct: function () {
           that.removeHandle()
         }
       }

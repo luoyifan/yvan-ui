@@ -1,0 +1,75 @@
+/*======================== button =======================*/
+.webix_el_label .webix_el_box {
+  color: #4b4c4c;
+  padding-left: 5px;
+  font: 400 13px/16px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif;
+}
+
+.layui-layer-btn > .layui-layer-btn1,
+.layui-layer-btn > .layui-layer-btn0,
+.webix_el_button > .webix_el_box > .webix_button {
+  font: 400 13px/16px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif;
+  border-radius: 0;
+  padding: 7px 7px 7px 7px;
+  border-width: 1px;
+  border-style: solid;
+  background-color: #f6f6f6;
+  color: #606060;
+}
+
+.layui-layer-btn > .layui-layer-btn1,
+.layui-layer-btn > .layui-layer-btn0,
+.webix_el_button > .webix_el_box > .webix_button:hover {
+  background-color: #ececec;
+}
+
+.webix_el_button > .webix_el_box > .webix_button > i {
+  padding-right: 6px;
+}
+
+.layui-layer-btn > .layui-layer-btn0,
+.webix_el_button.yvan_primary > .webix_el_box > .webix_button {
+  border-color: #5897ce;
+  background-color: #5fa2dd;
+  color: #f0f0f0;
+}
+
+.layui-layer-btn > .layui-layer-btn0,
+.webix_el_button.yvan_primary > .webix_el_box > .webix_button:hover {
+  border-color: #518bbd;
+  background-color: #5795cb;
+}
+
+.layui-layer-btn > .layui-layer-btn1,
+.layui-layer-btn > .layui-layer-btn0 {
+  line-height: 21px;
+  height: 18px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.webix_el_button.yvan_danger > .webix_el_box > .webix_button {
+  color: #f56c6c;
+  background: #fef0f0;
+  border-color: #fbc4c4;
+}
+
+.webix_el_button.yvan_danger > .webix_el_box > .webix_button:hover {
+  color: #fff;
+  background-color: #f56c6c;
+  border-color: #f56c6c;
+}
+
+.webix_el_button.yvan_success > .webix_el_box > .webix_button {
+  color: #67c23a;
+  background: #f0f9eb;
+  border-color: #c2e7b0;
+}
+
+.webix_el_button.yvan_success > .webix_el_box > .webix_button:hover {
+  color: #fff;
+  background-color: #67c23a;
+  border-color: #67c23a;
+}

@@ -10,8 +10,9 @@ import { YvDataSource } from '../../YvanDataSourceImp'
  * 下拉框组件
  */
 export class CtlCombo extends CtlInput<CtlCombo> {
-  static create(vjson: any): CtlCombo {
+  static create(module: any, vjson: any): CtlCombo {
     const that = new CtlCombo(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlComboDefault)
 

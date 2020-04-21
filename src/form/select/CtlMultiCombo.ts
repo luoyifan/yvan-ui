@@ -4,8 +4,9 @@ import { CtlMultiComboDefault } from '../../CtlDefaultValue'
 import { getFirstPinyin } from '../../Utils'
 
 export class CtlMultiCombo extends CtlInput<CtlMultiCombo> {
-  static create(vjson: any): CtlMultiCombo {
+  static create(module: any, vjson: any): CtlMultiCombo {
     const that = new CtlMultiCombo(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlMultiComboDefault)
 

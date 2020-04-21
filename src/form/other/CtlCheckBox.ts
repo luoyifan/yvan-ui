@@ -3,8 +3,9 @@ import { parseYvanPropChangeVJson } from '../../CtlUtils'
 import { CtlCheckboxDefault } from '../../CtlDefaultValue'
 
 export class CtlCheckBox extends CtlInput<CtlCheckBox> {
-  static create(vjson: any): CtlCheckBox {
+  static create(module: any, vjson: any): CtlCheckBox {
     const that = new CtlCheckBox(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlCheckboxDefault)
 

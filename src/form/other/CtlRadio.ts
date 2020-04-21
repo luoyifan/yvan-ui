@@ -3,8 +3,9 @@ import { parseYvanPropChangeVJson } from '../../CtlUtils'
 import { CtlRadioDefault } from '../../CtlDefaultValue'
 
 export class CtlRadio extends CtlInput<CtlRadio> {
-  static create(vjson: any): CtlRadio {
+  static create(module: any, vjson: any): CtlRadio {
     const that = new CtlRadio(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlRadioDefault)
 

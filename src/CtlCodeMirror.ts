@@ -7,7 +7,7 @@ webix.protoUI(
   {
     name: 'codemirror-editor',
     defaults: {},
-    $init: function(config: any) {
+    $init: function (config: any) {
       this.$view.innerHTML =
         "<textarea style='width:100%;height:100%;'></textarea>"
       this._waitEditor = webix.promise.defer()
@@ -17,7 +17,7 @@ webix.protoUI(
         config.on.onInited.call(this)
       }
     },
-    _render_cm_editor: function() {
+    _render_cm_editor: function () {
       this._render_when_ready()
       // if (this.config.cdn === false) {
       //     this._render_when_ready;
@@ -58,7 +58,7 @@ webix.protoUI(
       //         console.log(e);
       //     });
     },
-    _render_when_ready: function(this: any) {
+    _render_when_ready: function (this: any) {
       const CodeMirror: any = _.get(window, 'CodeMirror')
       this._editor = CodeMirror.fromTextArea(this.$view.firstChild, {
         // mode: this.config.mode,
@@ -75,13 +75,13 @@ webix.protoUI(
         this.focus()
       }
     },
-    _set_inner_size: function() {
+    _set_inner_size: function () {
       if (!this._editor || !this.$width) return
 
       this._updateScrollSize()
       this._editor.scrollTo(0, 0) //force repaint, mandatory for IE
     },
-    _updateScrollSize: function() {
+    _updateScrollSize: function () {
       var box = this._editor.getWrapperElement()
       var height = (this.$height || 0) + 'px'
 
@@ -94,12 +94,12 @@ webix.protoUI(
         this._editor.refresh()
       }
     },
-    $setSize: function(x: any, y: any) {
+    $setSize: function (x: any, y: any) {
       if (webix.ui.view.prototype.$setSize.call(this, x, y)) {
         this._set_inner_size()
       }
     },
-    setValue: function(value: any) {
+    setValue: function (value: any) {
       if (!value && value !== 0) {
         value = ''
       }
@@ -114,16 +114,16 @@ webix.protoUI(
         this._updateScrollSize()
       }
     },
-    getValue: function() {
+    getValue: function () {
       return this._editor ? this._editor.getValue() : this.config.value
     },
-    focus: function() {
+    focus: function () {
       this._focus_await = true
       if (this._editor) {
         this._editor.focus()
       }
     },
-    getEditor: function(waitEditor: any) {
+    getEditor: function (waitEditor: any) {
       return waitEditor ? this._waitEditor : this._editor
     },
     // //undo, redo, etc
@@ -133,7 +133,7 @@ webix.protoUI(
     // redo: function () {
     //     this._editor.redo();
     // },
-    undoLength: function() {
+    undoLength: function () {
       return this._editor.historySize().undo
     }
   },
@@ -141,8 +141,9 @@ webix.protoUI(
 )
 
 export class CtlCodeMirror extends CtlBase<CtlCodeMirror> {
-  static create(vjson: any): CtlCodeMirror {
+  static create(module: any, vjson: any): CtlCodeMirror {
     const that = new CtlCodeMirror(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlCodeMirrorDefault)
 

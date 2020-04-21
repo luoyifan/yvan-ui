@@ -6,8 +6,9 @@ import { DataSource } from './YvanDataSource'
 import { CtlDataviewDefault } from './CtlDefaultValue'
 
 export class CtlDataview extends CtlBase<CtlDataview> {
-  static create(vjson: any): CtlDataview {
+  static create(module: any, vjson: any): CtlDataview {
     const that = new CtlDataview(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlDataviewDefault)
 

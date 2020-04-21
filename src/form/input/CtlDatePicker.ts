@@ -3,8 +3,9 @@ import { parseYvanPropChangeVJson } from '../../CtlUtils'
 import { CtlDateDefault, CtlDateTimeDefault } from '../../CtlDefaultValue'
 
 export class CtlDatePicker extends CtlInput<CtlDatePicker> {
-  static create(vjson: any): CtlDatePicker {
+  static create(module: any, vjson: any): CtlDatePicker {
     const that = new CtlDatePicker(vjson)
+    that._module = module
 
     const baseConfig: any = {}
     if (vjson.view === 'datetime') {

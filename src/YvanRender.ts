@@ -469,93 +469,93 @@ export function wrapperWebixConfig<M, Refs, INP>(
     if (typeof obj.view === 'string') {
       switch (obj.view) {
         case 'button':
-          CtlButton.create(obj)
+          CtlButton.create(module, obj);
           break
 
         case 'text':
-          CtlText.create(obj)
+          CtlText.create(module, obj);
           break
 
         case 'number':
         case 'counter':
-          CtlNumber.create(obj)
+          CtlNumber.create(module, obj);
           break
 
         case 'datepicker':
         case 'date':
         case 'datetime':
-          CtlDatePicker.create(obj)
+          CtlDatePicker.create(module, obj);
           break
 
         case 'codemirror-editor':
-          CtlCodeMirror.create(obj)
+          CtlCodeMirror.create(module, obj);
           break
 
         case 'dataview':
-          CtlDataview.create(obj)
+          CtlDataview.create(module, obj);
           break
 
         case 'echarts':
-          CtlECharts.create(obj)
+          CtlECharts.create(module, obj);
           break
 
         case 'daterangepicker':
         case 'daterange':
         case 'datetimerange':
-          CtlDateRangePicker.create(obj)
+          CtlDateRangePicker.create(module, obj);
           break
 
         case 'combo':
         case 'combobox':
-          CtlCombo.create(obj)
+          CtlCombo.create(module, obj);
           break
 
         case 'multicombo':
-          CtlMultiCombo.create(obj)
+          CtlMultiCombo.create(module, obj);
           break
 
         case 'search':
         case 'searchbox':
-          CtlSearch.create(obj)
+          CtlSearch.create(module, obj);
           break
 
         case 'check':
         case 'checkbox':
-          CtlCheckBox.create(obj)
+          CtlCheckBox.create(module, obj);
           break
 
         case 'switch':
         case 'switchbox':
-          CtlSwitch.create(obj)
+          CtlSwitch.create(module, obj);
           break
 
         case 'radio':
         case 'radiobox':
-          CtlRadio.create(obj)
+          CtlRadio.create(module, obj);
           break
 
         case 'tree':
-          CtlTree.create(obj)
+          CtlTree.create(module, obj);
           break
 
         case 'treetable':
-          CtlTreeTable.create(obj)
+          CtlTreeTable.create(module, obj);
           break
 
         case 'tabview':
-          CtlTab.create(obj)
+          CtlTab.create(module, obj);
           break
 
         case 'grid':
-          CtlGrid.create(obj)
+          CtlGrid.create(module, obj);
           break
 
         case 'form':
-          CtlForm.create(obj)
+          CtlForm.create(module, obj);
           break
 
         case 'carousel':
-          CtlCarousel.create(obj)
+          CtlCarousel.create(module, obj);
           break
       }
     }

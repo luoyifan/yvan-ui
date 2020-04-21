@@ -1,0 +1,25 @@
+[role='echarts'] {
+  font-style: normal;
+  font-variant-ligatures: normal;
+  font-variant-caps: normal;
+  font-variant-numeric: normal;
+  font-variant-east-asian: normal;
+  font-stretch: normal;
+  font-size: 13px !important;
+  font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif !important;
+  width: 100%;
+  height: 100%;
+}
+
+.webix_view.webix_header.webix_win_title {
+  cursor: move;
+}
+.webix_icon.fa {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

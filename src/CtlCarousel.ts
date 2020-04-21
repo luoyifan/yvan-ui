@@ -5,8 +5,9 @@ import { YvEvent, YvEventDispatch } from './YvanEvent'
 export class CtlCarousel extends CtlBase<CtlCarousel> {
   onShow?: YvEvent<CtlCarousel, string>
 
-  static create(vjson: any): CtlCarousel {
+  static create(module: any, vjson: any): CtlCarousel {
     const that = new CtlCarousel(vjson)
+    that._module = module
 
     const yvanProp = parseYvanPropChangeVJson(vjson, ['onShow'])
 
@@ -21,10 +22,10 @@ export class CtlCarousel extends CtlBase<CtlCarousel> {
         onInited() {
           that.attachHandle(this)
         },
-        onDestruct: function() {
+        onDestruct: function () {
           that.removeHandle()
         },
-        onShow: function(this: any) {
+        onShow: function (this: any) {
           const value = this.getActiveIndex()
           YvEventDispatch(that.onShow, that, value)
         }

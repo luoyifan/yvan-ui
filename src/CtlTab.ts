@@ -6,8 +6,9 @@ import { createContextMenu } from './CtlContextMenu'
 import webix from 'webix'
 
 export class CtlTab extends CtlBase<CtlTab> {
-  static create(vjson: any): CtlTab {
+  static create(module: any, vjson: any): CtlTab {
     const that = new CtlTab(vjson)
+    that._module = module
 
     if (vjson.hasOwnProperty('debugger')) {
       debugger

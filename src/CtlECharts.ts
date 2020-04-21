@@ -3,8 +3,9 @@ import { YvEvent, YvEventDispatch } from './YvanEvent'
 import { parseYvanPropChangeVJson } from './CtlUtils'
 
 export class CtlECharts extends CtlBase<CtlECharts> {
-  static create(vjson: any): CtlECharts {
+  static create(module: any, vjson: any): CtlECharts {
     const that = new CtlECharts(_.cloneDeep(vjson))
+    that._module = module
 
     if (vjson.hasOwnProperty('debugger')) {
       debugger
@@ -24,7 +25,7 @@ export class CtlECharts extends CtlBase<CtlECharts> {
       view: 'grid',
       template: `<div role="echarts"></div>`,
       on: {
-        onAfterRender: function(this: any) {
+        onAfterRender: function (this: any) {
           that.attachHandle(this)
           that._resetECharts()
         },

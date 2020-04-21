@@ -14,7 +14,7 @@
     },
     "module": "esnext",
     "declaration": true,
-    "declarationMap": true,
+    // "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
     "strict": true,

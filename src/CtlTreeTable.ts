@@ -5,8 +5,9 @@ import { YvEvent, YvEventDispatch } from './YvanEvent'
 import { DataSource } from './YvanDataSource'
 
 export class CtlTreeTable extends CtlBase<CtlTreeTable> {
-  static create(vjson: any): CtlTreeTable {
+  static create(module: any, vjson: any): CtlTreeTable {
     const that = new CtlTreeTable(vjson)
+    that._module = module
 
     if (vjson.hasOwnProperty('debugger')) {
       debugger
@@ -46,7 +47,7 @@ export class CtlTreeTable extends CtlBase<CtlTreeTable> {
           YvEventDispatch(that.onNodeDblClick, that, item)
         }
       },
-      template: function(obj: any, common: any) {
+      template: function (obj: any, common: any) {
         let t = ''
         if (that.showCheckbox) {
           t += common.checkbox(obj, common)
@@ -63,7 +64,7 @@ export class CtlTreeTable extends CtlBase<CtlTreeTable> {
       threeState: that.showCheckbox,
       // 树的左侧图标
       type: {
-        folder: function(obj: any) {
+        folder: function (obj: any) {
           if (obj.icon) {
             return (
               "<span style='padding-left: 5px; padding-right: 5px; color: #063978; font-size: 16px' class='" +

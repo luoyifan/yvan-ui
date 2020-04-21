@@ -1,0 +1,8 @@
+/*======================== tree =======================*/
+.webix_tree .webix_tree_item:hover {
+  background-color: #eaeff4;
+}
+
+.webix_tree .webix_tree_item.webix_selected {
+  background-color: #ffefbb;
+}

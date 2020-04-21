@@ -6,8 +6,9 @@ import {
 } from '../../CtlDefaultValue'
 
 export class CtlDateRangePicker extends CtlInput<CtlDateRangePicker> {
-  static create(vjson: any): CtlDateRangePicker {
+  static create(module: any, vjson: any): CtlDateRangePicker {
     const that = new CtlDateRangePicker(vjson)
+    that._module = module
 
     const baseConfig: any = {}
     if (vjson.view === 'datetimerange') {

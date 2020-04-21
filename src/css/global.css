@@ -1,0 +1,48 @@
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+}
+
+/*======================== global =======================*/
+.webix_view {
+  font-size: 13px;
+  font-weight: 400;
+  font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif;
+}
+
+.webix_inp_label,
+.webix_inp_top_label,
+legend.webix_forminput_label,
+.webix_el_label .webix_el_box {
+  font-size: 13px;
+  font-weight: 400;
+  font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif;
+}
+
+.webix_fieldset_label {
+  color: #475466;
+  font-size: 13px;
+  padding: 0 8px;
+  text-transform: uppercase;
+}
+
+.webix_all_tabs .webix_item_tab {
+  font: 500 13px/20px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif;
+}
+
+.webix_el_text input,
+.webix_el_search input,
+.webix_el_combo input,
+.webix_el_datepicker input,
+.webix_el_colorpicker input {
+  font: 500 13px/20px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif;
+  padding: 0 6px;
+}

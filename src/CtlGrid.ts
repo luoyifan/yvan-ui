@@ -41,8 +41,9 @@ export interface CtlGridRowButtonClickArgs {
 }
 
 export class CtlGrid extends CtlBase<CtlGrid> {
-  static create(vjson: any): CtlGrid {
+  static create(module: any, vjson: any): CtlGrid {
     const that = new CtlGrid(_.cloneDeep(vjson))
+    that._module = module
 
     if (vjson.hasOwnProperty('debugger')) {
       debugger

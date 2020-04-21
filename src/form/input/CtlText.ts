@@ -4,8 +4,9 @@ import { parseYvanPropChangeVJson } from '../../CtlUtils'
 import { CtlTextDefault } from '../../CtlDefaultValue'
 
 export class CtlText extends CtlInput<CtlText> {
-  static create(vjson: any): CtlText {
+  static create(module: any, vjson: any): CtlText {
     const that = new CtlText(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlTextDefault)
 
@@ -29,7 +30,7 @@ export class CtlText extends CtlInput<CtlText> {
     if (typeof nv === 'function') {
       this._validate = nv
     } else if (typeof nv === 'string') {
-      const vl = function(value: any, data: any) {
+      const vl = function (value: any, data: any) {
         let msg = YvanUI.complexValid['fun'](nv, value)
         const $input = $(that._webix.$view).find('input')
         if (msg) {

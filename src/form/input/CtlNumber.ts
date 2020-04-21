@@ -3,8 +3,9 @@ import { parseYvanPropChangeVJson } from '../../CtlUtils'
 import { CtlNumberDefault } from '../../CtlDefaultValue'
 
 export class CtlNumber extends CtlInput<CtlNumber> {
-  static create(vjson: any): CtlNumber {
+  static create(module: any, vjson: any): CtlNumber {
     const that = new CtlNumber(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlNumberDefault)
 
@@ -71,7 +72,7 @@ export class CtlNumber extends CtlInput<CtlNumber> {
 
   onInputEvent(e: Event) {
     let value = (e.target as any).value
-    ;(e.target as any).value = this._testNumber(value)
+      ; (e.target as any).value = this._testNumber(value)
     super.onInputEvent(e)
   }
 

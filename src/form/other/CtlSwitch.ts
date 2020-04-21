@@ -3,8 +3,9 @@ import { parseYvanPropChangeVJson } from '../../CtlUtils'
 import { CtlSwitchDefault } from '../../CtlDefaultValue'
 
 export class CtlSwitch extends CtlInput<CtlSwitch> {
-  static create(vjson: any): CtlSwitch {
+  static create(module: any, vjson: any): CtlSwitch {
     const that = new CtlSwitch(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlSwitchDefault)
 

@@ -100,7 +100,10 @@ export class YvanDataSourceGrid {
 
       if (that.ctl.pagination) {
         /** 分页模式 **/
-        that.ctl.gridPage.getPageData = (currentPage: number, pageSize: number) => {
+        that.ctl.gridPage.getPageData = (
+          currentPage: number,
+          pageSize: number
+        ) => {
           let params: any = {}
           params.successCallback = (data: [], rowCount: number) => {
             if (data.length > 0) {
@@ -116,18 +119,7 @@ export class YvanDataSourceGrid {
           params.endRow = currentPage * pageSize
           that.serverQuery(option, paramFunction, params)
         }
-
-        if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
-          // 设置为不要自动加载
-          that.rowCount = 0
-          that.ctl.loading = false
-          that.isFirstAutoLoad = false
-
-        } else {
-          // 其他情况，都要加载数据
-          that.ctl.gridPage.getPageData(1, that.ctl.gridPage.pageSize)
-        }
-
+        that.ctl.gridPage.getPageData(1, that.ctl.gridPage.pageSize)
       } else {
         /** 无限滚动模式 **/
 

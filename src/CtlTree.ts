@@ -7,8 +7,9 @@ import { CtlTreeDefault } from './CtlDefaultValue'
 import { getFirstPinyin } from './Utils'
 
 export class CtlTree extends CtlBase<CtlTree> {
-  static create(vjson: any): CtlTree {
+  static create(module: any, vjson: any): CtlTree {
     const that = new CtlTree(vjson)
+    that._module = module
 
     _.defaultsDeep(vjson, CtlTreeDefault)
 
@@ -182,7 +183,16 @@ export class CtlTree extends CtlBase<CtlTree> {
    */
   set dataSource(nv: DataSource<CtlTree>) {
     this._dataSource = nv
-    this._rebindDataSource()
+    if (!this.getModule()) {
+      // onload 函数还没有执行（模块还没加载完）
+      debugger
+      _.defer(() => {
+        this._rebindDataSource()
+      })
+
+    } else {
+      this._rebindDataSource()
+    }
   }
 
   /**
