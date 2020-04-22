@@ -183,14 +183,9 @@ export class CtlTree extends CtlBase<CtlTree> {
    */
   set dataSource(nv: DataSource<CtlTree>) {
     this._dataSource = nv
-    if (!this.getModule()) {
-      // onload 函数还没有执行（模块还没加载完）
-      debugger
-      _.defer(() => {
-        this._rebindDataSource()
-      })
-
-    } else {
+    if (this._module.loadFinished) {
+      // onLoad 之后会触发 view.onInited -> attachHandle -> refreshState -> _rebindDataSource
+      // onLoad 之前都不需要主动触发 _rebindDataSource
       this._rebindDataSource()
     }
   }
@@ -362,18 +357,25 @@ export class CtlTree extends CtlBase<CtlTree> {
 
   //重新绑定数据源
   private _rebindDataSource() {
-    if (this.dataSourceBind) {
-      this.dataSourceBind.destory()
-      this.dataSourceBind = undefined
+    const innerMethod = () => {
+      if (this.dataSourceBind) {
+        this.dataSourceBind.destory()
+        this.dataSourceBind = undefined
+      }
+
+      if (this._webix && this._module) {
+        this.dataSourceBind = new YvDataSource(this, this.dataSource, this._dataSourceProcess.bind(this))
+        this.dataSourceBind.init()
+      }
     }
 
-    if (this._webix && this.getModule()) {
-      this.dataSourceBind = new YvDataSource(
-        this,
-        this.dataSource,
-        this._dataSourceProcess.bind(this)
-      )
-      this.dataSourceBind.init()
+    if (!this._module.loadFinished) {
+      // onload 函数还没有执行（模块还没加载完）, 延迟调用 rebind
+      _.defer(innerMethod)
+
+    } else {
+      // 否则实时调用 rebind
+      innerMethod()
     }
   }
 

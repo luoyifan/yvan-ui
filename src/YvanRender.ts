@@ -614,12 +614,10 @@ export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP
 }
 
 /**
- * 将传统 Java Class 转换为 Vue 对象
+ * 将传统 ts Class 转换为 vue 对象.
+ * 普通模块对象和 dialog 对象都要经过转换
  */
-export function componentFactory<M, Refs, INP>(
-  Component: BaseModule<M, Refs, INP> & any,
-  options: any = {}
-): any {
+export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, INP> & any, options: any = {}): any {
   //return VueComponent<BaseModule<M, Refs, INP>>(options)
   if (!options.mixins) {
     options.mixins = []
@@ -671,6 +669,7 @@ export function componentFactory<M, Refs, INP>(
         inParamter: undefined,
         dialogParent: undefined,
         instanceId: _.uniqueId('_mins_id_'),
+        loadFinished: false,
         ...collectDataFromConstructor(this, Component)
       }
       return data
@@ -766,6 +765,7 @@ export function componentFactory<M, Refs, INP>(
           on: {
             onShow() {
               module.onLoad()
+              module.loadFinished = true
             },
             onDestruct() {
               module.onClose()
@@ -792,93 +792,6 @@ export function componentFactory<M, Refs, INP>(
             return;
           }
         })
-
-        /** 
-        const {
-          title = '未命名对话框',
-          width = 500,
-          height = 300,
-          modal = true,
-          body,
-          btn
-        } = vjson
-
-        const layerConfig: any = {
-          id: _.uniqueId('layerno_'),
-          zIndex: layer.zIndex, // layer.zIndex - 19891000,
-          type: 1,
-          area: [`${width}px`, `${height}px`],
-          title,
-          shade: modal ? 0.6 : false,
-          maxmin: true,
-          btn: btn,
-          anim: 0,
-          content: ''
-        }
-
-        // layer 打开后的回调
-        layerConfig.success = function(layero: any) {
-          module.layero = layero
-          layer.setTop(layero)
-          // 默认焦点在关闭上
-          layero
-            .find('a.layui-layer-close')
-            .attr('tabindex', 1)
-            .focus()
-
-          // if (isFromSearchBox) {
-          // 监听回车和取消键
-          layero.on('keydown', (event: KeyboardEvent) => {
-            if (event.keyCode === 13) {
-              module.onEnter()
-              if (isFromSearchBox) {
-                event.stopPropagation()
-              }
-              event.preventDefault()
-            } else if (event.keyCode === 27) {
-              module.onEsc()
-              event.stopPropagation()
-              event.preventDefault()
-            }
-          })
-          // }
-
-          // DOM 结果出现之后, 渲染 webix
-          body.container = layero.find('.layui-layer-content').attr('id') // layero[0]; // layero.attr('id');
-          module._layeroInner = body.container
-          const $innerDOM = $('#' + module._layeroInner)
-          _.extend(body, {
-            width: $innerDOM.innerWidth(),
-            height: $innerDOM.innerHeight()
-          })
-          module._webixId = webix.ui(body)
-          module.onLoad()
-        }
-
-        // layer 大小改变后的回调
-        layerConfig.restore = layerConfig.full = layerConfig.resizing = function(
-          layero: any
-        ) {
-          //$$(module._webixId).resize();
-          const $innerDOM = $('#' + module._layeroInner)
-          module._webixId.define({
-            width: $innerDOM.innerWidth(),
-            height: $innerDOM.innerHeight()
-          })
-          module._webixId.resize()
-          console.log('resized')
-        }
-
-        // layer 关闭后的回调
-        layerConfig.end = function() {
-          module.onClose()
-
-          webix.$$(module._webixId).destructor()
-          module.$destroy()
-        }
-
-        module._layerIndex = layer.open(layerConfig)
-        */
       }
     }
   })
@@ -891,10 +804,7 @@ export function componentFactory<M, Refs, INP>(
 /**
  * 在目标 DOM 选择器上渲染模块
  */
-export function render<M, Refs, INP>(
-  selector: string,
-  baseModule: BaseModule<M, Refs, INP>
-) {
+export function render<M, Refs, INP>(selector: string, baseModule: BaseModule<M, Refs, INP>) {
   const lastHandle = _.get(window, 'LastRenderHandler')
   if (lastHandle) {
     lastHandle.destructor()

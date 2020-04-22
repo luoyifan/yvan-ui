@@ -1,11 +1,5 @@
 import * as YvanUI from './YvanUIExtend'
-import {
-  GridDataSource,
-  GridDataSourceSql,
-  GridDataSourceStaticFunction,
-  WatchParam,
-  GetParam
-} from './YvanDataSourceGrid'
+import { GridDataSource, GridDataSourceSql, GridDataSourceStaticFunction, WatchParam, GetParam } from './YvanDataSourceGrid'
 import { isDesignMode } from './DesignHelper'
 
 export class YvanDataSourceGrid {
@@ -19,76 +13,63 @@ export class YvanDataSourceGrid {
   private rowCount: number | undefined
   private lastFilterModel: any
 
-  serverQuery = _.debounce(
-    (
-      option: GridDataSourceSql,
-      paramFunction: undefined | (() => any),
-      params: any
-    ) => {
-      const that = this
+  serverQuery = _.debounce((option: GridDataSourceSql, paramFunction: undefined | (() => any), params: any) => {
+    const that = this
 
-      //异步请求数据内容
-      that.ctl.loading = true
-      let needCount = false
-      if (typeof that.rowCount === 'undefined') {
-        //从来没有统计过 rowCount(记录数)
+    //异步请求数据内容
+    that.ctl.loading = true
+    let needCount = false
+    if (typeof that.rowCount === 'undefined') {
+      //从来没有统计过 rowCount(记录数)
+      needCount = true
+      that.lastFilterModel = _.cloneDeep(params.filterModel)
+    } else {
+      if (!_.isEqual(that.lastFilterModel, params.filterModel)) {
+        //深度对比，如果 filter 模型更改了，需要重新统计 rowCount(记录数)
         needCount = true
         that.lastFilterModel = _.cloneDeep(params.filterModel)
-      } else {
-        if (!_.isEqual(that.lastFilterModel, params.filterModel)) {
-          //深度对比，如果 filter 模型更改了，需要重新统计 rowCount(记录数)
-          needCount = true
-          that.lastFilterModel = _.cloneDeep(params.filterModel)
-        }
       }
-      const queryParams = {
-        ...(typeof paramFunction === 'function' ? paramFunction() : undefined)
-      }
-      YvanUI.dbs[option.db]
-        .query({
-          params: queryParams,
-          limit: params.startRow,
-          limitOffset: params.endRow - params.startRow,
-          needCount,
-          orderByModel: params.sortModel,
-          filterModel: params.filterModel,
-          sqlId: option.sqlId
-        })
-        .then(res => {
-          const { data: resultData, totalCount, params: resParams } = res
-          if (needCount) {
-            that.rowCount = totalCount
-          }
-          params.successCallback(resultData, that.rowCount)
-          /** 如果不分页就在这里设置总条目数量，避免多次刷新分页栏 **/
-          if (!that.ctl.pagination) {
-            that.ctl.gridPage.itemCount = that.rowCount
-          }
-          that.ctl._bindingComplete()
-          if (that.ctl.entityName) {
-            _.set(
-              that.module,
-              that.ctl.entityName + '.selectedRow',
-              that.ctl.getSelectedRow()
-            )
-          }
-        })
-        .catch(r => {
-          params.failCallback()
-        })
-        .finally(() => {
-          this.ctl.loading = false
-        })
     }
-  )
+    const queryParams = {
+      ...(typeof paramFunction === 'function' ? paramFunction() : undefined)
+    }
+    YvanUI.dbs[option.db]
+      .query({
+        params: queryParams,
+        limit: params.startRow,
+        limitOffset: params.endRow - params.startRow,
+        needCount,
+        orderByModel: params.sortModel,
+        filterModel: params.filterModel,
+        sqlId: option.sqlId
+      })
+      .then(res => {
+        const { data: resultData, totalCount, params: resParams } = res
+        if (needCount) {
+          that.rowCount = totalCount
+        }
+        params.successCallback(resultData, that.rowCount)
+        /** 如果不分页就在这里设置总条目数量，避免多次刷新分页栏 **/
+        if (!that.ctl.pagination) {
+          that.ctl.gridPage.itemCount = that.rowCount
+        }
+        that.ctl._bindingComplete()
+        if (that.ctl.entityName) {
+          _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow())
+        }
+      })
+      .catch(r => {
+        params.failCallback()
+      })
+      .finally(() => {
+        this.ctl.loading = false
+      })
+  })
 
   /**
    * SQL取值
    */
-  setSqlMode(
-    option: GridDataSourceSql,
-    paramFunction: undefined | (() => any)
-  ) {
+  setSqlMode(option: GridDataSourceSql, paramFunction: undefined | (() => any)) {
     const that = this
     this.reload = () => {
       this.ctl.loading = true
@@ -100,10 +81,7 @@ export class YvanDataSourceGrid {
 
       if (that.ctl.pagination) {
         /** 分页模式 **/
-        that.ctl.gridPage.getPageData = (
-          currentPage: number,
-          pageSize: number
-        ) => {
+        that.ctl.gridPage.getPageData = (currentPage: number, pageSize: number) => {
           let params: any = {}
           params.successCallback = (data: [], rowCount: number) => {
             if (data.length > 0) {
@@ -122,7 +100,6 @@ export class YvanDataSourceGrid {
         that.ctl.gridPage.getPageData(1, that.ctl.gridPage.pageSize)
       } else {
         /** 无限滚动模式 **/
-
         that.ctl.gridApi.setDatasource({
           getRows: (params: any) => {
             if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
@@ -145,10 +122,7 @@ export class YvanDataSourceGrid {
   /**
    * 自定义函数式取值
    */
-  setCustomFunctionMode(
-    option: GridDataSourceStaticFunction,
-    paramFunction: undefined | (() => any)
-  ) {
+  setCustomFunctionMode(option: GridDataSourceStaticFunction, paramFunction: undefined | (() => any)) {
     const that = this
     this.reload = () => {
       that.clearRowCount()
@@ -301,10 +275,7 @@ export class YvanDataSourceGrid {
         this.setCustomFunctionMode(option.bind, paramFunction)
       } else {
         // 取 bind 函数
-        const bindFunction: GridDataSourceStaticFunction = _.get(
-          this.module,
-          option.bind
-        ) as GridDataSourceStaticFunction
+        const bindFunction: GridDataSourceStaticFunction = _.get(this.module, option.bind) as GridDataSourceStaticFunction
         if (!bindFunction) {
           console.error(`没有找到名称为 ${option.bind} 的方法`)
           return

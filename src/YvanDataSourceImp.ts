@@ -1,9 +1,4 @@
-import {
-  DataSource,
-  DataSourceStaticFunction,
-  DataSourceDb,
-  DataSourceProcessFunction
-} from './YvanDataSource'
+import { DataSource, DataSourceStaticFunction, DataSourceDb, DataSourceProcessFunction } from './YvanDataSource'
 import { YvEvent, YvEventDispatch } from './YvanEvent'
 import * as YvanUI from './YvanUIExtend'
 import { isDesignMode } from './DesignHelper'
@@ -16,31 +11,68 @@ export class YvDataSource<T> {
   private watches: Function[] = []
   public reload: undefined | (() => void)
 
+  customFunctionModeDebounce = _.debounce((option: DataSourceStaticFunction<T>) => {
+    const that = this
+
+    that.ctl.loading = true
+    option.call(that.module, that.ctl, {
+      successCallback(data: any[]) {
+        if (that.dataSourceProcess) {
+          //自定义的数据处理过程
+          that.ctl.dataReal = that.dataSourceProcess(data)
+        } else {
+          that.ctl.dataReal = data
+        }
+
+        that.ctl.loading = false
+        YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined)
+      },
+      failCallback() {
+        that.ctl.dataReal = []
+        that.ctl.loading = false
+        YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined)
+      }
+    })
+  });
+
+  sqlModeDebounce = _.debounce((option: DataSourceDb) => {
+    const that = this
+
+    //异步请求数据内容
+    that.ctl.loading = true
+
+    YvanUI.dbs[option.db]
+      .query({
+        params: option.params,
+        needCount: false,
+        sqlId: option.sqlId
+      }).then(res => {
+        const { data: resultData, params: resParams } = res
+
+        if (this.dataSourceProcess) {
+          //自定义的数据处理过程
+          that.ctl.dataReal = this.dataSourceProcess(resultData)
+        } else {
+          that.ctl.dataReal = resultData
+        }
+        YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined)
+
+      })
+      .catch(r => {
+        that.ctl.dataReal = []
+      })
+      .finally(() => {
+        that.ctl.loading = false
+      })
+  });
+
   /**
    * 自定义函数式取值
    */
   setCustomFunctionMode(option: DataSourceStaticFunction<T>) {
     const that = this
     this.reload = () => {
-      that.ctl.loading = true
-      option.call(that.module, that.ctl, {
-        successCallback(data: any[]) {
-          if (that.dataSourceProcess) {
-            //自定义的数据处理过程
-            that.ctl.dataReal = that.dataSourceProcess(data)
-          } else {
-            that.ctl.dataReal = data
-          }
-
-          that.ctl.loading = false
-          YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined)
-        },
-        failCallback() {
-          that.ctl.dataReal = []
-          that.ctl.loading = false
-          YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined)
-        }
-      })
+      that.customFunctionModeDebounce(option)
     }
     this.reload()
   }
@@ -51,41 +83,12 @@ export class YvDataSource<T> {
   setSqlMode(option: DataSourceDb) {
     const that = this
     this.reload = () => {
-      //异步请求数据内容
-      that.ctl.loading = true
-
-      YvanUI.dbs[option.db]
-        .query({
-          params: option.params,
-          needCount: false,
-          sqlId: option.sqlId
-        })
-        .then(res => {
-          const { data: resultData, params: resParams } = res
-
-          if (this.dataSourceProcess) {
-            //自定义的数据处理过程
-            that.ctl.dataReal = this.dataSourceProcess(resultData)
-          } else {
-            that.ctl.dataReal = resultData
-          }
-          YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined)
-        })
-        .catch(r => {
-          that.ctl.dataReal = []
-        })
-        .finally(() => {
-          that.ctl.loading = false
-        })
+      that.sqlModeDebounce(option)
     }
     this.reload()
   }
 
-  constructor(
-    ctl: any,
-    option: DataSource<T>,
-    dataSourceProcess?: DataSourceProcessFunction
-  ) {
+  constructor(ctl: any, option: DataSource<T>, dataSourceProcess?: DataSourceProcessFunction) {
     if (isDesignMode()) {
       return
     }

@@ -61,14 +61,19 @@ export abstract class BaseModule<M, Refs, INP> extends Vue
   instanceId!: string
 
   /**
+ * 模块是否加载完毕
+ */
+  loadFinished!: boolean
+
+  /**
    * 模块被渲染完成之后调用
    */
-  onLoad(): void {}
+  onLoad(): void { }
 
   /**
    * 每次从隐藏状态换显出来后调用
    */
-  onShow(): void {}
+  onShow(): void { }
 
   abstract viewResolver(): VJson
 
@@ -80,11 +85,7 @@ export abstract class BaseModule<M, Refs, INP> extends Vue
   }
 }
 
-export abstract class BaseDialog<M, Refs, INP> extends BaseModule<
-  M,
-  Refs,
-  INP
-> {
+export abstract class BaseDialog<M, Refs, INP> extends BaseModule<M, Refs, INP> {
   /**
    * 对话框 DOM 对象
    */
@@ -128,7 +129,7 @@ export abstract class BaseDialog<M, Refs, INP> extends BaseModule<
   /**
    * 关闭后触发
    */
-  onClose() {}
+  onClose() { }
 
   /**
    * 对话框的父亲（打开者）
@@ -177,7 +178,7 @@ export type BaseModuleType<M, Refs, INP> = typeof BaseModule
  * @param options
  */
 export function BizModule<M, Refs, INP>(option?: any): Function {
-  return function(Component: BaseModule<M, Refs, INP>) {
+  return function (Component: BaseModule<M, Refs, INP>) {
     return componentFactory(Component, option)
   }
 
@@ -226,11 +227,7 @@ export function Watch(
   if (typeof immediate === 'undefined') {
     immediate = false
   }
-  return function(
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     if (typeof target.watches === 'undefined') {
       target.watches = []
     }

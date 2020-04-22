@@ -95,6 +95,9 @@ export class CtlGrid extends CtlBase<CtlGrid> {
    */
   set dataSource(nv: GridDataSource) {
     this.vjson.dataSource = nv
+    if (this._module.loadFinished) {
+      throw new Error('Grid 不允许动态设置数据源')
+    }
   }
 
   /**
@@ -716,11 +719,25 @@ export class CtlGrid extends CtlBase<CtlGrid> {
    * 重新绑定数据源
    */
   _rebindDataSource() {
-    if (this.dataSourceBind) {
-      this.dataSourceBind.destory()
-      this.dataSourceBind = undefined
+    const innerMethod = () => {
+      if (this.dataSourceBind) {
+        this.dataSourceBind.destory()
+        this.dataSourceBind = undefined
+      }
+
+      if (this._webix && this._module) {
+        this.dataSourceBind = new YvanDataSourceGrid(this, this.dataSource)
+      }
     }
-    this.dataSourceBind = new YvanDataSourceGrid(this, this.dataSource)
+
+    if (!this._module.loadFinished) {
+      // onload 函数还没有执行（模块还没加载完）, 延迟调用 rebind
+      _.defer(innerMethod)
+
+    } else {
+      // 否则实时调用 rebind
+      innerMethod()
+    }
   }
 
   /**
