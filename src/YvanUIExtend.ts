@@ -1,5 +1,5 @@
-import {Ajax} from './YvanUIAjax';
-import {Db} from './YvanUIDb';
+import { Ajax } from './YvanUIAjax';
+import { Db } from './YvanUIDb';
 
 export type FormatterFunction = (id: string) => string;
 
@@ -50,7 +50,16 @@ export interface ExtendOption {
      */
     validType: { [validName: string]: ValidFunction };
 
+    /**
+     * 复杂校验通用方法
+     */
     complexValid: { [validName: string]: ComplexValidFunction };
+
+    /**
+     * 组件渲染过滤器, 如果方法返回 false 代表该组件不需要被渲染.
+     * 可以修改 vjson 的内容，但不能删除他
+     */
+    componentRenderFilter: (vjson: any) => undefined | boolean
 }
 
 export const version = "3.0.2"
@@ -80,8 +89,16 @@ export const dict: { [dictName: string]: Dict } = {};
  */
 export const validType: { [validName: string]: ValidFunction } = {};
 
+/**
+ * 复杂校验通用方法
+ */
 export const complexValid: { [validName: string]: ComplexValidFunction } = {};
 
+/**
+ * 组件渲染过滤器, 如果方法返回 false 代表该组件不需要被渲染.
+ * 可以修改 vjson 的内容，但不能删除他
+ */
+export let componentRenderFilter: (undefined | ((vjson: any) => undefined | boolean)) = undefined;
 
 /**
  * YvanUI 全局扩展配置
@@ -93,7 +110,7 @@ export function extend(option: Partial<ExtendOption>) {
     }
 
     if (option.serverJsPrefix) {
-        _.extend(window, {_YvanUI_serverJSPrefix: option.serverJsPrefix});
+        _.extend(window, { _YvanUI_serverJSPrefix: option.serverJsPrefix });
     }
 
     if (option.dbs) {
@@ -114,5 +131,9 @@ export function extend(option: Partial<ExtendOption>) {
 
     if (option.complexValid) {
         _.extend(complexValid, option.complexValid);
+    }
+
+    if (option.componentRenderFilter) {
+        componentRenderFilter = option.componentRenderFilter
     }
 }

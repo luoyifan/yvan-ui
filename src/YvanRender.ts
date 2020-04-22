@@ -33,10 +33,7 @@ _.set(window, 'webix', webix);
  * @param resolver 分析函数
  * @return 记录 resolver 方法返回 true 时，对象的访问路径
  */
-export function deepTravVJson(
-  vjson: VJson,
-  resolver: (child: VJson) => any
-): Array<PathMarker> {
+export function deepTravVJson(vjson: VJson, resolver: (child: VJson) => any): Array<PathMarker> {
   const markerList: Array<PathMarker> = []
   deepTrav1(vjson, resolver, markerList)
   return markerList
@@ -51,11 +48,7 @@ export interface PathMarker {
   object: any
 }
 
-function deepTrav1(
-  obj: VJson,
-  resolver: (child: VJson) => any,
-  marker?: Array<PathMarker>
-) {
+function deepTrav1(obj: VJson, resolver: (child: VJson) => any, marker?: Array<PathMarker>) {
   let isMarker = resolver(obj)
   if (marker && isMarker === true) {
     marker.unshift({ id: 0, keyName: '', object: obj })
@@ -99,6 +92,9 @@ function deepTrav1(
       marker.unshift({ id: obj.id, keyName: key, object: value })
     }
   })
+
+  // 删除作废对象
+  _.remove(obj, (v: any) => v.isFiltered);
 
   return isMarker
 }
@@ -444,14 +440,65 @@ function createCommonMix<M, Refs, INP>() {
 }
 
 /**
+ * 判断组件是否被删除后，是否需要预占宽度
+ */
+function cmpNeedOccupied(code: any) {
+  switch (code.view) {
+    case 'text':
+    case 'combo':
+    case 'date':
+    case 'datetime':
+    case 'datepicker':
+    // case 'button': // button 按钮直接删除即可，不需要预占宽度
+    case 'checkbox':
+    case 'label':
+      return true;
+  }
+
+  // 高度和宽度可变的组件，不需要预占任何宽度
+  return false;
+}
+
+/**
  * 根据 vjson 格式，嵌入 yvan 组件, 生成能够为 webix 使用的 vjson
  */
-export function wrapperWebixConfig<M, Refs, INP>(
-  module: BaseModule<M, Refs, INP>,
-  vjson: VJson
-) {
+export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP>, vjson: VJson) {
   // 形成最终的 viewResolver 方法
   deepTravVJson(vjson, obj => {
+
+    // 检查组件是否被过滤(不渲染)
+    let isFiltered = false;
+    const componentRenderFilter: Function = _.get(window, 'YvanUI.componentRenderFilter');
+    if (componentRenderFilter && componentRenderFilter(obj) === false) {
+      isFiltered = true;
+    }
+
+    if (isFiltered) {
+      // 组件不需要渲染
+      if (_.has(obj, 'hiddenPlaceholder')) {
+        // 如果有 hiddenPlaceholder 属性，最优先使用 hiddenPlaceholder, 替换现有的 vjson
+        const ph = obj.hiddenPlaceholder;
+        _.forOwn(obj, (v, k) => delete obj[k]);
+        _.assign(obj, ph);
+
+      } else if (cmpNeedOccupied(obj)) {
+        // 需要预占宽度的组件，变成 template
+        _.forOwn(obj, (v, k) => {
+          if (k !== 'height' && k !== 'width') {
+            delete obj[k]
+          }
+        });
+        obj.view = "template";
+        obj.borderless = true;
+        obj.template = "";
+
+      } else {
+        // 其他情况，直接告知外循环，删除本对象
+        obj.isFiltered = true;
+      }
+      return;
+    }
+
     if (obj.view === 'iframe') {
       return
     }
