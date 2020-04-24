@@ -112,7 +112,7 @@ export function downLoad(downLoadUrl: string, filename: string, data: any, heade
     xhr.onload = function (e: any) {
         if (this.status === 200) {
             const blob = this.response;
-            if (_.has(window, 'navigator.msSaveOrOpenBlob')) {
+            if (_.hasIn(window, 'navigator.msSaveOrOpenBlob')) {
                 navigator.msSaveBlob(blob, filename)
                 YvanUI.clearLoading();
 

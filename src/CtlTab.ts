@@ -121,6 +121,8 @@ export class CtlTab extends CtlBase<CtlTab> {
             if (!vue._isLoadInvoked) {
               vue._webixId = tabId
               vue._isLoadInvoked = true
+              // 标题栏不允许被选中
+              $(this.$view).parent().prev().addClass('ag-unselectable');
               vue.onLoad()
             }
 

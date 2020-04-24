@@ -138,6 +138,10 @@ export class CtlDataview extends CtlBase<CtlDataview> {
     }
   }
 
+  public filter(func: Function) {
+    this._webix.filter(func);
+  }
+
   /* =============================================== 以下部分为私有函数 =============================================== */
 
   //数据源设置

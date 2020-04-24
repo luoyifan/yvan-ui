@@ -121,6 +121,10 @@ export class CtlCombo extends CtlInput<CtlCombo> {
 
   //重新绑定数据源
   private _rebindDataSource() {
+    if (!this._module) {
+      return;
+    }
+
     const innerMethod = () => {
       if (this.dataSourceBind) {
         this.dataSourceBind.destory()
