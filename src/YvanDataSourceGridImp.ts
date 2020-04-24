@@ -84,11 +84,9 @@ export class YvanDataSourceGrid {
         that.ctl.gridPage.getPageData = (currentPage: number, pageSize: number) => {
           let params: any = {}
           params.successCallback = (data: [], rowCount: number) => {
-            if (data.length > 0) {
-              that.ctl.setData(data)
-              that.ctl.gridPage.itemCount = rowCount
-              that.ctl.gridPage.currentPage = currentPage
-            }
+            that.ctl.setData(data)
+            that.ctl.gridPage.itemCount = rowCount
+            that.ctl.gridPage.currentPage = currentPage
           }
           params.failCallback = () => {
             console.error('error')
