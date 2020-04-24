@@ -93,7 +93,16 @@ export class YvanDataSourceGrid {
           }
           params.startRow = (currentPage - 1) * pageSize
           params.endRow = currentPage * pageSize
-          that.serverQuery(option, paramFunction, params)
+
+          if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
+            that.rowCount = 0
+            params.successCallback([], that.rowCount)
+            that.ctl.loading = false
+            that.isFirstAutoLoad = false
+            
+          } else {
+            that.serverQuery(option, paramFunction, params)
+          }
         }
         that.ctl.gridPage.getPageData(1, that.ctl.gridPage.pageSize)
       } else {
