@@ -731,8 +731,10 @@ export class CtlGrid extends CtlBase<CtlGrid> {
     }
 
     if (!this._module.loadFinished) {
-      // onload 函数还没有执行（模块还没加载完）, 延迟调用 rebind
-      _.defer(innerMethod)
+      if (this.autoLoad !== false) {
+        // onload 函数还没有执行（模块还没加载完）, 延迟调用 rebind
+        _.defer(innerMethod)
+      }
 
     } else {
       // 否则实时调用 rebind
