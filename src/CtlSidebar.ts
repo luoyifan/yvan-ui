@@ -151,7 +151,14 @@ export class CtlSidebar extends CtlBase<CtlSidebar> {
    * 展开或收起状态互换
    */
   public toggle(): void {
-    this._webix.toggle()
+    return this._webix.toggle();
+  }
+
+  /**
+   * 是否折叠状态
+   */
+  public isCollapsed(): boolean {
+    return this._webix.config.collapsed;
   }
 
   /* =============================================== 以下部分为私有函数 =============================================== */

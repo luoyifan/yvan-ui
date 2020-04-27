@@ -167,6 +167,21 @@ export class CtlButton extends CtlBase<CtlButton> {
     return this._text
   }
 
+  /**
+   * 是否允许
+   */
+  get enable(): boolean {
+    return this._webixConfig.disabled
+  }
+
+  set enable(nv: boolean) {
+    if (!this._webix) {
+      this._webixConfig.disabled = !nv
+      return
+    }
+    this._webix.define('disabled', !nv)
+  }
+
   /*============================ 私有属性部分 ============================*/
 
   private _text: string = ''

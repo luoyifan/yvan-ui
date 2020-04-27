@@ -316,11 +316,11 @@ export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP
       return
     }
 
-    if (module && _.has(obj, 'id')) {
-      if (obj.id !== 'MainWindowFirstPage') {
-        console.error('禁用 ID 属性', obj)
-      }
-    }
+    // if (module && _.has(obj, 'id')) {
+    //   if (obj.id !== 'MainWindowFirstPage') {
+    //     console.error('禁用 ID 属性', obj)
+    //   }
+    // }
 
     if (typeof obj.placeId === 'string') {
       obj.id = module.instanceId + '$' + obj.placeId

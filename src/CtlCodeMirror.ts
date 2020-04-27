@@ -185,6 +185,89 @@ export class CtlCodeMirror extends CtlBase<CtlCodeMirror> {
   }
 
   /**
+   * 添加内容
+   */
+  append(msg: string) {
+    const editor = this._webix.getEditor();
+    const CodeMirror = _.get(window, 'CodeMirror');
+    editor.replaceRange(msg, CodeMirror.Pos(editor.lastLine()));
+  }
+
+  /**
+   * 移动光标到文档开始处
+   */
+  goDocStart() {
+    this._webix.getEditor().execCommand('goDocStart');
+  }
+
+  /**
+   * 移动光标到文档结束处
+   */
+  goDocEnd() {
+    this.execCommand('goDocEnd');
+  }
+
+  /**
+   * 移动光标到行开始处
+   */
+  goLineStart() {
+    this.execCommand('goLineStart');
+  }
+
+  /**
+   * 移动光标到行结束处
+   */
+  goLineEnd() {
+    this.execCommand('goLineEnd');
+  }
+
+  /**
+   * 移动光标到上一行
+   */
+  goLineUp() {
+    this.execCommand('goLineUp');
+  }
+
+  /**
+   * 移动光标到下一行
+   */
+  goLineDown() {
+    this.execCommand('goLineDown');
+  }
+
+  /**
+   * 获取对应行的内容
+   */
+  getLine(n: number): string {
+    return this._webix.getEditor().getLine(n)
+  }
+
+  /**
+   * 设置scroll到position位置
+   */
+  scrollTo(x: any, y: any) {
+    this._webix.getEditor().scrollTo(x, y);
+  }
+
+  clear() {
+    this.value = '';
+  }
+
+  /**
+   * 执行命令
+   */
+  execCommand(cmd: any) {
+    return this._webix.getEditor().execCommand(cmd);
+  }
+
+  /**
+   * 刷新编辑器
+   */
+  refresh() {
+    this._webix.getEditor().refresh();
+  }
+
+  /**
    * 设置值
    */
   set value(nv: any) {

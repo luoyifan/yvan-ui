@@ -17,7 +17,8 @@ export class CtlTab extends CtlBase<CtlTab> {
     const yvanProp = parseYvanPropChangeVJson(vjson, [
       'tabbarContextMenu',
       'defaultTabIndex',
-      'onTabChanged'
+      'onTabChanged',
+      'onTabClosed'
     ])
 
     // 将 vjson 存至 _webixConfig
@@ -55,6 +56,9 @@ export class CtlTab extends CtlBase<CtlTab> {
           },
           onChange(newBodyId: string) {
             YvEventDispatch(that.onTabChanged, that, newBodyId)
+          },
+          onOptionRemove(newBodyId: string) {
+            YvEventDispatch(that.onTabClosed, that, newBodyId)
           }
         }
       },
@@ -73,6 +77,11 @@ export class CtlTab extends CtlBase<CtlTab> {
    * 当前选项卡发生变化时触发
    */
   onTabChanged?: YvEvent<CtlTab, any>
+
+  /**
+   * 当前选项卡关闭时触发
+   */
+  onTabClosed?: YvEvent<CtlTab, any>
 
   /**
    * tabbar 上的快捷菜单
@@ -114,6 +123,9 @@ export class CtlTab extends CtlBase<CtlTab> {
         id: id,
         on: {
           onDestruct() {
+            if (vue.onClose) {
+              vue.onClose();
+            }
             vue.$destroy()
             delete vue._isLoadInvoked
           },
