@@ -21,6 +21,7 @@ import { CtlSwitch } from './form/other/CtlSwitch'
 import { CtlNumber } from './form/input/CtlNumber'
 import { CtlRadio } from './form/other/CtlRadio'
 import { CtlCodeMirror } from './CtlCodeMirror'
+import { CtlSidebar } from './CtlSidebar'
 import webix from 'webix'
 
 // export const webix = require("../webix/webix");
@@ -356,6 +357,10 @@ export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP
 
         case 'echarts':
           CtlECharts.create(module, obj);
+          break
+
+        case 'sidebar':
+          CtlSidebar.create(module, obj);
           break
 
         case 'daterangepicker':

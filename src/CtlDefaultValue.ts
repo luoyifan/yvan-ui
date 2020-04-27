@@ -15,6 +15,10 @@ export const CtlTreeDefault: any = {
     showIcon: true,
 };
 
+export const CtlSidebarDefault: any = {
+
+}
+
 export const CtlCodeMirrorDefault = {
     mode: 'sql',
     indentWithTabs: true,
@@ -22,7 +26,7 @@ export const CtlCodeMirrorDefault = {
     lineNumbers: true,
     matchBrackets: true,
     autofocus: true,
-    extraKeys: {"Ctrl-Space": "autocomplete"},
+    extraKeys: { "Ctrl-Space": "autocomplete" },
     hintOptions: {
         tables: {
             users: ["name", "score", "birthDate"],

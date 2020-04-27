@@ -188,7 +188,7 @@ input[type='number']::-webkit-outer-spin-button {
 
 /*表头鼠标悬停*/
 .ag-theme-blue .ag-header-cell:hover {
-  background-color: #eaeff4;
+  /* background-color: #eaeff4; */
 }
 
 [role='yvGrid'] .ag-cell {
