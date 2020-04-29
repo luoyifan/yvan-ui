@@ -19,6 +19,7 @@ import CtlGridCellButton from './CtlGridCellButton'
 import CtlGridFilterSet from './CtlGridFilterSet'
 import CtlGridEditorText from './CtlGridEditorText'
 import CtlGridEditorCombo from './CtlGridEditorCombo'
+import webix from 'webix'
 
 /**
  * 表格中的行按钮被点击后触发的事件参数
@@ -39,6 +40,16 @@ export interface CtlGridRowButtonClickArgs {
    */
   colId: string
 }
+
+/**
+ * 扩展 grid 组件
+ */
+webix.protoUI(
+  {
+    name: 'grid'
+  },
+  webix.ui.template
+)
 
 export class CtlGrid extends CtlBase<CtlGrid> {
   static create(module: any, vjson: any): CtlGrid {

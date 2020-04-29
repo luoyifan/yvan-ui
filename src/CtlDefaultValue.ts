@@ -19,6 +19,10 @@ export const CtlSidebarDefault: any = {
 
 }
 
+export const CtlXtermDefault: any = {
+
+}
+
 export const CtlCodeMirrorDefault = {
     mode: 'sql',
     indentWithTabs: true,

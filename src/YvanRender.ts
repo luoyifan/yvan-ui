@@ -22,6 +22,7 @@ import { CtlNumber } from './form/input/CtlNumber'
 import { CtlRadio } from './form/other/CtlRadio'
 import { CtlCodeMirror } from './CtlCodeMirror'
 import { CtlSidebar } from './CtlSidebar'
+import { CtlXterm } from './CtlXterm'
 import webix from 'webix'
 
 // export const webix = require("../webix/webix");
@@ -353,6 +354,10 @@ export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP
 
         case 'dataview':
           CtlDataview.create(module, obj);
+          break
+
+        case 'xterm':
+          CtlXterm.create(module, obj);
           break
 
         case 'echarts':

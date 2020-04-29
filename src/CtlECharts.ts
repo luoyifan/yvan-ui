@@ -1,6 +1,17 @@
 import { CtlBase } from './CtlBase'
 import { YvEvent, YvEventDispatch } from './YvanEvent'
 import { parseYvanPropChangeVJson } from './CtlUtils'
+import webix from 'webix'
+
+/**
+ * 扩展 echarts 组件
+ */
+webix.protoUI(
+  {
+    name: 'echarts'
+  },
+  webix.ui.template
+)
 
 export class CtlECharts extends CtlBase<CtlECharts> {
   static create(module: any, vjson: any): CtlECharts {

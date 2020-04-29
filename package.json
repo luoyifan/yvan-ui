@@ -28,17 +28,17 @@
     "@types/webix": "^5.1.1",
     "ag-grid": "^18.1.2",
     "axios": "^0.19.2",
+    "cssnano": "^4.1.10",
     "jest": "^24.5.0",
     "jest-extended": "^0.11.1",
+    "postcss-cssnext": "^3.1.0",
     "postcss-less-engine": "^0.6.2",
+    "postcss-nested": "^4.2.1",
+    "postcss-simple-vars": "^5.0.2",
     "prettier": "^1.18.2",
     "prettier-config-standard": "^1.0.1",
     "rollup": "^1.27.0",
     "rollup-plugin-postcss": "2.8.2",
-    "cssnano": "^4.1.10",
-    "postcss-cssnext": "^3.1.0",
-    "postcss-nested": "^4.2.1",
-    "postcss-simple-vars": "^5.0.2",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.25.2",
     "ts-jest": "^24.0.2",
@@ -46,7 +46,11 @@
     "tslib": "^1.11.1",
     "typedoc": "^0.16.0",
     "typescript": "^3.7.4",
-    "webix": "^7.2.0"
+    "webix": "^7.2.0",
+    "xterm": "^4.5.0",
+    "xterm-addon-fit": "^0.3.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    
+  }
 }
