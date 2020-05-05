@@ -1,30 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import Qs from 'qs'
-import { YvanDataSourceGrid } from './YvanDataSourceGridImp';
-
-export function invokeApi<T>(apiId: string, args: IArguments, entity: T): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-        const ajax: Ajax.Function = _.get(window, 'YvanUI.ajax');
-        const prefix = _.get(window, '_YvanUI_serverJSPrefix');
-
-        const postBodyParamter = [];
-        for (let i = 0; i < args.length; i++) {
-            postBodyParamter.push(args[i]);
-        }
-
-        ajax({
-            url: prefix + apiId,
-            method: 'POST-JSON',
-            data: {
-                p: postBodyParamter
-            }
-
-        }).then(res => {
-            _.extend(entity, res.data);
-            resolve(entity);
-        });
-    })
-}
 
 export namespace Ajax {
 
@@ -77,13 +52,13 @@ export namespace Ajax {
     /**
      * 数据响应
      */
-    export interface Response {
+    export interface Response<T> {
         success: boolean
         msg: string
-        data: any
+        data: T
     }
 
-    export type Function = (option: Option) => Promise<Ajax.Response>
+    export type Function = (option: Option) => Promise<Ajax.Response<any>>
 }
 
 export function downLoad(downLoadUrl: string, filename: string, data: any, header: any) {
@@ -150,7 +125,7 @@ export function createAjax(createOption: Ajax.CreateAjaxOption): Ajax.Function {
         if (option.method === 'DOWNLOAD') {
             downLoad(createOption.baseUrl + option.url, option.fileName || 'file',
                 option.data, option.headers);
-            return new Promise<Ajax.Response>((resolver, reject) => {
+            return new Promise<Ajax.Response<any>>((resolver, reject) => {
             });
         }
 
@@ -200,7 +175,7 @@ export function createAjax(createOption: Ajax.CreateAjaxOption): Ajax.Function {
             throw new Error('not implements')
         }
 
-        return new Promise<Ajax.Response>((resolver, reject) => {
+        return new Promise<Ajax.Response<any>>((resolver, reject) => {
             axios(ax).then((resolverRaw: AxiosResponse<any>) => {
                 resolver(resolverRaw.data)
 

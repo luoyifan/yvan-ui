@@ -24,7 +24,7 @@ export namespace Db {
         orderByModel?: any
     }
 
-    export interface Response {
+    export interface Response extends Ajax.Response<any> {
 
         /**
          * 输出后台运行的实际 SQL (DEBUG 模式才会存在)
@@ -36,25 +36,22 @@ export namespace Db {
          */
         params: any[]
 
-        /**
-         * 统计的总行数
-         */
-        totalCount?: number
+        pagination: {
+            /**
+             * 总行数
+             */
+            total?: number
 
-        /**
-         * 行数取值
-         */
-        limit?: number
+            /**
+             * 页大小
+             */
+            size?: number
 
-        /**
-         * 偏移值
-         */
-        limitOffset?: number
-
-        /**
-         * SQL 运行输出的参数
-         */
-        data: any
+            /**
+             * 当前页
+             */
+            current?: number
+        }
     }
 
     export class Client {

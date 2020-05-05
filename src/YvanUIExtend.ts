@@ -100,6 +100,10 @@ export const complexValid: { [validName: string]: ComplexValidFunction } = {};
  */
 export let componentRenderFilter: (undefined | ((vjson: any) => undefined | boolean)) = undefined;
 
+export function getServerPrefix(url: string) {
+    return _.get(window, '_YvanUI_serverJSPrefix') + url;
+}
+
 /**
  * YvanUI 全局扩展配置
  * @param option 配置信息

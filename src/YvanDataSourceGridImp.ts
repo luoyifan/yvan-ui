@@ -1,6 +1,8 @@
 import * as YvanUI from './YvanUIExtend'
-import { GridDataSource, GridDataSourceSql, GridDataSourceStaticFunction, WatchParam, GetParam } from './YvanDataSourceGrid'
+import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSourceStaticFunction, WatchParam, GetParam } from './YvanDataSourceGrid'
 import { isDesignMode } from './DesignHelper'
+import { brokerInvoke } from './Service'
+import { Db } from './YvanUIDb'
 
 export class YvanDataSourceGrid {
   private option: GridDataSource
@@ -13,7 +15,7 @@ export class YvanDataSourceGrid {
   private rowCount: number | undefined
   private lastFilterModel: any
 
-  serverQuery = _.debounce((option: GridDataSourceSql, paramFunction: undefined | (() => any), params: any) => {
+  serverQuery = _.debounce((option: GridDataSourceSql | GridDataSourceServer, paramFunction: undefined | (() => any), params: any) => {
     const that = this
 
     //异步请求数据内容
@@ -30,46 +32,75 @@ export class YvanDataSourceGrid {
         that.lastFilterModel = _.cloneDeep(params.filterModel)
       }
     }
+
+    // 获取所有参数
     const queryParams = {
       ...(typeof paramFunction === 'function' ? paramFunction() : undefined)
     }
-    YvanUI.dbs[option.db]
-      .query({
+
+    let ajaxPromise: Promise<Db.Response>;
+    if (option.type === 'SQL') {
+      ajaxPromise = YvanUI.dbs[option.db]
+        .query({
+          params: queryParams,
+          limit: params.endRow - params.startRow,
+          limitOffset: params.startRow,
+          needCount,
+          orderByModel: params.sortModel,
+          filterModel: params.filterModel,
+          sqlId: option.sqlId
+        })
+
+    } else if (option.type === 'Server') {
+      const [serverUrl, method] = _.split(option.method, '@');
+      ajaxPromise = <Promise<Db.Response>>brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, {
         params: queryParams,
-        limit: params.startRow,
-        limitOffset: params.endRow - params.startRow,
+        limit: params.endRow - params.startRow,
+        limitOffset: params.startRow,
         needCount,
         orderByModel: params.sortModel,
         filterModel: params.filterModel,
-        sqlId: option.sqlId
       })
-      .then(res => {
-        const { data: resultData, totalCount, params: resParams } = res
-        if (needCount) {
-          that.rowCount = totalCount
+
+    } else {
+      console.error('unSupport dataSource mode:', option);
+      params.failCallback();
+      return;
+    }
+
+    ajaxPromise.then(res => {
+      const { data: resultData, pagination, params: resParams } = res
+      if (needCount) {
+        if (_.has(res, 'totalCount')) {
+          // 兼容老模式
+          that.rowCount = _.get(res, 'totalCount');
+
+        } else {
+          that.rowCount = pagination.total
         }
-        params.successCallback(resultData, that.rowCount)
-        /** 如果不分页就在这里设置总条目数量，避免多次刷新分页栏 **/
-        if (!that.ctl.pagination) {
-          that.ctl.gridPage.itemCount = that.rowCount
-        }
-        that.ctl._bindingComplete()
-        if (that.ctl.entityName) {
-          _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow())
-        }
-      })
-      .catch(r => {
-        params.failCallback()
-      })
-      .finally(() => {
-        this.ctl.loading = false
-      })
+      }
+      params.successCallback(resultData, that.rowCount)
+      /** 如果不分页就在这里设置总条目数量，避免多次刷新分页栏 **/
+      if (!that.ctl.pagination) {
+        that.ctl.gridPage.itemCount = that.rowCount
+      }
+      that.ctl._bindingComplete()
+      if (that.ctl.entityName) {
+        _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow())
+      }
+
+    }).catch(r => {
+      params.failCallback()
+
+    }).finally(() => {
+      this.ctl.loading = false
+    })
   })
 
   /**
    * SQL取值
    */
-  setSqlMode(option: GridDataSourceSql, paramFunction: undefined | (() => any)) {
+  setSqlMode(option: GridDataSourceSql | GridDataSourceServer, paramFunction: undefined | (() => any)) {
     const that = this
     this.reload = () => {
       this.ctl.loading = true
@@ -99,7 +130,7 @@ export class YvanDataSourceGrid {
             params.successCallback([], that.rowCount)
             that.ctl.loading = false
             that.isFirstAutoLoad = false
-            
+
           } else {
             that.serverQuery(option, paramFunction, params)
           }
@@ -292,7 +323,7 @@ export class YvanDataSourceGrid {
       return
     }
 
-    if (option.type === 'SQL') {
+    if (option.type === 'SQL' || option.type === 'Server') {
       this.setSqlMode(option, paramFunction)
       return
     }
