@@ -266,4 +266,26 @@ export class CtlSidebar extends CtlBase<CtlSidebar> {
     super.refreshState()
     this._rebindDataSource()
   }
+
+  /**
+   * 根据id获取一行数据
+   */
+  public getItem(id: any) {
+    return this._webix.getItem(id)
+  }
+
+  /**
+   * 选中一行
+   * @param id
+   */
+  public select(id: any) {
+    // this._webix.showItem(id);
+    let pid = id
+    while (pid) {
+      this._webix.open(pid)
+      pid = this._webix.getParentId(pid)
+    }
+
+    this._webix.select(id)
+  }
 }
