@@ -1,0 +1,12 @@
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+}
+
+@import './css/global.css';
+@import './css/tree.css';
+@import './css/button.css';
