@@ -60,4 +60,13 @@ export declare class CtlSidebar extends CtlBase<CtlSidebar> {
     private _rebindDataSource;
     private _dataSourceProcess;
     protected refreshState(): void;
+    /**
+     * 根据id获取一行数据
+     */
+    getItem(id: any): any;
+    /**
+     * 选中一行
+     * @param id
+     */
+    select(id: any): void;
 }
