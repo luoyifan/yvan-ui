@@ -560,25 +560,25 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
             view: "toolbar", margin: -4, cols: [
               { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
               {
-                view: "icon", icon: "wxi-plus-square", click: function (this: any) {
+                view: "icon", icon: "fa fa-expand", click: function (this: any) {
                   dialog.config.fullscreen = !dialog.config.fullscreen;
                   if (dialog.config.fullscreen) {
                     dialog.config.oldtop = dialog.config.top;
                     dialog.config.oldleft = dialog.config.left;
                     dialog.config.left = 0;
                     dialog.config.top = 0;
-                    this.define({ icon: 'wxi-minus-square' });
+                    this.define({ icon: 'fa fa-compress' });
                   } else {
                     dialog.config.top = dialog.config.oldtop;
                     dialog.config.left = dialog.config.oldleft;
-                    this.define({ icon: 'wxi-plus-square' });
+                    this.define({ icon: 'fa fa-expand' });
                   }
                   dialog.resize();
                   this.refresh();
                 }
               },
               {
-                view: "icon", icon: "wxi-close", click: function () {
+                view: "icon", icon: "fa fa-times", title: '关闭', tooltip: '关闭', click: function () {
                   dialog.close();
                 }
               }

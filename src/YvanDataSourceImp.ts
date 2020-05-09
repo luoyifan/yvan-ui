@@ -1,7 +1,9 @@
-import { DataSource, DataSourceStaticFunction, DataSourceDb, DataSourceProcessFunction } from './YvanDataSource'
+import { DataSource, DataSourceStaticFunction, DataSourceDb, DataSourceServer, DataSourceProcessFunction } from './YvanDataSource'
 import { YvEvent, YvEventDispatch } from './YvanEvent'
 import * as YvanUI from './YvanUIExtend'
 import { isDesignMode } from './DesignHelper'
+import { brokerInvoke } from './Service'
+import { Db } from './YvanUIDb'
 
 export class YvDataSource<T> {
   private readonly module: any
@@ -35,35 +37,52 @@ export class YvDataSource<T> {
     })
   });
 
-  sqlModeDebounce = _.debounce((option: DataSourceDb) => {
+  sqlModeDebounce = _.debounce((option: DataSourceDb | DataSourceServer) => {
     const that = this
 
     //异步请求数据内容
     that.ctl.loading = true
 
-    YvanUI.dbs[option.db]
-      .query({
+    let ajaxPromise: Promise<Db.Response>;
+    if (option.type === 'SQL') {
+      ajaxPromise = YvanUI.dbs[option.db].query({
         params: option.params,
         needCount: false,
         sqlId: option.sqlId
-      }).then(res => {
-        const { data: resultData, params: resParams } = res
+      })
 
-        if (this.dataSourceProcess) {
-          //自定义的数据处理过程
-          that.ctl.dataReal = this.dataSourceProcess(resultData)
-        } else {
-          that.ctl.dataReal = resultData
-        }
-        YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined)
+    } else if (option.type === 'Server') {
+      const [serverUrl, method] = _.split(option.method, '@');
+      ajaxPromise = <Promise<Db.Response>>brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, {
+        params: option.params,
+        needCount: false,
+      })
 
-      })
-      .catch(r => {
-        that.ctl.dataReal = []
-      })
-      .finally(() => {
-        that.ctl.loading = false
-      })
+    } else {
+      console.error('unSupport dataSource mode:', option);
+      that.ctl.dataReal = []
+      that.ctl.loading = false
+      return;
+    }
+
+    ajaxPromise.then(res => {
+      const { data: resultData, params: resParams } = res
+
+      if (this.dataSourceProcess) {
+        //自定义的数据处理过程
+        that.ctl.dataReal = this.dataSourceProcess(resultData)
+      } else {
+        that.ctl.dataReal = resultData
+      }
+      YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined)
+
+    }).catch(r => {
+      that.ctl.dataReal = []
+
+    }).finally(() => {
+      that.ctl.loading = false
+
+    })
   });
 
   /**
@@ -80,7 +99,7 @@ export class YvDataSource<T> {
   /**
    * SQL取值
    */
-  setSqlMode(option: DataSourceDb) {
+  setSqlMode(option: DataSourceDb | DataSourceServer) {
     const that = this
     this.reload = () => {
       that.sqlModeDebounce(option)
@@ -146,7 +165,7 @@ export class YvDataSource<T> {
         }
         this.setCustomFunctionMode(bindFunction)
       }
-    } else if (this.option.type === 'SQL') {
+    } else if (this.option.type === 'SQL' || this.option.type === 'Server') {
       this.setSqlMode(this.option)
     } else {
       console.error(`其他方式没有实现`)

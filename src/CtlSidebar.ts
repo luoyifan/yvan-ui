@@ -65,7 +65,7 @@ export class CtlSidebar extends CtlBase<CtlSidebar> {
     this._webix.filter((node: any) => {
       const value = node.value
       const nodePy = getFirstPinyin(value).toLowerCase()
-      return nodePy.indexOf(nv.toLowerCase()) >= 0 || value.indexOf(nv) >= 0
+      return nodePy.indexOf(nv.toLowerCase()) >= 0 || value.toLowerCase().indexOf(nv) >= 0
     })
   }
 

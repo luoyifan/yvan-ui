@@ -12,7 +12,7 @@ export interface DataSourceParam {
 }
 export declare type DataSourceStaticFunction<T> = (sender: T, option: DataSourceParam) => void;
 export declare type DataSourceProcessFunction = (data: any[]) => any;
-export declare type DataSource<T> = undefined | any[] | DataSourceDb | DataSourceStaticFunction<T> | DataSourceFunctionBind<T>;
+export declare type DataSource<T> = undefined | any[] | DataSourceDb | DataSourceServer | DataSourceStaticFunction<T> | DataSourceFunctionBind<T>;
 export interface DataSourceFunctionBind<T> {
     type: 'function';
     /**
@@ -63,6 +63,7 @@ export interface DataSourceServer {
     params?: {
         [name: string]: string | number | WatchParam | GetParam;
     };
+    watch?: string[];
     displayField: string;
     valueField: string;
     parentField: string;

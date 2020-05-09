@@ -24,6 +24,7 @@ export type DataSource<T> =
   | undefined
   | any[]
   | DataSourceDb
+  | DataSourceServer
   | DataSourceStaticFunction<T>
   | DataSourceFunctionBind<T>
 
@@ -85,6 +86,8 @@ export interface DataSourceServer {
   params?: {
     [name: string]: string | number | WatchParam | GetParam
   }
+
+  watch?: string[]
 
   displayField: string
   valueField: string

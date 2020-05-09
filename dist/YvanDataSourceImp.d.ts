@@ -11,7 +11,7 @@
 /// <reference types="node_modules/@types/lodash/ts3.1/common/seq" />
 /// <reference types="node_modules/@types/lodash/ts3.1/common/string" />
 /// <reference types="node_modules/@types/lodash/ts3.1/common/util" />
-import { DataSource, DataSourceStaticFunction, DataSourceDb, DataSourceProcessFunction } from './YvanDataSource';
+import { DataSource, DataSourceStaticFunction, DataSourceDb, DataSourceServer, DataSourceProcessFunction } from './YvanDataSource';
 export declare class YvDataSource<T> {
     private readonly module;
     private option;
@@ -20,7 +20,7 @@ export declare class YvDataSource<T> {
     private watches;
     reload: undefined | (() => void);
     customFunctionModeDebounce: ((option: DataSourceStaticFunction<T>) => void) & import("lodash").Cancelable;
-    sqlModeDebounce: ((option: DataSourceDb) => void) & import("lodash").Cancelable;
+    sqlModeDebounce: ((option: DataSourceDb | DataSourceServer) => void) & import("lodash").Cancelable;
     /**
      * 自定义函数式取值
      */
@@ -28,7 +28,7 @@ export declare class YvDataSource<T> {
     /**
      * SQL取值
      */
-    setSqlMode(option: DataSourceDb): void;
+    setSqlMode(option: DataSourceDb | DataSourceServer): void;
     constructor(ctl: any, option: DataSource<T>, dataSourceProcess?: DataSourceProcessFunction);
     init(): void;
     destory(): void;
