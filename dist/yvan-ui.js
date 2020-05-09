@@ -3994,6 +3994,21 @@
                       filterModel: params.filterModel,
                   });
               }
+              else if (option.type === 'Ajax') {
+                  var ajax = _.get(window, 'YvanUI.ajax');
+                  ajaxPromise = ajax({
+                      url: option.url,
+                      method: 'POST-JSON',
+                      data: {
+                          params: queryParams,
+                          limit: params.endRow - params.startRow,
+                          limitOffset: params.startRow,
+                          needCount: needCount,
+                          orderByModel: params.sortModel,
+                          filterModel: params.filterModel,
+                      }
+                  });
+              }
               else {
                   console.error('unSupport dataSource mode:', option);
                   params.failCallback();
@@ -4090,7 +4105,7 @@
               }
               return;
           }
-          if (option.type === 'SQL' || option.type === 'Server') {
+          if (option.type === 'SQL' || option.type === 'Server' || option.type === 'Ajax') {
               this.setSqlMode(option, paramFunction);
               return;
           }
