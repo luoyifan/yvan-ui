@@ -530,6 +530,9 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
       closeDialog(this: Vue & any) {
         this.dialog.close()
       },
+      setInParamter(this: Vue & BaseModule<M, Refs, INP> & any, inParamter: INP) {
+        this.inParamter = inParamter
+      },
       showDialog(this: Vue & BaseModule<M, Refs, INP> & any, inParamter: INP, container: any, isFromSearchBox: boolean = false): void {
         // 显示对话框
         const module: any = this

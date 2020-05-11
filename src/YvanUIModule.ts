@@ -83,6 +83,11 @@ export abstract class BaseModule<M, Refs, INP> extends Vue
   getPlace(placeId: string): any {
     return webix.$$(_.get(this, 'instanceId') + '$' + placeId)
   }
+
+  /**
+   * 从外部设置输入参数
+   */
+  setInParamter!: (inParamter: INP) => void
 }
 
 export abstract class BaseDialog<M, Refs, INP> extends BaseModule<M, Refs, INP> {
