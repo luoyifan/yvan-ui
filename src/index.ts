@@ -9,6 +9,7 @@ import './css/checkbox.css';
 import './css/loading.css';
 import './css/msg.css';
 import './css/dataview.css';
+import './css/console.css';
 
 export * from './YvanRender'
 // export * from './YvanModule'
@@ -52,4 +53,5 @@ export { CtlSearch } from './form/input/CtlSearch'
 export { CtlSwitch } from './form/other/CtlSwitch'
 export { CtlNumber } from './form/input/CtlNumber'
 export { CtlRadio } from './form/other/CtlRadio'
+export { CtlConsoleLog } from './CtlConsoleLog'
 export * from './UserComponent'

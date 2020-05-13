@@ -1125,3 +1125,62 @@ input[type='number']::-webkit-outer-spin-button {
 .webix_dataview_item[role='option'] {
   padding: 2px 2px;
 }
+
+.vc-log {
+  /* padding-bottom: 100px; */
+  -webkit-tap-highlight-color: transparent;
+  overflow: scroll;
+  height: 100%;
+}
+
+.vc-item {
+  margin: 0;
+  padding: 5px;
+  overflow: hidden;
+  line-height: 1.3;
+  border-bottom: 1px solid rgba(0, 0, 0, .1);
+  word-break: break-word;
+  display: block;
+}
+
+.vc-fold {
+  display: block;
+  overflow: auto;
+}
+
+.vc-fold-outer {
+  font-style: italic;
+  /* padding-left: 0.5em; */
+}
+
+.vc-fold-content {
+  padding-left: 1em;
+  border-top-color: rgba(255, 255, 255, .5);
+  border-left-color: transparent;
+}
+
+.vc-code-key {
+  color: #e36eec;
+}
+
+.vc-code-function {
+  color: #556af2;
+  font-style: italic;
+}
+
+.vc-code-number,
+.vc-code-boolean {
+  color: #9980ff;
+}
+
+.vc-code-string {
+  color: #c41a16;
+}
+
+.vc-code-string-selected {
+  background: yellow;
+}
+
+.vc-hidden {
+  display: none;
+}

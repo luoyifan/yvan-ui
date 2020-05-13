@@ -23,6 +23,7 @@ import { CtlRadio } from './form/other/CtlRadio'
 import { CtlCodeMirror } from './CtlCodeMirror'
 import { CtlSidebar } from './CtlSidebar'
 import { CtlXterm } from './CtlXterm'
+import { CtlConsoleLog } from './CtlConsoleLog'
 import webix from 'webix'
 
 // export const webix = require("../webix/webix");
@@ -358,6 +359,10 @@ export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP
 
         case 'xterm':
           CtlXterm.create(module, obj);
+          break
+
+        case 'xconsolelog':
+          CtlConsoleLog.create(module, obj);
           break
 
         case 'echarts':
