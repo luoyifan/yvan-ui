@@ -1,5 +1,6 @@
 import * as YvanUI from './YvanUIExtend'
-import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSourceStaticFunction, WatchParam, GetParam } from './YvanDataSourceGrid'
+import { Ajax } from './YvanUIAjax'
+import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSourceAjax, GridDataSourceStaticFunction, WatchParam, GetParam } from './YvanDataSourceGrid'
 import { isDesignMode } from './DesignHelper'
 import { brokerInvoke } from './Service'
 import { Db } from './YvanUIDb'
@@ -15,7 +16,7 @@ export class YvanDataSourceGrid {
   private rowCount: number | undefined
   private lastFilterModel: any
 
-  serverQuery = _.debounce((option: GridDataSourceSql | GridDataSourceServer, paramFunction: undefined | (() => any), params: any) => {
+  serverQuery = _.debounce((option: GridDataSourceSql | GridDataSourceServer | GridDataSourceAjax, paramFunction: undefined | (() => any), params: any) => {
     const that = this
 
     //异步请求数据内容
@@ -62,6 +63,21 @@ export class YvanDataSourceGrid {
         filterModel: params.filterModel,
       })
 
+    } else if (option.type === 'Ajax') {
+      const ajax: Ajax.Function = _.get(window, 'YvanUI.ajax');
+      ajaxPromise = <Promise<Db.Response>>ajax({
+        url: option.url,
+        method: 'POST-JSON',
+        data: {
+          params: queryParams,
+          limit: params.endRow - params.startRow,
+          limitOffset: params.startRow,
+          needCount,
+          orderByModel: params.sortModel,
+          filterModel: params.filterModel,
+        }
+      });
+
     } else {
       console.error('unSupport dataSource mode:', option);
       params.failCallback();
@@ -100,7 +116,7 @@ export class YvanDataSourceGrid {
   /**
    * SQL取值
    */
-  setSqlMode(option: GridDataSourceSql | GridDataSourceServer, paramFunction: undefined | (() => any)) {
+  setSqlMode(option: GridDataSourceSql | GridDataSourceServer | GridDataSourceAjax, paramFunction: undefined | (() => any)) {
     const that = this
     this.reload = () => {
       this.ctl.loading = true
@@ -323,7 +339,7 @@ export class YvanDataSourceGrid {
       return
     }
 
-    if (option.type === 'SQL' || option.type === 'Server') {
+    if (option.type === 'SQL' || option.type === 'Server' || option.type === 'Ajax') {
       this.setSqlMode(option, paramFunction)
       return
     }

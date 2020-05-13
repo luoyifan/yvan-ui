@@ -14,7 +14,7 @@ export interface CtlGridColumn {
     calcExpr: string;
     editMode: 'search' | 'checkbox' | 'number' | 'combo' | 'text' | 'area' | 'date' | 'datetime';
 }
-export declare type GridDataSource = undefined | GridDataSourceServer | GridDataSourceStatic | GridDataSourceSql | GridDataSourceStaticFunction | Array<any>;
+export declare type GridDataSource = undefined | GridDataSourceServer | GridDataSourceAjax | GridDataSourceStatic | GridDataSourceSql | GridDataSourceStaticFunction | Array<any>;
 export declare type GridDataSourceSave = undefined | GridDataSourceSaveStatic | GridDataSourceSaveStaticFunction;
 export interface WatchParam {
     $watch: string;
@@ -28,6 +28,40 @@ export interface GridDataSourceServer {
      * 方法名
      */
     method: string;
+    /**
+     * 自定义参数
+     * 参数中允许以下三种形式
+     * params:{
+     *   f1: 123,
+     *   f2: 'abc',
+     *   f3: { $get: 'dsMain.f1' },
+     *   f4: { $watch: 'dsMain.f2' }
+     *
+     * 参数也可以写成对象形式
+     *   'query.f1': 123,
+     *   'query.f2': 'abc',
+     *   'query.f3': { $get: 'dsMain.f1' },
+     *   'query.f4': { $watch: 'dsMain.f2' }
+     * }
+     */
+    params?: {
+        [name: string]: string | number | WatchParam | GetParam;
+    };
+    /**
+     * 执行前, 检查是否需要请求服务器
+     */
+    preFunction?: string;
+    /**
+     * 执行后, 更改服务器返回的数据结构
+     */
+    afterFunction?: string;
+}
+export interface GridDataSourceAjax {
+    type: 'Ajax';
+    /**
+     * 请求地址
+     */
+    url: string;
     /**
      * 自定义参数
      * 参数中允许以下三种形式

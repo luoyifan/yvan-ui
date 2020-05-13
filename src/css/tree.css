@@ -6,3 +6,7 @@
 .webix_tree .webix_tree_item.webix_selected {
   background-color: #ffefbb;
 }
+
+.webix_tree_item {
+  padding: 3px 0;
+}

@@ -56,6 +56,9 @@ legend.webix_forminput_label,
   background-color: #ffefbb;
 }
 
+.webix_tree_item {
+  padding: 3px 0;
+}
 /*======================== button =======================*/
 .webix_el_label .webix_el_box {
   color: #4b4c4c;
@@ -251,6 +254,7 @@ legend.webix_forminput_label,
 .webix_icon_btn.fa {
   font: normal normal normal 14px/1 FontAwesome;
 }
+
 
 [role='echarts'] {
   font-style: normal;

@@ -11,7 +11,7 @@
 /// <reference types="node_modules/@types/lodash/ts3.1/common/seq" />
 /// <reference types="node_modules/@types/lodash/ts3.1/common/string" />
 /// <reference types="node_modules/@types/lodash/ts3.1/common/util" />
-import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSourceStaticFunction } from './YvanDataSourceGrid';
+import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSourceAjax, GridDataSourceStaticFunction } from './YvanDataSourceGrid';
 export declare class YvanDataSourceGrid {
     private option;
     private ctl;
@@ -21,11 +21,11 @@ export declare class YvanDataSourceGrid {
     private reload;
     private rowCount;
     private lastFilterModel;
-    serverQuery: ((option: GridDataSourceServer | GridDataSourceSql, paramFunction: (() => any) | undefined, params: any) => void) & import("lodash").Cancelable;
+    serverQuery: ((option: GridDataSourceServer | GridDataSourceAjax | GridDataSourceSql, paramFunction: (() => any) | undefined, params: any) => void) & import("lodash").Cancelable;
     /**
      * SQL取值
      */
-    setSqlMode(option: GridDataSourceSql | GridDataSourceServer, paramFunction: undefined | (() => any)): void;
+    setSqlMode(option: GridDataSourceSql | GridDataSourceServer | GridDataSourceAjax, paramFunction: undefined | (() => any)): void;
     /**
      * 自定义函数式取值
      */

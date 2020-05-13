@@ -43,6 +43,10 @@ export declare abstract class BaseModule<M, Refs, INP> extends Vue implements Mo
      * 根据名称，获取空白区域操作句柄
      */
     getPlace(placeId: string): any;
+    /**
+     * 从外部设置输入参数
+     */
+    setInParamter: (inParamter: INP) => void;
 }
 export declare abstract class BaseDialog<M, Refs, INP> extends BaseModule<M, Refs, INP> {
     /**

@@ -49,7 +49,9 @@ webix.protoUI(
         },
         $setSize: function (x: any, y: any) {
             if (webix.ui.view.prototype.$setSize.call(this, x, y)) {
-                this._set_inner_size()
+                _.defer(() => {
+                    this._set_inner_size()
+                })
             }
         }
     },

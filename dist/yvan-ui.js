@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('webix'), require('ag-grid'), require('reflect-metadata'), require('xterm'), require('xterm-addon-fit'), require('axios'), require('qs'), require('typescript')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'webix', 'ag-grid', 'reflect-metadata', 'xterm', 'xterm-addon-fit', 'axios', 'qs', 'typescript'], factory) :
-  (global = global || self, factory(global['yvan-ui'] = {}, global.Vue, global.webix, global.agGrid, null, global.xterm, global.xtermAddonFit, global.axios, global.Qs, global.ts));
-}(this, (function (exports, Vue, webix, agGrid, reflectMetadata, xterm, xtermAddonFit, axios, Qs, ts) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('webix'), require('reflect-metadata'), require('ag-grid'), require('xterm'), require('xterm-addon-fit'), require('axios'), require('qs'), require('typescript')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'webix', 'reflect-metadata', 'ag-grid', 'xterm', 'xterm-addon-fit', 'axios', 'qs', 'typescript'], factory) :
+  (global = global || self, factory(global['yvan-ui'] = {}, global.Vue, global.webix, null, global.agGrid, global.xterm, global.xtermAddonFit, global.axios, global.Qs, global.ts));
+}(this, (function (exports, Vue, webix, reflectMetadata, agGrid, xterm, xtermAddonFit, axios, Qs, ts) { 'use strict';
 
   Vue = Vue && Object.prototype.hasOwnProperty.call(Vue, 'default') ? Vue['default'] : Vue;
   webix = webix && Object.prototype.hasOwnProperty.call(webix, 'default') ? webix['default'] : webix;
@@ -310,6 +310,39 @@
   }
   //# sourceMappingURL=YvanUIExtend.js.map
 
+  /**
+   * 服务调用
+   */
+  function brokerInvoke(serverUrl, method, args) {
+      return new Promise(function (resolve) {
+          var ajax = _.get(window, 'YvanUI.ajax');
+          ajax({
+              url: serverUrl + '@' + method,
+              method: 'POST-JSON',
+              data: args
+          }).then(function (res) {
+              resolve(res);
+          });
+      });
+  }
+  /**
+   * 创建服务代理
+   */
+  function createBroker(serviceType) {
+      var serviceProxy = serviceType;
+      var result = {};
+      // 具体参见 com.yvan.serverless.ServerLessServlet@doGet
+      _.each(serviceProxy.funcs, function (fun) {
+          _.set(result, fun, function () {
+              return brokerInvoke(serviceProxy.invokeUrl, fun, {
+                  args: Array.prototype.slice.call(arguments)
+              });
+          });
+      });
+      return result;
+  }
+  //# sourceMappingURL=Service.js.map
+
   var YvDataSource = /** @class */ (function () {
       function YvDataSource(ctl, option, dataSourceProcess) {
           var _this = this;
@@ -340,12 +373,28 @@
               var that = _this;
               //异步请求数据内容
               that.ctl.loading = true;
-              dbs[option.db]
-                  .query({
-                  params: option.params,
-                  needCount: false,
-                  sqlId: option.sqlId
-              }).then(function (res) {
+              var ajaxPromise;
+              if (option.type === 'SQL') {
+                  ajaxPromise = dbs[option.db].query({
+                      params: option.params,
+                      needCount: false,
+                      sqlId: option.sqlId
+                  });
+              }
+              else if (option.type === 'Server') {
+                  var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
+                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, {
+                      params: option.params,
+                      needCount: false,
+                  });
+              }
+              else {
+                  console.error('unSupport dataSource mode:', option);
+                  that.ctl.dataReal = [];
+                  that.ctl.loading = false;
+                  return;
+              }
+              ajaxPromise.then(function (res) {
                   var resultData = res.data, resParams = res.params;
                   if (_this.dataSourceProcess) {
                       //自定义的数据处理过程
@@ -355,11 +404,9 @@
                       that.ctl.dataReal = resultData;
                   }
                   YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined);
-              })
-                  .catch(function (r) {
+              }).catch(function (r) {
                   that.ctl.dataReal = [];
-              })
-                  .finally(function () {
+              }).finally(function () {
                   that.ctl.loading = false;
               });
           });
@@ -435,7 +482,7 @@
                   this.setCustomFunctionMode(bindFunction);
               }
           }
-          else if (this.option.type === 'SQL') {
+          else if (this.option.type === 'SQL' || this.option.type === 'Server') {
               this.setSqlMode(this.option);
           }
           else {
@@ -632,7 +679,7 @@
           this._webix.filter(function (node) {
               var value = node.value;
               var nodePy = getFirstPinyin(value).toLowerCase();
-              return nodePy.indexOf(nv.toLowerCase()) >= 0 || value.indexOf(nv) >= 0;
+              return nodePy.indexOf(nv.toLowerCase()) >= 0 || value.toLowerCase().indexOf(nv) >= 0;
           });
       };
       Object.defineProperty(CtlTree.prototype, "value", {
@@ -3932,39 +3979,6 @@
   }());
   //# sourceMappingURL=CtlGridHeadCheckbox.js.map
 
-  /**
-   * 服务调用
-   */
-  function brokerInvoke(serverUrl, method, args) {
-      return new Promise(function (resolve) {
-          var ajax = _.get(window, 'YvanUI.ajax');
-          ajax({
-              url: serverUrl + '@' + method,
-              method: 'POST-JSON',
-              data: args
-          }).then(function (res) {
-              resolve(res);
-          });
-      });
-  }
-  /**
-   * 创建服务代理
-   */
-  function createBroker(serviceType) {
-      var serviceProxy = serviceType;
-      var result = {};
-      // 具体参见 com.yvan.serverless.ServerLessServlet@doGet
-      _.each(serviceProxy.funcs, function (fun) {
-          _.set(result, fun, function () {
-              return brokerInvoke(serviceProxy.invokeUrl, fun, {
-                  args: Array.prototype.slice.call(arguments)
-              });
-          });
-      });
-      return result;
-  }
-  //# sourceMappingURL=Service.js.map
-
   var YvanDataSourceGrid = /** @class */ (function () {
       function YvanDataSourceGrid(ctl, option) {
           var _this = this;
@@ -4011,6 +4025,21 @@
                       needCount: needCount,
                       orderByModel: params.sortModel,
                       filterModel: params.filterModel,
+                  });
+              }
+              else if (option.type === 'Ajax') {
+                  var ajax = _.get(window, 'YvanUI.ajax');
+                  ajaxPromise = ajax({
+                      url: option.url,
+                      method: 'POST-JSON',
+                      data: {
+                          params: queryParams,
+                          limit: params.endRow - params.startRow,
+                          limitOffset: params.startRow,
+                          needCount: needCount,
+                          orderByModel: params.sortModel,
+                          filterModel: params.filterModel,
+                      }
                   });
               }
               else {
@@ -4109,7 +4138,7 @@
               }
               return;
           }
-          if (option.type === 'SQL' || option.type === 'Server') {
+          if (option.type === 'SQL' || option.type === 'Server' || option.type === 'Ajax') {
               this.setSqlMode(option, paramFunction);
               return;
           }
@@ -6534,7 +6563,7 @@
           this._webix.filter(function (node) {
               var value = node.value;
               var nodePy = getFirstPinyin(value).toLowerCase();
-              return nodePy.indexOf(nv.toLowerCase()) >= 0 || value.indexOf(nv) >= 0;
+              return nodePy.indexOf(nv.toLowerCase()) >= 0 || value.toLowerCase().indexOf(nv) >= 0;
           });
       };
       Object.defineProperty(CtlSidebar.prototype, "value", {
@@ -6762,8 +6791,11 @@
           }
       },
       $setSize: function (x, y) {
+          var _this = this;
           if (webix.ui.view.prototype.$setSize.call(this, x, y)) {
-              this._set_inner_size();
+              _.defer(function () {
+                  _this._set_inner_size();
+              });
           }
       }
   }, webix.ui.view);
@@ -6816,7 +6848,6 @@
       });
       return CtlXterm;
   }(CtlBase));
-  //# sourceMappingURL=CtlXterm.js.map
 
   webix.protoUI({
       name: 'xconsolelog',
@@ -7615,6 +7646,9 @@
               closeDialog: function () {
                   this.dialog.close();
               },
+              setInParamter: function (inParamter) {
+                  this.inParamter = inParamter;
+              },
               showDialog: function (inParamter, container, isFromSearchBox) {
                   if (isFromSearchBox === void 0) { isFromSearchBox = false; }
                   // 显示对话框
@@ -7642,26 +7676,26 @@
                           view: "toolbar", margin: -4, cols: [
                               { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
                               {
-                                  view: "icon", icon: "wxi-plus-square", click: function () {
+                                  view: "icon", icon: "fa fa-expand", click: function () {
                                       dialog.config.fullscreen = !dialog.config.fullscreen;
                                       if (dialog.config.fullscreen) {
                                           dialog.config.oldtop = dialog.config.top;
                                           dialog.config.oldleft = dialog.config.left;
                                           dialog.config.left = 0;
                                           dialog.config.top = 0;
-                                          this.define({ icon: 'wxi-minus-square' });
+                                          this.define({ icon: 'fa fa-compress' });
                                       }
                                       else {
                                           dialog.config.top = dialog.config.oldtop;
                                           dialog.config.left = dialog.config.oldleft;
-                                          this.define({ icon: 'wxi-plus-square' });
+                                          this.define({ icon: 'fa fa-expand' });
                                       }
                                       dialog.resize();
                                       this.refresh();
                                   }
                               },
                               {
-                                  view: "icon", icon: "wxi-close", click: function () {
+                                  view: "icon", icon: "fa fa-times", title: '关闭', tooltip: '关闭', click: function () {
                                       dialog.close();
                                   }
                               }
