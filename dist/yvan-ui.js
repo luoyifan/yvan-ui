@@ -6803,6 +6803,20 @@
           enumerable: true,
           configurable: true
       });
+      Object.defineProperty(CtlXterm.prototype, "xtermWidth", {
+          get: function () {
+              return this._webix.$width;
+          },
+          enumerable: true,
+          configurable: true
+      });
+      Object.defineProperty(CtlXterm.prototype, "xtermHeight", {
+          get: function () {
+              return this._webix.$height;
+          },
+          enumerable: true,
+          configurable: true
+      });
       return CtlXterm;
   }(CtlBase));
 
