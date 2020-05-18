@@ -101,4 +101,12 @@ export class CtlXterm extends CtlBase<CtlXterm> {
     get fitAddon(): FitAddon {
         return this._webix._fitAddon
     }
+
+    get xtermWidth(): number {
+        return this._webix.$width
+    }
+
+    get xtermHeight(): number {
+        return this._webix.$height
+    }
 }
