@@ -412,6 +412,7 @@ export class CtlTree extends CtlBase<CtlTree> {
     for (let i = 0; i < data.length; i++) {
       const row = data[i]
       nodeMap[row[idField]] = {
+        icon: row['icon'],
         value: row[textField],
         id: row[idField],
         row: row

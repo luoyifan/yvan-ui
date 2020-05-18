@@ -79,7 +79,6 @@
           return targetFunc.apply(vue, [sender, args]);
       }
   }
-  //# sourceMappingURL=YvanEvent.js.map
 
   var designMode = false;
   function initDesign() {
@@ -88,7 +87,6 @@
   function isDesignMode() {
       return designMode;
   }
-  //# sourceMappingURL=DesignHelper.js.map
 
   var CtlBase = /** @class */ (function () {
       function CtlBase(vjson) {
@@ -225,7 +223,6 @@
       });
       return CtlBase;
   }());
-  //# sourceMappingURL=CtlBase.js.map
 
   /**
    * 内部函数
@@ -247,7 +244,6 @@
       });
       return yvanProp;
   }
-  //# sourceMappingURL=CtlUtils.js.map
 
   var version = "3.0.2";
   /**
@@ -308,7 +304,6 @@
           exports.componentRenderFilter = option.componentRenderFilter;
       }
   }
-  //# sourceMappingURL=YvanUIExtend.js.map
 
   /**
    * 服务调用
@@ -341,7 +336,6 @@
       });
       return result;
   }
-  //# sourceMappingURL=Service.js.map
 
   var YvDataSource = /** @class */ (function () {
       function YvDataSource(ctl, option, dataSourceProcess) {
@@ -499,7 +493,6 @@
       };
       return YvDataSource;
   }());
-  //# sourceMappingURL=YvanDataSourceImp.js.map
 
   var CtlButtonDefault = {
       text: '',
@@ -568,12 +561,10 @@
       labelWidth: 110,
       labelAlign: 'right',
   };
-  //# sourceMappingURL=CtlDefaultValue.js.map
 
   function getFirstPinyin(msg) {
       return _.get(window, 'getFirstPinyin')(msg);
   }
-  //# sourceMappingURL=Utils.js.map
 
   var CtlTree = /** @class */ (function (_super) {
       __extends(CtlTree, _super);
@@ -923,6 +914,7 @@
           for (var i = 0; i < data.length; i++) {
               var row = data[i];
               nodeMap[row[idField]] = {
+                  icon: row['icon'],
                   value: row[textField],
                   id: row[idField],
                   row: row
@@ -961,7 +953,6 @@
       };
       return CtlTree;
   }(CtlBase));
-  //# sourceMappingURL=CtlTree.js.map
 
   var CtlTreeTable = /** @class */ (function (_super) {
       __extends(CtlTreeTable, _super);
@@ -1211,7 +1202,6 @@
       };
       return CtlTreeTable;
   }(CtlBase));
-  //# sourceMappingURL=CtlTreeTable.js.map
 
   /**
    * 创建快捷菜单
@@ -1315,7 +1305,6 @@
       //     }
       // });
   }
-  //# sourceMappingURL=CtlContextMenu.js.map
 
   var CtlTab = /** @class */ (function (_super) {
       __extends(CtlTab, _super);
@@ -1524,7 +1513,6 @@
       };
       return CtlTab;
   }(CtlBase));
-  //# sourceMappingURL=CtlTab.js.map
 
   var CtlDataview = /** @class */ (function (_super) {
       __extends(CtlDataview, _super);
@@ -1690,7 +1678,6 @@
       };
       return CtlDataview;
   }(CtlBase));
-  //# sourceMappingURL=CtlDataview.js.map
 
   /**
    * 扩展 echarts 组件
@@ -1783,7 +1770,6 @@
       };
       return CtlECharts;
   }(CtlBase));
-  //# sourceMappingURL=CtlECharts.js.map
 
   /**
    * 按钮组件
@@ -1970,7 +1956,6 @@
       };
       return CtlButton;
   }(CtlBase));
-  //# sourceMappingURL=CtlButton.js.map
 
   var CtlInput = /** @class */ (function (_super) {
       __extends(CtlInput, _super);
@@ -2456,7 +2441,6 @@
       };
       return CtlInput;
   }(CtlBase));
-  //# sourceMappingURL=CtlInput.js.map
 
   var CtlText = /** @class */ (function (_super) {
       __extends(CtlText, _super);
@@ -2516,7 +2500,6 @@
       });
       return CtlText;
   }(CtlInput));
-  //# sourceMappingURL=CtlText.js.map
 
   var CtlCheckBox = /** @class */ (function (_super) {
       __extends(CtlCheckBox, _super);
@@ -2631,7 +2614,6 @@
       });
       return CtlCheckBox;
   }(CtlInput));
-  //# sourceMappingURL=CtlCheckBox.js.map
 
   /**
    * 下拉框组件
@@ -2783,7 +2765,6 @@
       };
       return CtlCombo;
   }(CtlInput));
-  //# sourceMappingURL=CtlCombo.js.map
 
   var CtlDatePicker = /** @class */ (function (_super) {
       __extends(CtlDatePicker, _super);
@@ -2864,7 +2845,6 @@
       };
       return CtlDatePicker;
   }(CtlInput));
-  //# sourceMappingURL=CtlDatePicker.js.map
 
   var CtlDateRangePicker = /** @class */ (function (_super) {
       __extends(CtlDateRangePicker, _super);
@@ -3002,7 +2982,6 @@
       };
       return CtlDateRangePicker;
   }(CtlInput));
-  //# sourceMappingURL=CtlDateRangePicker.js.map
 
   var CtlForm = /** @class */ (function (_super) {
       __extends(CtlForm, _super);
@@ -3050,7 +3029,6 @@
       };
       return CtlForm;
   }(CtlBase));
-  //# sourceMappingURL=CtlForm.js.map
 
   var CtlMultiCombo = /** @class */ (function (_super) {
       __extends(CtlMultiCombo, _super);
@@ -3161,7 +3139,6 @@
       });
       return CtlMultiCombo;
   }(CtlInput));
-  //# sourceMappingURL=CtlMultiCombo.js.map
 
   var CtlSearch = /** @class */ (function (_super) {
       __extends(CtlSearch, _super);
@@ -3351,7 +3328,6 @@
       };
       return CtlSearch;
   }(CtlInput));
-  //# sourceMappingURL=CtlSearch.js.map
 
   var CtlCarousel = /** @class */ (function (_super) {
       __extends(CtlCarousel, _super);
@@ -3384,7 +3360,6 @@
       };
       return CtlCarousel;
   }(CtlBase));
-  //# sourceMappingURL=CtlCarousel.js.map
 
   var CtlGridLocale = {
       rownumber: " ",
@@ -3456,7 +3431,6 @@
       paste: "粘贴",
       ctrlV: "ctrl + V"
   };
-  //# sourceMappingURL=CtlGridLocale.js.map
 
   var CtlGridPage = /** @class */ (function () {
       function CtlGridPage(grid) {
@@ -3717,7 +3691,6 @@
       };
       return CtlGridPage;
   }());
-  //# sourceMappingURL=CtlGridPage.js.map
 
   function CtlGridIdRender (params, grid) {
       if (params.node.cstate) {
@@ -3746,7 +3719,6 @@
       }
       return 1 + params.node.rowIndex;
   }
-  //# sourceMappingURL=CtlGridIdRender.js.map
 
   var YvGridProp = {
       editable: false,
@@ -3795,7 +3767,6 @@
       datetimeformat: 'yyyy-MM-dd HH:mm:ss',
       data: []
   };
-  //# sourceMappingURL=CtlGridDefault.js.map
 
   var CtlGridCellCheckbox = /** @class */ (function () {
       function CtlGridCellCheckbox() {
@@ -3883,7 +3854,6 @@
       };
       return CtlGridCellCheckbox;
   }());
-  //# sourceMappingURL=CtlGridCellCheckbox.js.map
 
   var CtlGridHeadCheckbox = /** @class */ (function () {
       function CtlGridHeadCheckbox() {
@@ -3976,7 +3946,6 @@
       };
       return CtlGridHeadCheckbox;
   }());
-  //# sourceMappingURL=CtlGridHeadCheckbox.js.map
 
   var YvanDataSourceGrid = /** @class */ (function () {
       function YvanDataSourceGrid(ctl, option) {
@@ -4300,7 +4269,6 @@
       };
       return YvanDataSourceGrid;
   }());
-  //# sourceMappingURL=YvanDataSourceGridImp.js.map
 
   var CtlGridCellButton = /** @class */ (function () {
       function CtlGridCellButton() {
@@ -4366,7 +4334,6 @@
       };
       return CtlGridCellButton;
   }());
-  //# sourceMappingURL=CtlGridCellButton.js.map
 
   var CtlGridFilterSet = /** @class */ (function () {
       function CtlGridFilterSet() {
@@ -4578,7 +4545,6 @@
       };
       return CtlGridFilterSet;
   }());
-  //# sourceMappingURL=CtlGridFilterSet.js.map
 
   var CtlGridEditor = /** @class */ (function () {
       function CtlGridEditor() {
@@ -4649,7 +4615,6 @@
       };
       return CtlGridEditor;
   }());
-  //# sourceMappingURL=CtlGridEditor.js.map
 
   var isInput = false;
   var CtlGridEditorText = /** @class */ (function (_super) {
@@ -4822,7 +4787,6 @@
       };
       return CtlGridEditorText;
   }(CtlGridEditor));
-  //# sourceMappingURL=CtlGridEditorText.js.map
 
   var CtlGridEditorCombo = /** @class */ (function (_super) {
       __extends(CtlGridEditorCombo, _super);
@@ -4888,7 +4852,6 @@
       };
       return CtlGridEditorCombo;
   }(CtlGridEditor));
-  //# sourceMappingURL=CtlGridEditorCombo.js.map
 
   /**
    * 扩展 grid 组件
@@ -6049,7 +6012,6 @@
       };
       return CtlGrid;
   }(CtlBase));
-  //# sourceMappingURL=CtlGrid.js.map
 
   var CtlSwitch = /** @class */ (function (_super) {
       __extends(CtlSwitch, _super);
@@ -6104,7 +6066,6 @@
       });
       return CtlSwitch;
   }(CtlInput));
-  //# sourceMappingURL=CtlSwitch.js.map
 
   var CtlNumber = /** @class */ (function (_super) {
       __extends(CtlNumber, _super);
@@ -6200,7 +6161,6 @@
       });
       return CtlNumber;
   }(CtlInput));
-  //# sourceMappingURL=CtlNumber.js.map
 
   var CtlRadio = /** @class */ (function (_super) {
       __extends(CtlRadio, _super);
@@ -6245,7 +6205,6 @@
       });
       return CtlRadio;
   }(CtlInput));
-  //# sourceMappingURL=CtlRadio.js.map
 
   webix.protoUI({
       name: 'codemirror-editor',
@@ -6505,7 +6464,6 @@
       });
       return CtlCodeMirror;
   }(CtlBase));
-  //# sourceMappingURL=CtlCodeMirror.js.map
 
   var CtlSidebar = /** @class */ (function (_super) {
       __extends(CtlSidebar, _super);
@@ -6748,7 +6706,6 @@
       };
       return CtlSidebar;
   }(CtlBase));
-  //# sourceMappingURL=CtlSidebar.js.map
 
   webix.protoUI({
       name: 'xterm',
@@ -7493,7 +7450,6 @@
           });
       };
   }
-  //# sourceMappingURL=YvanUIAjax.js.map
 
   (function (Db) {
       var Client = /** @class */ (function () {
@@ -7577,7 +7533,6 @@
   function createDb(createOption) {
       return new exports.Db.Client(createOption);
   }
-  //# sourceMappingURL=YvanUIDb.js.map
 
   /**
    * 获取页面 URL 问号之后的参数
@@ -7671,7 +7626,6 @@
       }
       return queryString;
   }
-  //# sourceMappingURL=YvanUIUtils.js.map
 
   /**
    * 显示正在读取
@@ -7869,7 +7823,6 @@
       }
       // https://docs.webix.com/desktop__message_boxes.html
   }
-  //# sourceMappingURL=YvanUIMessage.js.map
 
   /**
    * 扩展 grid 组件
@@ -8001,7 +7954,6 @@
           target.watches.push(watch);
       };
   }
-  //# sourceMappingURL=YvanUIModule.js.map
 
   // eslint-disable-next-line import/no-extraneous-dependencies
   /**
@@ -8071,7 +8023,6 @@
       return result;
   }
   var contentText = "export type Refs = {\n};\n\nexport default abstract class<M, INP> extends YvanUI.BaseDialog<M, Refs, INP> {\n\n    main: {\n        FADMINID:string,\n        FADMINNAME: string,\n        FADMINPHONE: string,\n        FEMAIL: string\n    } = {\n        FADMINID:'',\n        FADMINNAME: '',\n        FADMINPHONE:'',\n        FEMAIL:''\n    };\n\n    viewResolver(): any {\n        console.log(this, this.inParamter);\n\n        return {\n            title: '\u8054\u7CFB\u65B9\u5F0F\u7EF4\u62A4',\n            modal: true,\n            width: 400,\n            height: 200,\n            body: {\n                rows: [\n                    {\n                        view: 'text',\n                        entityName: \"main.FADMINNAME\",\n                        label: \"\u7BA1\u7406\u5458\u540D\u79F0\",\n                        required: true,\n                        width: 320,\n                    },\n                    {\n                        view: 'text',\n                        entityName: 'main.FADMINPHONE',\n                        label: '\u7BA1\u7406\u5458\u8054\u7CFB\u65B9\u5F0F',\n                        width: 320,\n                        required: true,\n                    },\n                    {\n                        view: 'text',\n                        entityName: \"main.FEMAIL\",\n                        label: \"\u8054\u7CFBEMAIL\",\n                        width: 320,\n                        required: true,\n                    },\n                    {\n                        cols: [\n                            {width: 110},\n                            {\n                                view: \"button\", text: \"\u786E\u5B9A\", cssType: \"primary\", width: 0,\n                                onClick: {\n                                    type: 'function',\n                                    bind: 'ok'\n                                }\n                            },\n                            {\n                                view: \"button\", text: \"\u53D6\u6D88\", cssType: 'default', width: 0,\n                                onClick: {\n                                    type: 'function',\n                                    bind: 'cancel'\n                                }\n                            }\n                        ]\n                    }\n                ]\n            }\n        }\n    }\n}";
-  //# sourceMappingURL=YvanUICode.js.map
 
   var PropertyDescription = /** @class */ (function () {
       function PropertyDescription() {
@@ -8113,7 +8064,6 @@
       };
       return PropertyDescription;
   }());
-  //# sourceMappingURL=PropertyDescription.js.map
 
   var PropertyDescriptionTable = new Map();
   PropertyDescriptionTable.set('layout', new PropertyDescription({
@@ -8414,7 +8364,6 @@
           { name: 'onNodeDblClick', desc: '节点被双击后触发' }
       ]
   }));
-  //# sourceMappingURL=PropertyDescriptionTable.js.map
 
   function userComponentFactory(Component, name) {
   }
@@ -8432,7 +8381,6 @@
       }
       return UserComponentBase;
   }());
-  //# sourceMappingURL=UserComponent.js.map
 
   exports.BaseDialog = BaseDialog;
   exports.BaseModule = BaseModule;
