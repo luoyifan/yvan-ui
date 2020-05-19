@@ -23,6 +23,10 @@ export const CtlXtermDefault: any = {
 
 }
 
+export const CtlConsoleLogDefault: any = {
+
+}
+
 export const CtlCodeMirrorDefault = {
     mode: 'sql',
     indentWithTabs: true,

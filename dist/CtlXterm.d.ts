@@ -11,4 +11,6 @@ export declare class CtlXterm extends CtlBase<CtlXterm> {
      * 获取填充插件
      */
     get fitAddon(): FitAddon;
+    get xtermWidth(): number;
+    get xtermHeight(): number;
 }

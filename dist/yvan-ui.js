@@ -79,7 +79,6 @@
           return targetFunc.apply(vue, [sender, args]);
       }
   }
-  //# sourceMappingURL=YvanEvent.js.map
 
   var designMode = false;
   function initDesign() {
@@ -88,7 +87,6 @@
   function isDesignMode() {
       return designMode;
   }
-  //# sourceMappingURL=DesignHelper.js.map
 
   var CtlBase = /** @class */ (function () {
       function CtlBase(vjson) {
@@ -225,7 +223,6 @@
       });
       return CtlBase;
   }());
-  //# sourceMappingURL=CtlBase.js.map
 
   /**
    * 内部函数
@@ -247,7 +244,6 @@
       });
       return yvanProp;
   }
-  //# sourceMappingURL=CtlUtils.js.map
 
   var version = "3.0.2";
   /**
@@ -308,7 +304,6 @@
           exports.componentRenderFilter = option.componentRenderFilter;
       }
   }
-  //# sourceMappingURL=YvanUIExtend.js.map
 
   /**
    * 服务调用
@@ -341,7 +336,6 @@
       });
       return result;
   }
-  //# sourceMappingURL=Service.js.map
 
   var YvDataSource = /** @class */ (function () {
       function YvDataSource(ctl, option, dataSourceProcess) {
@@ -499,7 +493,6 @@
       };
       return YvDataSource;
   }());
-  //# sourceMappingURL=YvanDataSourceImp.js.map
 
   var CtlButtonDefault = {
       text: '',
@@ -516,6 +509,7 @@
   };
   var CtlSidebarDefault = {};
   var CtlXtermDefault = {};
+  var CtlConsoleLogDefault = {};
   var CtlCodeMirrorDefault = {
       mode: 'sql',
       indentWithTabs: true,
@@ -568,12 +562,10 @@
       labelWidth: 110,
       labelAlign: 'right',
   };
-  //# sourceMappingURL=CtlDefaultValue.js.map
 
   function getFirstPinyin(msg) {
       return _.get(window, 'getFirstPinyin')(msg);
   }
-  //# sourceMappingURL=Utils.js.map
 
   var CtlTree = /** @class */ (function (_super) {
       __extends(CtlTree, _super);
@@ -923,6 +915,7 @@
           for (var i = 0; i < data.length; i++) {
               var row = data[i];
               nodeMap[row[idField]] = {
+                  icon: row['icon'],
                   value: row[textField],
                   id: row[idField],
                   row: row
@@ -961,7 +954,6 @@
       };
       return CtlTree;
   }(CtlBase));
-  //# sourceMappingURL=CtlTree.js.map
 
   var CtlTreeTable = /** @class */ (function (_super) {
       __extends(CtlTreeTable, _super);
@@ -1211,7 +1203,6 @@
       };
       return CtlTreeTable;
   }(CtlBase));
-  //# sourceMappingURL=CtlTreeTable.js.map
 
   /**
    * 创建快捷菜单
@@ -1315,7 +1306,6 @@
       //     }
       // });
   }
-  //# sourceMappingURL=CtlContextMenu.js.map
 
   var CtlTab = /** @class */ (function (_super) {
       __extends(CtlTab, _super);
@@ -1524,7 +1514,6 @@
       };
       return CtlTab;
   }(CtlBase));
-  //# sourceMappingURL=CtlTab.js.map
 
   var CtlDataview = /** @class */ (function (_super) {
       __extends(CtlDataview, _super);
@@ -1690,7 +1679,6 @@
       };
       return CtlDataview;
   }(CtlBase));
-  //# sourceMappingURL=CtlDataview.js.map
 
   /**
    * 扩展 echarts 组件
@@ -1783,7 +1771,6 @@
       };
       return CtlECharts;
   }(CtlBase));
-  //# sourceMappingURL=CtlECharts.js.map
 
   /**
    * 按钮组件
@@ -1970,7 +1957,6 @@
       };
       return CtlButton;
   }(CtlBase));
-  //# sourceMappingURL=CtlButton.js.map
 
   var CtlInput = /** @class */ (function (_super) {
       __extends(CtlInput, _super);
@@ -2456,7 +2442,6 @@
       };
       return CtlInput;
   }(CtlBase));
-  //# sourceMappingURL=CtlInput.js.map
 
   var CtlText = /** @class */ (function (_super) {
       __extends(CtlText, _super);
@@ -2516,7 +2501,6 @@
       });
       return CtlText;
   }(CtlInput));
-  //# sourceMappingURL=CtlText.js.map
 
   var CtlCheckBox = /** @class */ (function (_super) {
       __extends(CtlCheckBox, _super);
@@ -2631,7 +2615,6 @@
       });
       return CtlCheckBox;
   }(CtlInput));
-  //# sourceMappingURL=CtlCheckBox.js.map
 
   /**
    * 下拉框组件
@@ -2783,7 +2766,6 @@
       };
       return CtlCombo;
   }(CtlInput));
-  //# sourceMappingURL=CtlCombo.js.map
 
   var CtlDatePicker = /** @class */ (function (_super) {
       __extends(CtlDatePicker, _super);
@@ -2864,7 +2846,6 @@
       };
       return CtlDatePicker;
   }(CtlInput));
-  //# sourceMappingURL=CtlDatePicker.js.map
 
   var CtlDateRangePicker = /** @class */ (function (_super) {
       __extends(CtlDateRangePicker, _super);
@@ -3002,7 +2983,6 @@
       };
       return CtlDateRangePicker;
   }(CtlInput));
-  //# sourceMappingURL=CtlDateRangePicker.js.map
 
   var CtlForm = /** @class */ (function (_super) {
       __extends(CtlForm, _super);
@@ -3050,7 +3030,6 @@
       };
       return CtlForm;
   }(CtlBase));
-  //# sourceMappingURL=CtlForm.js.map
 
   var CtlMultiCombo = /** @class */ (function (_super) {
       __extends(CtlMultiCombo, _super);
@@ -3161,7 +3140,6 @@
       });
       return CtlMultiCombo;
   }(CtlInput));
-  //# sourceMappingURL=CtlMultiCombo.js.map
 
   var CtlSearch = /** @class */ (function (_super) {
       __extends(CtlSearch, _super);
@@ -3351,7 +3329,6 @@
       };
       return CtlSearch;
   }(CtlInput));
-  //# sourceMappingURL=CtlSearch.js.map
 
   var CtlCarousel = /** @class */ (function (_super) {
       __extends(CtlCarousel, _super);
@@ -3384,7 +3361,6 @@
       };
       return CtlCarousel;
   }(CtlBase));
-  //# sourceMappingURL=CtlCarousel.js.map
 
   var CtlGridLocale = {
       rownumber: " ",
@@ -3456,7 +3432,6 @@
       paste: "粘贴",
       ctrlV: "ctrl + V"
   };
-  //# sourceMappingURL=CtlGridLocale.js.map
 
   var CtlGridPage = /** @class */ (function () {
       function CtlGridPage(grid) {
@@ -3717,7 +3692,6 @@
       };
       return CtlGridPage;
   }());
-  //# sourceMappingURL=CtlGridPage.js.map
 
   function CtlGridIdRender (params, grid) {
       if (params.node.cstate) {
@@ -3746,7 +3720,6 @@
       }
       return 1 + params.node.rowIndex;
   }
-  //# sourceMappingURL=CtlGridIdRender.js.map
 
   var YvGridProp = {
       editable: false,
@@ -3795,7 +3768,6 @@
       datetimeformat: 'yyyy-MM-dd HH:mm:ss',
       data: []
   };
-  //# sourceMappingURL=CtlGridDefault.js.map
 
   var CtlGridCellCheckbox = /** @class */ (function () {
       function CtlGridCellCheckbox() {
@@ -3883,7 +3855,6 @@
       };
       return CtlGridCellCheckbox;
   }());
-  //# sourceMappingURL=CtlGridCellCheckbox.js.map
 
   var CtlGridHeadCheckbox = /** @class */ (function () {
       function CtlGridHeadCheckbox() {
@@ -3976,7 +3947,6 @@
       };
       return CtlGridHeadCheckbox;
   }());
-  //# sourceMappingURL=CtlGridHeadCheckbox.js.map
 
   var YvanDataSourceGrid = /** @class */ (function () {
       function YvanDataSourceGrid(ctl, option) {
@@ -4300,7 +4270,6 @@
       };
       return YvanDataSourceGrid;
   }());
-  //# sourceMappingURL=YvanDataSourceGridImp.js.map
 
   var CtlGridCellButton = /** @class */ (function () {
       function CtlGridCellButton() {
@@ -4366,7 +4335,6 @@
       };
       return CtlGridCellButton;
   }());
-  //# sourceMappingURL=CtlGridCellButton.js.map
 
   var CtlGridFilterSet = /** @class */ (function () {
       function CtlGridFilterSet() {
@@ -4578,7 +4546,6 @@
       };
       return CtlGridFilterSet;
   }());
-  //# sourceMappingURL=CtlGridFilterSet.js.map
 
   var CtlGridEditor = /** @class */ (function () {
       function CtlGridEditor() {
@@ -4649,7 +4616,6 @@
       };
       return CtlGridEditor;
   }());
-  //# sourceMappingURL=CtlGridEditor.js.map
 
   var isInput = false;
   var CtlGridEditorText = /** @class */ (function (_super) {
@@ -4822,7 +4788,6 @@
       };
       return CtlGridEditorText;
   }(CtlGridEditor));
-  //# sourceMappingURL=CtlGridEditorText.js.map
 
   var CtlGridEditorCombo = /** @class */ (function (_super) {
       __extends(CtlGridEditorCombo, _super);
@@ -4888,7 +4853,6 @@
       };
       return CtlGridEditorCombo;
   }(CtlGridEditor));
-  //# sourceMappingURL=CtlGridEditorCombo.js.map
 
   /**
    * 扩展 grid 组件
@@ -6049,7 +6013,6 @@
       };
       return CtlGrid;
   }(CtlBase));
-  //# sourceMappingURL=CtlGrid.js.map
 
   var CtlSwitch = /** @class */ (function (_super) {
       __extends(CtlSwitch, _super);
@@ -6104,7 +6067,6 @@
       });
       return CtlSwitch;
   }(CtlInput));
-  //# sourceMappingURL=CtlSwitch.js.map
 
   var CtlNumber = /** @class */ (function (_super) {
       __extends(CtlNumber, _super);
@@ -6200,7 +6162,6 @@
       });
       return CtlNumber;
   }(CtlInput));
-  //# sourceMappingURL=CtlNumber.js.map
 
   var CtlRadio = /** @class */ (function (_super) {
       __extends(CtlRadio, _super);
@@ -6245,7 +6206,6 @@
       });
       return CtlRadio;
   }(CtlInput));
-  //# sourceMappingURL=CtlRadio.js.map
 
   webix.protoUI({
       name: 'codemirror-editor',
@@ -6505,7 +6465,6 @@
       });
       return CtlCodeMirror;
   }(CtlBase));
-  //# sourceMappingURL=CtlCodeMirror.js.map
 
   var CtlSidebar = /** @class */ (function (_super) {
       __extends(CtlSidebar, _super);
@@ -6748,7 +6707,6 @@
       };
       return CtlSidebar;
   }(CtlBase));
-  //# sourceMappingURL=CtlSidebar.js.map
 
   webix.protoUI({
       name: 'xterm',
@@ -6845,7 +6803,396 @@
           enumerable: true,
           configurable: true
       });
+      Object.defineProperty(CtlXterm.prototype, "xtermWidth", {
+          get: function () {
+              return this._webix.$width;
+          },
+          enumerable: true,
+          configurable: true
+      });
+      Object.defineProperty(CtlXterm.prototype, "xtermHeight", {
+          get: function () {
+              return this._webix.$height;
+          },
+          enumerable: true,
+          configurable: true
+      });
       return CtlXterm;
+  }(CtlBase));
+
+  webix.protoUI({
+      name: 'xconsolelog',
+      defaults: {},
+      $init: function (config) {
+          this._domid = webix.uid();
+          this.$view.innerHTML = "<div id='" + this._domid + "' class=\"vc-log\"></div>";
+          this.$ready.push(this._ready);
+          _.extend(this.config, config);
+          if (config.on && typeof config.on.onInited === 'function') {
+              config.on.onInited.call(this);
+          }
+      },
+      _ready: function () {
+      },
+      _set_inner_size: function () {
+          if (!this._term || !this.$width)
+              return;
+          this._updateScrollSize();
+          // this._editor.scrollTo(0, 0) //force repaint, mandatory for IE
+      },
+      _updateScrollSize: function () {
+          var box = this._term.element;
+          var height = (this.$height || 0) + 'px';
+          box.style.height = height;
+          box.style.width = (this.$width || 0) + 'px';
+      },
+      $setSize: function (x, y) {
+          if (webix.ui.view.prototype.$setSize.call(this, x, y)) {
+              this._set_inner_size();
+          }
+      }
+  }, webix.ui.view);
+  var CtlConsoleLog = /** @class */ (function (_super) {
+      __extends(CtlConsoleLog, _super);
+      function CtlConsoleLog() {
+          var _this = _super !== null && _super.apply(this, arguments) || this;
+          _this._realHtml = new Array();
+          _this.realRender = _.debounce(function () {
+              $(_this._webix.$view).find('.vc-log').append(_this._realHtml.join(''));
+              _this._realHtml = [];
+          });
+          return _this;
+      }
+      CtlConsoleLog.create = function (module, vjson) {
+          var that = new CtlConsoleLog(vjson);
+          that._module = module;
+          _.defaultsDeep(vjson, CtlConsoleLogDefault);
+          var yvanProp = parseYvanPropChangeVJson(vjson, ['value']);
+          // 将 vjson 存至 _webixConfig
+          that._webixConfig = vjson;
+          // 将 yvanProp 合并至当前 Ctl 对象, 期间会操作 _webixConfig
+          _.assign(that, yvanProp);
+          // 将 事件与 _webixConfig 一起存至 vjson 交给 webix 框架做渲染
+          _.merge(vjson, that._webixConfig, {
+              on: {
+                  onInited: function () {
+                      var _this = this;
+                      that.attachHandle(this);
+                      _.defer(function () {
+                          $(_this.$view).on('click', '.vc-fold', function (e) {
+                              that.vcfoldclick(this);
+                          });
+                      });
+                  },
+                  onAfterDelete: function () {
+                      that.removeHandle();
+                  }
+              }
+          });
+          return that;
+      };
+      /**
+       * @param logs 需要打印的json
+       */
+      CtlConsoleLog.prototype.printLog = function (logs) {
+          var logHtml = '<div class="vc-item">';
+          if (!logs) {
+              logHtml += '<div><i class="vc-code-string">undefined</i></div>';
+          }
+          else {
+              logHtml += this.log2html(logs);
+          }
+          logHtml += "</div>";
+          this.renderDom(logHtml);
+      };
+      CtlConsoleLog.prototype.renderDom = function (domHtml) {
+          // console.log(domHtml)
+          // var originDom;
+          // for (let index = 0; index < this._webix.$view.children.length; index++) {
+          //   const element = this._webix.$view.children[index];
+          //   if (element.classList.contains("vc-log")) {
+          //     originDom = element;
+          //   }
+          // }
+          // var originHtml = originDom.innerHTML;
+          // var newHtml = originHtml + domHtml;
+          // originDom.innerHTML = newHtml;
+          // const that = this;
+          this._realHtml.push(domHtml);
+          this.realRender();
+      };
+      /**
+        * 递归生成html
+        */
+      CtlConsoleLog.prototype.log2html = function (params) {
+          if (this.isArray(params) || this.isObject(params)) {
+              return this.obj2html(params);
+          }
+          else if (this.isNumber(params) || this.isBoolean(params)) {
+              return '<div><i class="vc-code-number">' + params + '</i></div>';
+          }
+          else {
+              return '<div><i class="vc-code-string">"' + params.toString() + '"</i></div>';
+          }
+      };
+      CtlConsoleLog.prototype.obj2html = function (params, title) {
+          var outer = '';
+          var json = this.JSONStringify(params);
+          var preview = json.substr(0, 36);
+          outer = this.getObjName(params);
+          if (json.length > 36) {
+              preview += '...';
+          }
+          outer += ' ' + preview;
+          var obj2htmlContent;
+          if (title) {
+              obj2htmlContent = '<div class="vc-fold">\
+      <div><i class="vc-code-key">' +
+                  title + '</i>:' +
+                  '<i class="vc-fold-outer">' +
+                  outer +
+                  '</i></div>\
+      </div> \
+      <div class="vc-fold-content vc-hidden">';
+          }
+          else {
+              obj2htmlContent = '<div class="vc-fold">\
+      <i class="vc-fold-outer">' +
+                  outer +
+                  '</i> \
+      </div> \
+      <div class="vc-fold-content vc-hidden">';
+          }
+          if (this.isObject(params)) {
+              var objKeys = this.getObjAllKeys(params);
+              for (var i = 0; i < objKeys.length; i++) {
+                  var val = params[objKeys[i]];
+                  if (this.isObject(val) || this.isArray(val)) {
+                      obj2htmlContent += '<div>' + this.obj2html(val, objKeys[i]) + '</div>';
+                  }
+                  else if (this.isNumber(val) || this.isBoolean(val)) {
+                      obj2htmlContent += '<div><i class="vc-code-key">' + objKeys[i] + '</i>: <i class="vc-code-number">' + val + '</i></div>';
+                  }
+                  else {
+                      obj2htmlContent += '<div><i class="vc-code-key">' + objKeys[i] + '</i>: <i class="vc-code-string">"' + val + '"</i></div>';
+                  }
+              }
+          }
+          else if (this.isArray(params)) {
+              for (var i = 0; i < params.length; i++) {
+                  obj2htmlContent += '<div>' + this.obj2html(params[i]) + '</div>';
+              }
+          }
+          obj2htmlContent += '</div>';
+          return obj2htmlContent;
+      };
+      /**
+       * div打开关闭
+       */
+      CtlConsoleLog.prototype.vcfoldclick = function (params) {
+          var vcFoldElements = params.parentElement.children;
+          var vcFoldContent = vcFoldElements[vcFoldElements.length - 1];
+          if (vcFoldContent.classList.contains("vc-hidden")) {
+              vcFoldContent.classList.remove("vc-hidden");
+          }
+          else {
+              vcFoldContent.classList.add("vc-hidden");
+          }
+      };
+      /**
+     * 搜索并打开div
+     */
+      CtlConsoleLog.prototype.searchText = function (inputValue) {
+          var items;
+          for (var index = 0; index < this._webix.$view.children.length; index++) {
+              var element = this._webix.$view.children[index];
+              if (element.classList.contains("vc-log")) {
+                  items = element;
+              }
+          }
+          this.removeSelected(items);
+          if (!inputValue) {
+              return;
+          }
+          this.itemContainsText(items, inputValue);
+      };
+      CtlConsoleLog.prototype.itemContainsText = function (params, inputValue) {
+          for (var i = 0; i < params.children.length; i++) {
+              var item = params.children[i];
+              if (item.innerHTML.indexOf(inputValue) !== -1) {
+                  if (item.classList.contains("vc-fold-content")) {
+                      item.classList.remove("vc-hidden");
+                  }
+                  if (item.classList.contains("vc-code-key") ||
+                      item.classList.contains("vc-code-string") ||
+                      item.classList.contains("vc-code-number") ||
+                      item.classList.contains("vc-code-boolean")) {
+                      item.classList.add("vc-code-string-selected");
+                  }
+                  this.itemContainsText(item, inputValue);
+              }
+          }
+      };
+      CtlConsoleLog.prototype.removeSelected = function (params) {
+          for (var i = 0; i < params.children.length; i++) {
+              var item = params.children[i];
+              item.classList.remove("vc-code-string-selected");
+              this.removeSelected(item);
+          }
+      };
+      /**
+     * 全部清空
+     */
+      CtlConsoleLog.prototype.vcClearAll = function () {
+          var vcLog = $('#' + this._webix._domid)[0];
+          vcLog.innerHTML = '';
+      };
+      /**
+     * 全部收起
+     */
+      CtlConsoleLog.prototype.vcCloseAll = function () {
+          var vcLog = $('#' + this._webix._domid)[0];
+          this.closeOrOpen(vcLog, false);
+      };
+      /**
+       * 全部展开
+       */
+      CtlConsoleLog.prototype.vcOpenAll = function () {
+          var vcLog = $('#' + this._webix._domid)[0];
+          this.closeOrOpen(vcLog, true);
+          // var vvv = _.cloneDeepWith(vcLog, function customizer(value) {
+          //   if (_.isElement(value)) {
+          //     return value.cloneNode(true);
+          //   }
+          // });
+          // this.closeOrOpen(vvv, true);
+          // vcLog.innerHTML = vvv.innerHTML;
+      };
+      CtlConsoleLog.prototype.closeOrOpen = function (items, isOpen) {
+          for (var i = 0; i < items.children.length; i++) {
+              var item = items.children[i];
+              if (item.classList.contains("vc-fold-content")) {
+                  if (isOpen) {
+                      item.classList.remove("vc-hidden");
+                  }
+                  else {
+                      item.classList.add("vc-hidden");
+                  }
+              }
+              this.closeOrOpen(item, isOpen);
+          }
+      };
+      /**
+       * tools
+       */
+      CtlConsoleLog.prototype.isNumber = function (value) {
+          return Object.prototype.toString.call(value) == '[object Number]';
+      };
+      CtlConsoleLog.prototype.isString = function (value) {
+          return Object.prototype.toString.call(value) == '[object String]';
+      };
+      CtlConsoleLog.prototype.isArray = function (value) {
+          return Object.prototype.toString.call(value) == '[object Array]';
+      };
+      CtlConsoleLog.prototype.isBoolean = function (value) {
+          return Object.prototype.toString.call(value) == '[object Boolean]';
+      };
+      CtlConsoleLog.prototype.isUndefined = function (value) {
+          return value === undefined;
+      };
+      CtlConsoleLog.prototype.isNull = function (value) {
+          return value === null;
+      };
+      CtlConsoleLog.prototype.isSymbol = function (value) {
+          return Object.prototype.toString.call(value) == '[object Symbol]';
+      };
+      CtlConsoleLog.prototype.isFunction = function (value) {
+          return Object.prototype.toString.call(value) == '[object Function]';
+      };
+      CtlConsoleLog.prototype.isObject = function (value) {
+          return (Object.prototype.toString.call(value) == '[object Object]' ||
+              // if it isn't a primitive value, then it is a common object
+              (!this.isNumber(value) &&
+                  !this.isString(value) &&
+                  !this.isBoolean(value) &&
+                  !this.isArray(value) &&
+                  !this.isNull(value) &&
+                  !this.isFunction(value) &&
+                  !this.isUndefined(value) &&
+                  !this.isSymbol(value)));
+      };
+      /**
+     * Simple JSON stringify, stringify top level key-value
+     */
+      CtlConsoleLog.prototype.JSONStringify = function (stringObject) {
+          if (!this.isObject(stringObject) && !this.isArray(stringObject)) {
+              return JSON.stringify(stringObject);
+          }
+          var prefix = '{', suffix = '}';
+          if (this.isArray(stringObject)) {
+              prefix = '[';
+              suffix = ']';
+          }
+          var str = prefix;
+          var keys = this.getObjAllKeys(stringObject);
+          for (var i = 0; i < keys.length; i++) {
+              var key = keys[i];
+              var value = stringObject[key];
+              try {
+                  // key
+                  if (!this.isArray(stringObject)) {
+                      if (this.isObject(key) || this.isArray(key) || this.isSymbol(key)) {
+                          str += Object.prototype.toString.call(key);
+                      }
+                      else {
+                          str += key;
+                      }
+                      str += ': ';
+                  }
+                  // value
+                  if (this.isArray(value)) {
+                      str += 'Array[' + value.length + ']';
+                  }
+                  else if (this.isObject(value) || this.isSymbol(value) || this.isFunction(value)) {
+                      str += Object.prototype.toString.call(value);
+                  }
+                  else {
+                      str += JSON.stringify(value);
+                  }
+                  if (i < keys.length - 1) {
+                      str += ', ';
+                  }
+              }
+              catch (e) {
+                  continue;
+              }
+          }
+          str += suffix;
+          return str;
+      };
+      /**
+     * get an object's all keys ignore whether they are not enumerable
+     */
+      CtlConsoleLog.prototype.getObjAllKeys = function (obj) {
+          if (!this.isObject(obj) && !this.isArray(obj)) {
+              return [];
+          }
+          if (this.isArray(obj)) {
+              var m_1 = [];
+              obj.forEach(function (_, index) {
+                  m_1.push(index);
+              });
+              return m_1;
+          }
+          return Object.getOwnPropertyNames(obj).sort();
+      };
+      /**
+       * get an object's prototype name
+       */
+      CtlConsoleLog.prototype.getObjName = function (obj) {
+          return Object.prototype.toString.call(obj).replace('[object ', '').replace(']', '');
+      };
+      return CtlConsoleLog;
   }(CtlBase));
 
   // export const webix = require("../webix/webix");
@@ -7130,6 +7477,9 @@
                       break;
                   case 'xterm':
                       CtlXterm.create(module, obj);
+                      break;
+                  case 'xconsolelog':
+                      CtlConsoleLog.create(module, obj);
                       break;
                   case 'echarts':
                       CtlECharts.create(module, obj);
@@ -7493,7 +7843,6 @@
           });
       };
   }
-  //# sourceMappingURL=YvanUIAjax.js.map
 
   (function (Db) {
       var Client = /** @class */ (function () {
@@ -7577,7 +7926,6 @@
   function createDb(createOption) {
       return new exports.Db.Client(createOption);
   }
-  //# sourceMappingURL=YvanUIDb.js.map
 
   /**
    * 获取页面 URL 问号之后的参数
@@ -7671,7 +8019,6 @@
       }
       return queryString;
   }
-  //# sourceMappingURL=YvanUIUtils.js.map
 
   /**
    * 显示正在读取
@@ -7869,7 +8216,6 @@
       }
       // https://docs.webix.com/desktop__message_boxes.html
   }
-  //# sourceMappingURL=YvanUIMessage.js.map
 
   /**
    * 扩展 grid 组件
@@ -8001,7 +8347,6 @@
           target.watches.push(watch);
       };
   }
-  //# sourceMappingURL=YvanUIModule.js.map
 
   // eslint-disable-next-line import/no-extraneous-dependencies
   /**
@@ -8071,7 +8416,6 @@
       return result;
   }
   var contentText = "export type Refs = {\n};\n\nexport default abstract class<M, INP> extends YvanUI.BaseDialog<M, Refs, INP> {\n\n    main: {\n        FADMINID:string,\n        FADMINNAME: string,\n        FADMINPHONE: string,\n        FEMAIL: string\n    } = {\n        FADMINID:'',\n        FADMINNAME: '',\n        FADMINPHONE:'',\n        FEMAIL:''\n    };\n\n    viewResolver(): any {\n        console.log(this, this.inParamter);\n\n        return {\n            title: '\u8054\u7CFB\u65B9\u5F0F\u7EF4\u62A4',\n            modal: true,\n            width: 400,\n            height: 200,\n            body: {\n                rows: [\n                    {\n                        view: 'text',\n                        entityName: \"main.FADMINNAME\",\n                        label: \"\u7BA1\u7406\u5458\u540D\u79F0\",\n                        required: true,\n                        width: 320,\n                    },\n                    {\n                        view: 'text',\n                        entityName: 'main.FADMINPHONE',\n                        label: '\u7BA1\u7406\u5458\u8054\u7CFB\u65B9\u5F0F',\n                        width: 320,\n                        required: true,\n                    },\n                    {\n                        view: 'text',\n                        entityName: \"main.FEMAIL\",\n                        label: \"\u8054\u7CFBEMAIL\",\n                        width: 320,\n                        required: true,\n                    },\n                    {\n                        cols: [\n                            {width: 110},\n                            {\n                                view: \"button\", text: \"\u786E\u5B9A\", cssType: \"primary\", width: 0,\n                                onClick: {\n                                    type: 'function',\n                                    bind: 'ok'\n                                }\n                            },\n                            {\n                                view: \"button\", text: \"\u53D6\u6D88\", cssType: 'default', width: 0,\n                                onClick: {\n                                    type: 'function',\n                                    bind: 'cancel'\n                                }\n                            }\n                        ]\n                    }\n                ]\n            }\n        }\n    }\n}";
-  //# sourceMappingURL=YvanUICode.js.map
 
   var PropertyDescription = /** @class */ (function () {
       function PropertyDescription() {
@@ -8113,7 +8457,6 @@
       };
       return PropertyDescription;
   }());
-  //# sourceMappingURL=PropertyDescription.js.map
 
   var PropertyDescriptionTable = new Map();
   PropertyDescriptionTable.set('layout', new PropertyDescription({
@@ -8414,7 +8757,6 @@
           { name: 'onNodeDblClick', desc: '节点被双击后触发' }
       ]
   }));
-  //# sourceMappingURL=PropertyDescriptionTable.js.map
 
   function userComponentFactory(Component, name) {
   }
@@ -8432,7 +8774,6 @@
       }
       return UserComponentBase;
   }());
-  //# sourceMappingURL=UserComponent.js.map
 
   exports.BaseDialog = BaseDialog;
   exports.BaseModule = BaseModule;
@@ -8442,6 +8783,7 @@
   exports.CtlCheckBox = CtlCheckBox;
   exports.CtlCodeMirror = CtlCodeMirror;
   exports.CtlCombo = CtlCombo;
+  exports.CtlConsoleLog = CtlConsoleLog;
   exports.CtlDataview = CtlDataview;
   exports.CtlDatePicker = CtlDatePicker;
   exports.CtlDateRangePicker = CtlDateRangePicker;

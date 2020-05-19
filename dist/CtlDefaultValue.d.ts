@@ -3,6 +3,7 @@ export declare const CtlDataviewDefault: any;
 export declare const CtlTreeDefault: any;
 export declare const CtlSidebarDefault: any;
 export declare const CtlXtermDefault: any;
+export declare const CtlConsoleLogDefault: any;
 export declare const CtlCodeMirrorDefault: {
     mode: string;
     indentWithTabs: boolean;
