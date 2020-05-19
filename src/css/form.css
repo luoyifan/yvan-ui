@@ -8,8 +8,8 @@
     sans-serif;
   padding: 0 6px;
   height: 28px;
-  border-radius: 5px!important;
-  transition: all .3s ease!important;
+  border-radius: 2px;
+  transition: all .3s ease;
   box-shadow: 0px 1px 5px rgba(0,0,0,.08) inset
 }
 .webix_inp_label,
