@@ -541,16 +541,17 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
 
         // 获取到 viewResolver 方法，拿到最原始的 vjson
         const vjson: any = module.viewResolver()
-
         if (!_.has(vjson, 'body')) {
           vjson.body = {
             template: 'dialog 没有 body'
           }
+        }else{
+          if(!_.has(vjson.body, 'padding')){
+            vjson.body.padding=10
+          }
         }
-
         // 与 yvan 组件进行交换，使 vjson 能被 webix 使用
         wrapperWebixConfig(module, vjson.body)
-
         // 构建 window
         _.merge(vjson, {
           view: 'window',

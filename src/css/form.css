@@ -1,0 +1,59 @@
+/*======================== form =======================*/
+.webix_el_text input,
+.webix_el_search input,
+.webix_el_combo input,
+.webix_el_datepicker input,
+.webix_el_colorpicker input {
+  font: 500 13px/20px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif;
+  padding: 0 6px;
+  height: 28px;
+  border-radius: 5px!important;
+  transition: all .3s ease!important;
+  box-shadow: 0px 1px 5px rgba(0,0,0,.08) inset
+}
+.webix_inp_label,
+.webix_inp_top_label,
+legend.webix_forminput_label,
+.webix_el_label .webix_el_box {
+  font-size: 13px;
+  font-weight: 400;
+  font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
+    sans-serif;
+}
+.webix_el_text input:focus, .webix_el_search input:focus, .webix_el_combo input:focus, .webix_el_datepicker input:focus, .webix_el_colorpicker input:focus{
+  outline: 0;
+  box-shadow: 0 0 0 2px rgba(24,144,255,.2);
+  border-color:#1890ff
+}
+.webix_inp_label, .webix_inp_top_label, legend.webix_forminput_label, .webix_el_label .webix_el_box{
+  line-height: 28px;
+  font-size: 13px
+}
+.webix_list_item{
+  height: 32px!important;
+  line-height: 32px;
+  font-size: 13px!important
+}
+.webix_list_item.webix_selected{
+  box-shadow:none;
+  background: #e6f7ff;
+}
+input::-webkit-input-placeholder{
+  color:#e4e4e4;
+  font-size: 12px
+}
+input::-moz-placeholder{
+  color:#e4e4e4;
+  font-size: 12px
+}
+input:-ms-input-placeholder{
+  color:#e4e4e4;
+  font-size: 12px
+}
+.webix_el_radio .webix_radio_1 .webix_custom_radio{
+  color:#1890ff
+}
+.webix_el_radio .webix_custom_radio:before{
+  font-size: 18px;
+}

@@ -1,94 +1,4 @@
 /* ====================== tabview =========================*/
-.maintab > .webix_view.webix_control.webix_el_tabbar {
-  background-color: #5fa2dd;
-}
-
-.maintab > .webix_el_tabbar > .webix_all_tabs .webix_item_tab {
-  position: relative;
-  padding: 0 28px 0 6px;
-}
-
-.maintab
-  > .webix_el_tabbar
-  > .webix_all_tabs
-  .webix_item_tab
-  .webix_icon.webix_tab_close {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  height: 28px;
-  line-height: 28px;
-  margin-top: -14px;
-}
-
-.maintab > .webix_el_tabbar > .webix_all_tabs .webix_item_tab.webix_selected,
-.maintab
-  > .webix_el_tabbar
-  > .webix_all_tabs
-  .webix_item_tab.webix_selected:active {
-  box-shadow: inset 0 -2px #fff;
-  color: #4c82b1;
-  background-color: #fff;
-}
-
-.maintab > .webix_el_tabbar > .webix_all_tabs .webix_item_tab:hover {
-  border-color: #000;
-  background-color: rgba(0, 0, 0, 0.08);
-}
-.maintab
-  > .webix_el_tabbar
-  > .webix_all_tabs
-  .webix_item_tab.webix_selected:hover {
-  border-color: #000;
-  background-color: #fff;
-}
-
-.maintab
-  > .webix_el_tabbar
-  > .webix_all_tabs
-  .webix_item_tab.webix_selected
-  .webix_icon.webix_tab_close {
-  color: #919191;
-  font-weight: bold;
-  font-size: 13px;
-}
-
-.maintab
-  > .webix_el_tabbar
-  > .webix_all_tabs
-  .webix_item_tab
-  .webix_icon.webix_tab_close {
-  color: #fff;
-  font-weight: bold;
-  font-size: 13px;
-}
-
-.maintab > .webix_el_tabbar > .webix_all_tabs {
-  padding-top: 8px;
-  padding-left: 10px;
-}
-
-.maintab > .webix_el_tabbar {
-  border-bottom: 0;
-}
-
-.maintab .webix_multiview > .webix_layout_line {
-  border-top: 0;
-}
-
-.maintab > .webix_el_tabbar > .webix_all_tabs > .webix_item_tab {
-  display: table-cell;
-  text-align: center;
-  vertical-align: middle;
-  overflow: hidden;
-  cursor: pointer;
-  background-color: #5fa2dd;
-  color: #f0f0f0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 130px;
-}
-
 /* iframe 遮盖层样式 */
 .webix_designer_overlay {
   width: 100%;
@@ -100,4 +10,30 @@
 .webix_icon_btn.fa {
   font: normal normal normal 14px/1 FontAwesome;
 }
-
+.webix_all_tabs{
+  width: 100%;
+  border-bottom:1px solid #f0f0f0;
+  height: 40px!important;
+  display: block;
+}
+.webix_item_tab{
+  width: 100px!important;
+  color:#475466!important;
+  transition: color .3s ease;
+  height: 40px!important;
+}
+.webix_all_tabs .webix_item_tab:hover{
+  color:#1890ff!important;
+  background: none!important;
+}
+.webix_all_tabs .webix_item_tab.webix_selected{
+  box-shadow: inset 0 -2px #1890ff;
+  color:#1890ff
+}
+.webix_multiview .webix_selected{
+  background: #fff!important;
+}
+.webix_all_tabs .webix_item_tab.webix_selected:focus{
+  box-shadow: inset 0 -2px #1890ff;
+  color:#1890ff
+}

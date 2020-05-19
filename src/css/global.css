@@ -6,19 +6,8 @@ body,
   overflow: hidden;
   margin: 0;
 }
-
 /*======================== global =======================*/
 .webix_view {
-  font-size: 13px;
-  font-weight: 400;
-  font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
-    sans-serif;
-}
-
-.webix_inp_label,
-.webix_inp_top_label,
-legend.webix_forminput_label,
-.webix_el_label .webix_el_box {
   font-size: 13px;
   font-weight: 400;
   font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
@@ -37,12 +26,271 @@ legend.webix_forminput_label,
     sans-serif;
 }
 
-.webix_el_text input,
-.webix_el_search input,
-.webix_el_combo input,
-.webix_el_datepicker input,
-.webix_el_colorpicker input {
-  font: 500 13px/20px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
-    sans-serif;
-  padding: 0 6px;
+/*======================== mainView =======================*/
+.mainHeader{
+  background: #fff;
+  border:0px solid #000
+}
+.mainHeader .webix_scroll_cont{
+  height:63px;
+  -webkit-box-shadow: 0 2px 8px #f0f1f2;
+  box-shadow: 0 2px 8px #f0f1f2
+}
+.mainHeader .webix_scroll_cont div{
+  height:63px!important
+}
+.mainHeader  .webix_template{
+  color: rgba(0,0,0,.85)
+}
+.headerMenu{
+  height:63px!important
+}
+.headerMenu .webix_scroll_cont{
+  -webkit-box-shadow:none;
+  box-shadow: none;
+  margin-top: 0!important;
+  text-align: right;
+  padding-right:20px
+}
+.headerMenu .webix_list_item{
+  height:63px!important;
+  background: #fff;
+  border-top:2px solid #fff;
+  color:rgba(0, 0, 0, 0.85);
+  line-height: 62px
+}
+.headerMenu a:last-child{
+  margin-right:15px
+}
+.headerMenu .webix_list_item:hover,.headerMenu .webix_list_item:focus{
+  background: #fff;
+  border-top:2px Solid #1890ff;
+  color:#1890ff
+}
+.webix_view a.webix_list_item{
+  transition: all .3s ease!important
+}
+.webix_view{
+  border-color:#fff;
+  border:none;
+}
+.mainLeft input{
+  border:none;
+  background: url(/static/images/search.png) 30px no-repeat;
+  background-size: 14px 14px;
+  transition: all .3s ease!important;
+  padding:0 20px 0 51px!important;
+  box-shadow:0 0 0!important;
+}
+.mainLeft input:hover{
+  border:none;
+  background: url(/static/images/search-foucs.png) 30px no-repeat;
+  background-size: 14px 14px
+}
+.mainLeft input:focus{
+  border:none;
+}
+.mainLeft input::-webkit-input-placeholder {
+  color:#a3b1bf;
+  font-size: 13px
+}
+.mainLeft .webix_form{
+  border-bottom:1px solid #f0f0f0!important;
+  border-right:1px solid #f0f0f0!important
+}
+.mainLeft .webix_form .webix_el_box{
+  transition: all .3s ease;
+  border-bottom:1px solid #f0f0f0!important
+}
+.mainLeft .webix_form .webix_el_box:hover{
+  border-bottom:1px solid #1890ff!important
+}
+.mainLeft .webix_tree{
+  border-right:1px solid #f0f0f0
+}
+.mainLeft .webix_tree .webix_scroll_cont > .webix_tree_leaves{
+  padding:0!important;
+}
+.mainLeft .webix_tree .webix_tree_item{
+  padding:8px;
+  cursor: pointer;
+  transition: all .3s ease;
+}
+.mainLeft .webix_tree .webix_tree_item:hover{
+  color:#1890ff
+}
+.mainLeft .webix_tree .webix_selected{
+  background: #e6f7ff;
+  border-right:3px solid #1890ff;
+  color:#1890ff
+}
+.mainLeft .webix_tree .webix_tree_branch_2 .webix_tree_item{
+  padding-left:28px
+}
+.webix_tree_leaves .webix_tree_leaves{
+  margin:0px!important
+}
+.mainLeft .webix_tree::-webkit-scrollbar {
+  width: 5px;
+  height: 10px;
+  overflow: auto
+}
+.mainLeft .webix_tree::-webkit-scrollbar-thumb {
+  background-color: #d9d9d9;
+  min-height: 25px;
+  min-width: 25px;
+  border: 1px solid #f0f0f0
+}
+.mainLeft .webix_tree::-webkit-scrollbar-track {
+  background-color: #f7f7f7
+}
+.maintab{
+  margin-left:3px!important
+}
+.maintab > .webix_view.webix_control.webix_el_tabbar{
+  background: #fff
+}
+.maintab > .webix_el_tabbar > .webix_all_tabs{
+  padding:0!important;
+  height:38px;
+  position: relative;
+  top:-1px
+}
+.maintab .webix_el_tabbar .webix_all_tabs {
+  border-bottom:1px solid #f0f0f0!important
+}
+.mainTabBar .webix_item_tab{
+  background: none!important;
+  padding:0 5px 0 0!important;
+  color:#666!important;
+  border-bottom:0;
+  font-size: 14px;
+  transition: color .3s ease
+}
+.mainTabBar .myTabDiv{
+  border:1px solid #f0f0f0;
+  border-bottom: 0;
+  width: 100%;
+  height: 100%;
+  padding:0 16px;
+  box-sizing: border-box;
+  background: #f0f0f0;
+  border-radius: 6px 6px 0 0;
+  line-height: 38px;
+  position: relative;
+  top: 1px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden
+}
+.mainTabBar .webix_item_tab:hover{
+  border-color:#f0f0f0!important;
+  color:#1890ff!important
+}
+.mainTabBar .webix_selected{
+  background: none!important;
+  color:#1890ff!important;
+  position: relative;
+  top: 1px;
+  box-shadow: 0 0 0 0!important;
+  -webkit-box-shadow: 0 0 0 0!important
+}
+.mainTabBar .webix_selected .myTabDiv{
+  background: #fff!important;
+  color:#1890ff!important;
+  border-top:1px solid #1890ff!important
+}
+.mainTabBar .webix_item_tab .webix_tab_close{
+  color:#666!important;
+  width: 20px!important;
+  top:20px!important;
+  right:6px!important
+}
+.mainTabBar .webix_selected .webix_tab_close{
+  color:#1890ff!important
+}
+/*======================== mainView-mainTab =======================*/
+.maintab > .webix_el_tabbar > .webix_all_tabs .webix_item_tab {
+  position: relative;
+  padding: 0 28px 0 6px;
+}
+.maintab
+  > .webix_el_tabbar
+  > .webix_all_tabs
+  .webix_item_tab
+  .webix_icon.webix_tab_close {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  height: 28px;
+  line-height: 28px;
+  margin-top: -14px;
+}
+
+.maintab > .webix_el_tabbar > .webix_all_tabs .webix_item_tab.webix_selected,
+.maintab
+  > .webix_el_tabbar
+  > .webix_all_tabs
+  .webix_item_tab.webix_selected:active {
+  box-shadow: inset 0 -2px #fff;
+  color: #4c82b1;
+  background-color: #fff;
+}
+
+.maintab > .webix_el_tabbar > .webix_all_tabs .webix_item_tab:hover {
+  border-color: #000;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.maintab
+  > .webix_el_tabbar
+  > .webix_all_tabs
+  .webix_item_tab.webix_selected:hover {
+  border-color: #000;
+  background-color: #fff;
+}
+
+.maintab
+  > .webix_el_tabbar
+  > .webix_all_tabs
+  .webix_item_tab.webix_selected
+  .webix_icon.webix_tab_close {
+  color: #919191;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.maintab
+  > .webix_el_tabbar
+  > .webix_all_tabs
+  .webix_item_tab
+  .webix_icon.webix_tab_close {
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.maintab > .webix_el_tabbar > .webix_all_tabs {
+  padding-top: 8px;
+  padding-left: 10px;
+}
+
+.maintab > .webix_el_tabbar {
+  border-bottom: 0;
+}
+
+.maintab .webix_multiview > .webix_layout_line {
+  border-top: 0;
+}
+
+.maintab > .webix_el_tabbar > .webix_all_tabs > .webix_item_tab {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #5fa2dd;
+  color: #f0f0f0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
 }

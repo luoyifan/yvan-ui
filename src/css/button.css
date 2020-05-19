@@ -1,4 +1,7 @@
 /*======================== button =======================*/
+.inputButton .webix_el_box{
+  height:34px
+}
 .webix_el_label .webix_el_box {
   color: #4b4c4c;
   padding-left: 5px;
@@ -13,10 +16,11 @@
     sans-serif;
   border-radius: 0;
   padding: 7px 7px 7px 7px;
-  border-width: 1px;
-  border-style: solid;
+  border:1px solid #d9d9d9;
   background-color: #f6f6f6;
   color: #606060;
+  border-radius: 6px;
+  transition: all .3s ease;
 }
 
 .layui-layer-btn > .layui-layer-btn1,
@@ -49,7 +53,38 @@
   min-width: 50px;
   text-align: center;
 }
-
+.webix_el_button.yvan_primary > .webix_el_box > .webix_button {
+  color: #fff;
+  background: #1890ff;
+  border-color: #1890ff;
+}
+.webix_el_button.yvan_primary > .webix_el_box > .webix_button:hover {
+  color: #fff;
+  background-color: #3ea1fc;
+  border-color: #1890ff;
+}
+.webix_el_button.yvan_default > .webix_el_box > .webix_button:hover {
+  color: #3ea1fc;
+  background-color: #fff;
+  border-color: #1890ff;
+}
+.webix_el_button.yvan_ghost > .webix_el_box > .webix_button {
+  background: #fff;
+}
+.webix_el_button.yvan_ghost > .webix_el_box > .webix_button:hover {
+  color: #3ea1fc;
+  background-color: #fff;
+  border-color: #1890ff;
+}
+.webix_el_button.yvan_dashed > .webix_el_box > .webix_button {
+  background: #fff;
+  border-style: dashed;
+}
+.webix_el_button.yvan_dashed > .webix_el_box > .webix_button:hover {
+  color: #3ea1fc;
+  background-color: #fff;
+  border-color: #1890ff;
+}
 .webix_el_button.yvan_danger > .webix_el_box > .webix_button {
   color: #f56c6c;
   background: #fef0f0;

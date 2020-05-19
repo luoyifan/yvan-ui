@@ -1,12 +1,32 @@
 /*======================== tree =======================*/
-.webix_tree .webix_tree_item:hover {
-  background-color: #eaeff4;
-}
-
-.webix_tree .webix_tree_item.webix_selected {
-  background-color: #ffefbb;
-}
-
 .webix_tree_item {
   padding: 3px 0;
+}
+.webix_multiview .webix_tree_item{
+  height: 28px;
+  line-height: 28px;
+  transition: all .3s ease
+}
+.webix_multiview .webix_tree_item:hover{
+  background: #e6f7ff!important
+}
+.webix_multiview .webix_selected{
+  background: #e6f7ff!important
+}
+.webix_multiview .webix_tree::-webkit-scrollbar {
+  width: 5px;
+  height: 10px;
+  overflow: auto
+}
+.webix_multiview .webix_tree::-webkit-scrollbar-thumb {
+  background-color: #d9d9d9;
+  min-height: 25px;
+  min-width: 25px;
+  border: 1px solid #f0f0f0
+}
+.webix_multiview .webix_tree::-webkit-scrollbar-track {
+  background-color: #f7f7f7
+}
+.webix_tree .webix_scroll_cont > .webix_tree_leaves{
+  padding:0
 }
