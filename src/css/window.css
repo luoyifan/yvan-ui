@@ -23,3 +23,65 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* ================dialog================= */
+.webix_window{
+  border-radius: 6px;
+}
+.webix_win_title{
+  text-align: left;
+}
+.webix_win_title .webix_el_box{
+  padding-left:5px!important;
+  font-size: 14px!important;
+  font-weight: bold!important;
+  line-height: 37px!important
+}
+.webix_window .webix_win_head .webix_toolbar{
+  border-bottom: 0px solid #e9e9e9;
+  background: #fafafa;
+}
+.webix_window .webix_el_text input, .webix_window .webix_el_search input, .webix_window .webix_el_combo input, .webix_window .webix_el_datepicker input, .webix_window .webix_el_colorpicker input{
+  height: 28px;
+  border-radius: 5px!important;
+  transition: all .3s ease!important;
+  box-shadow: 0px 1px 5px rgba(0,0,0,.08) inset
+}
+.webix_window .webix_el_text input:focus, .webix_window .webix_el_search input:focus, .webix_window .webix_el_combo input:focus, .webix_window .webix_el_datepicker input:focus, .webix_window .webix_el_colorpicker input:focus{
+  outline: 0;
+  box-shadow: 0 0 0 2px rgba(24,144,255,.2);
+  border-color:#1890ff
+}
+.webix_layout_line .yvan_primary button{
+  color: #fff!important;
+  background-color: #1890ff!important;
+  border-color: #1890ff;
+  transition: all .3s ease;
+}
+.webix_layout_line .yvan_primary button:hover{
+  background: #3ea1fc!important
+}
+.webix_el_icon{
+  font-size: 12px;
+}
+.webix_window.webix_toolbar{
+  margin-left:0!important
+}
+.webix_window .webix_toolbar .webix_icon_button:before{
+  border-radius: 0!important;
+}
+.webix_window.webix_win_body {
+  position: relative;
+}
+.webix_window .dialogBottom{
+  margin:0!important;
+  border-top:1px solid #e9e9e9;
+  background: #fafafa;
+  width: 100%!important;
+  position: absolute;
+  bottom: 0px;
+  text-align: right;
+  padding:3px 0 3px 0;
+}
+.webix_window .dialogBottom .webix_el_button {
+  margin-right:7px;
+}
