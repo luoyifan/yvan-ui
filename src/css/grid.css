@@ -228,7 +228,10 @@ input[type='number']::-webkit-outer-spin-button {
 }
 .ag-header-cell-text{
   width: 100%;
-  text-align: center;
+}
+.ag-header-cell-text{
+  font-weight: bold;
+  color: rgba(0,0,0,.85);
 }
 .ag-theme-blue .ag-header-cell:after, .ag-theme-blue .ag-header-group-cell:after{
   background: none!important;
