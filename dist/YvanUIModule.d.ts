@@ -47,6 +47,11 @@ export declare abstract class BaseModule<M, Refs, INP> extends Vue implements Mo
      * 从外部设置输入参数
      */
     setInParamter: (inParamter: INP) => void;
+    /**
+     * 获取或设置 window 标题
+     */
+    set title(v: string);
+    get title(): string;
 }
 export declare abstract class BaseDialog<M, Refs, INP> extends BaseModule<M, Refs, INP> {
     /**

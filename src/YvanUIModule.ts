@@ -41,8 +41,7 @@ export interface Module<M, Refs, INP> {
   onLoad?(): void
 }
 
-export abstract class BaseModule<M, Refs, INP> extends Vue
-  implements Module<M, Refs, INP> {
+export abstract class BaseModule<M, Refs, INP> extends Vue implements Module<M, Refs, INP> {
   /**
    * 组件对象引用
    */
@@ -88,6 +87,27 @@ export abstract class BaseModule<M, Refs, INP> extends Vue
    * 从外部设置输入参数
    */
   setInParamter!: (inParamter: INP) => void
+
+  /**
+   * 获取或设置 window 标题
+   */
+  set title(v: string) {
+    if (this._webixId) {
+      // webix 对象已经出现
+      this._webixId.define('title', v)
+      $(this._webixId.$view).find('.webix_win_head .webix_win_title .webix_el_box').html(v);
+      return
+    }
+    console.error('无法设置 title')
+  }
+
+  get title(): string {
+    if (this._webixId) {
+      // webix 对象已经出现
+      return <string>this._webixId.config.title;
+    }
+    return '无法获取';
+  }
 }
 
 export abstract class BaseDialog<M, Refs, INP> extends BaseModule<M, Refs, INP> {
