@@ -294,6 +294,9 @@ body,
   white-space: nowrap;
   max-width: 130px;
 }
+.webix_layout_line{
+  padding:.5px 0!important
+}
 /* =================================== */
 ::-webkit-scrollbar {
   width: 5px;

@@ -63,8 +63,8 @@
   top: 0;
   left: 0;
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   background-color: #fff;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
@@ -75,7 +75,7 @@
 .yvan-checkbox .yvan-checkbox-switch .yvan-checkbox-status::after {
   position: absolute;
   top: 50%;
-  left: 21%;
+  left: 20%;
   display: table;
   width: 5.71428571px;
   height: 9.14285714px;
