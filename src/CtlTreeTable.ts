@@ -248,6 +248,13 @@ export class CtlTreeTable extends CtlBase<CtlTreeTable> {
     this._webix.closeAll()
   }
 
+  /**
+   * 过滤, 如果不设置 condition 代表不过滤，否则带入过滤函数
+   */
+  public filter(condition?: (v: any) => boolean) {
+    this._webix.filter(condition)
+  }
+
   /* =============================================== 以下部分为私有函数 =============================================== */
 
   //数据源设置
@@ -265,7 +272,7 @@ export class CtlTreeTable extends CtlBase<CtlTreeTable> {
       }
 
       if (this._webix && this._module) {
-        this.dataSourceBind = new YvDataSource(this, this.dataSource)
+        this.dataSourceBind = new YvDataSource(this, this.dataSource, this._dataSourceProcess.bind(this))
         this.dataSourceBind.init()
       }
     }
@@ -278,6 +285,60 @@ export class CtlTreeTable extends CtlBase<CtlTreeTable> {
       // 否则实时调用 rebind
       innerMethod()
     }
+  }
+
+
+  private _dataSourceProcess(data: any[]) {
+    if (!this.dataSource || _.isArray(this.dataSource) || _.isFunction(this.dataSource)) {
+      return data
+    }
+
+    if (this.dataSource.type !== 'SQL' && this.dataSource.type !== 'function') {
+      return data
+    }
+
+    if (!this.dataSource.parentField || !this.dataSource.valueField) {
+      return data
+    }
+
+    const idField = this.dataSource.valueField
+    const parentField = this.dataSource.parentField
+
+    data = _.cloneDeep(data)
+
+    // 第一遍扫描, 建立映射关系
+    const nodeMap: any = {}
+    const rootNode = []
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i]
+      nodeMap[row[idField]] = row
+    }
+
+    // 第二遍扫描，建立父子关系
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i]
+      const parent = row[parentField]
+      const id = row[idField]
+
+      if (!parent || parent === '0') {
+        // 没有父亲，作为根节点
+        rootNode.push(nodeMap[id])
+
+      } else if (nodeMap.hasOwnProperty(parent)) {
+        //找到父亲
+        const parentNode = nodeMap[parent]
+        if (parentNode.hasOwnProperty('data')) {
+          parentNode.data.push(nodeMap[id])
+        } else {
+          parentNode.data = [nodeMap[id]]
+        }
+      } else {
+        // 没有找到父亲，作为根节点
+        rootNode.push(nodeMap[id])
+      }
+    }
+
+    return rootNode
   }
 
   //刷新状态时，自动重绑数据源

@@ -347,6 +347,13 @@ export class CtlTree extends CtlBase<CtlTree> {
     this._webix.closeAll()
   }
 
+  /**
+   * 递归查找每个节点, 直到寻找到想要的节点
+   */
+  public find(condition: (node: any) => boolean) {
+    return this._webix.find(condition);
+  }
+
   /* =============================================== 以下部分为私有函数 =============================================== */
 
   //数据源设置
