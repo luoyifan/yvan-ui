@@ -30,9 +30,6 @@
   box-shadow: inset 0 -2px #1890ff;
   color:#1890ff
 }
-.webix_multiview .webix_selected{
-  background: #fff!important;
-}
 .webix_all_tabs .webix_item_tab.webix_selected:focus{
   box-shadow: inset 0 -2px #1890ff;
   color:#1890ff
