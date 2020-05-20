@@ -302,6 +302,9 @@ body,
   white-space: nowrap;
   max-width: 130px;
 }
+.webix_layout_line{
+  padding:.5px 0!important
+}
 /* =================================== */
 ::-webkit-scrollbar {
   width: 5px;
@@ -356,6 +359,9 @@ body,
 }
 .webix_tree .webix_selected{
   background: #e6f7ff!important;
+}
+.mainLeft .webix_tree_leaves .webix_tree_leaves{
+  padding-left:0
 }
 /*======================== button =======================*/
 .inputButton .webix_el_box{
@@ -628,9 +634,9 @@ body,
 
 /* ====================== grid =========================*/
 /* 表格内编辑器 */
-.ag-theme-blue .ag-cell.ag-cell-inline-editing {
+/* .ag-theme-blue .ag-cell.ag-cell-inline-editing {
   height: 37px;
-}
+} */
 
 input.ag-cell-edit-input {
   border: none;
@@ -649,34 +655,48 @@ input.ag-cell-edit-input {
 
 /*表格内行*/
 .ag-theme-blue .ag-row {
-  /*border-bottom-width: 1px;*/
-  border-width: 1px 0 0;
+  border:1px solid #f0f0f0
+  /* border-width: 1px 0 0;
   border-bottom-style: solid;
-  border-color: #e9e9e9;
+  border-color: #e9e9e9; */
 }
 
 /*行分割线*/
 .ag-theme-blue .ag-row:not(.ag-row-first) {
   border-style: solid;
-  border-width: 1px 0 0;
-  border-color: #e9e9e9;
+  border-width: 1px 0 0 ;
+  border-color: #f0f0f0;
 }
 
 .ag-theme-blue .ag-ltr .ag-cell {
-  /*border-style: solid;*/
-  /*border-color: #e9e9e9;*/
-  border-right: 1px solid #e9e9e9;
+  border-right: 1px solid #f0f0f0!important;
 }
 
 /*表格过滤按钮不允许隐藏*/
+.ag-cell-label-container{
+  height: 100%;
+}
 .ag-header-icon.ag-header-cell-menu-button {
-  opacity: 100 !important;
+  opacity: 0.8!important;
   color: #b2b2b2;
+  padding:0 7px;
+  height: 100%;
 }
 
 .ag-header-icon.ag-header-cell-menu-button:hover {
-  opacity: 100 !important;
-  color: #666666;
+  opacity:1!important;
+  color: #666;
+  background: #d9d9d9;
+}
+.ag-header-cell-label{
+  padding-left:12px;
+  -webkit-transition: all .3s ease;
+  transition: all .3s ease;
+}
+.ag-header-cell-label:hover{
+  background: #d9d9d9;
+}
+.ag-header-cell.ag-header-cell-sortable{
 }
 
 /*表格单元格对其方式*/
@@ -759,18 +779,12 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 [role='yvGrid'] .ag-root {
-  border: none;
-}
-
-[role='yvGrid'] .ag-row-odd {
-  background-color: #f6f6f6;
+  border: none!important;
 }
 
 /*表格行选中的颜色*/
 [role='yvGrid'] .ag-row-selected {
-  background-color: #f2e3b2;
-  border-style: solid;
-  border-color: #f2e3b2 !important;
+  background-color: #eaf8fe;
 }
 
 /*表头颜色*/
@@ -781,7 +795,6 @@ input[type='number']::-webkit-outer-spin-button {
 
 /*表头右边框*/
 .ag-theme-blue .ag-header-cell {
-  border-right: 1px solid #d0d0d0;
   font: 500 13px/19px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
     sans-serif;
 }
@@ -792,12 +805,8 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 /*表头鼠标悬停*/
-.ag-theme-blue .ag-header-cell:hover {
-  /* background-color: #eaeff4; */
-}
-
-[role='yvGrid'] .ag-cell {
-  line-height: 33px;
+.ag-theme-blue .ag-cell{
+  line-height: 32px!important;
 }
 
 .webixui {
@@ -805,25 +814,34 @@ input[type='number']::-webkit-outer-spin-button {
   height: 100%;
   overflow: hidden;
 }
-
+.ag-theme-blue .ag-body-viewport{
+  background: #fff!important;
+}
 .ag-theme-blue .ag-header{
   background: #e7e7e7!important;
   border-bottom: 1px solid #cdcdcd!important;
 }
 .ag-theme-blue .ag-header-row{
-  color:#666!important
+  color:#666
 }
 .ag-theme-blue .ag-root-wrapper{
-  border: 1px solid #f0f0f0!important;
+  border: 1px solid #f0f0f0;
 }
 .ag-theme-blue .ag-header-cell{
-  border: 0;
+  border-right: none!important;
+  overflow:visible;
+  padding:0!important
+}
+.ag-header-cell-resize{
+  position: absolute;
+}
+.ag-header-cell-resize:hover{
+  border-left:1px dashed #1890ff;
+  border-right:1px dashed #1890ff;
+  background: #d5d5d5;
 }
 .ag-center-cols-container .ag-cell{
-  border-right:1px solid #f0f0f0!important;
-}
-.ag-theme-blue .ag-paging-panel{
-  border-top:1px solid #f0f0f0!important;
+  border-right:1px solid #f0f0f0;
 }
 .ag-theme-blue .ag-row-odd{
   background: #fff!important;
@@ -832,19 +850,113 @@ input[type='number']::-webkit-outer-spin-button {
   background: #eaf8fe!important;
 }
 .ag-header-cell-text{
-  width: 100%;
-}
-.ag-header-cell-text{
   font-weight: bold;
   color: rgba(0, 0, 0, .85);
 }
+.ag-theme-blue .ag-icon{
+  color:#797979!important;
+}
+.ag-header-cell-menu-button,.ag-sort-descending-icon{
+  height: 32px;
+  line-height: 32px;
+}
+.ag-theme-blue .ag-menu{
+  background: #fff!important;
+  border:none!important
+}
+.ag-theme-blue .ag-filter .ag-filter-select{
+  margin:0px 10px 4px 10px!important;
+  padding:3px;
+  border: 1px solid #DADEE0;
+  -webkit-box-shadow: 0px 1px 5px rgba(0, 0, 0, .08) inset;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, .08) inset;
+  background: #fff;
+  border-radius: 2px;
+}
+.ag-theme-blue .ag-filter .ag-filter-body{
+  margin:0 4px 4px 4px!important;
+}
+.ag-theme-blue .ag-filter-body-wrapper{
+  padding-top:4px
+}
+.ag-theme-blue .ag-filter input[type="text"], .ag-theme-blue .ag-filter input[type="date"]{
+  padding:4px 2px;
+  border: 1px solid #DADEE0!important;
+  -webkit-box-shadow: 0px 1px 5px rgba(0, 0, 0, .08) inset;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, .08) inset;
+  background: #fff;
+  border-radius: 2px;
+}
+.ag-theme-blue .ag-filter input[type="text"]:focus, .ag-theme-blue .ag-filter input[type="date"]:focus,.ag-theme-blue .ag-filter .ag-filter-select:focus{
+  -webkit-box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
+  border-color: #1890ff!important;
+}
+.ag-theme-blue .ag-filter button{
+  border-radius: 1px;
+  -webkit-transition: all .3s ease;
+  transition: all .3s ease;
+  cursor: pointer;
+}
+.ag-theme-blue .ag-filter button:first-child{
+  background: #f6f6f6;
+  border: 1px solid #d9d9d9;
+}
+.ag-theme-blue .ag-filter button:first-child:hover{
+  border: 1px solid #1890ff;
+  color:#1890ff
+}
+.ag-theme-blue .ag-filter button:last-child{
+  border: 1px solid #1890ff;
+  background: #1890ff;
+  color:#fff
+}
+.ag-theme-blue .ag-filter button:last-child:hover{
+  background: #3ea1fc;
+}
+.ag-theme-blue .ag-filter .ag-filter-header-container{
+  border-bottom:1px solid #e9e9e9!important;
+  position: relative;
+  top: -4px;
+  background: #fafafa;
+  height: 26px;
+}
+.ag-theme-blue .ag-filter .ag-filter-header-container label{
+  height: 24px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.ag-theme-blue .ag-icon-checkbox-checked{
+  color:#666!important;
+  border-radius: 4px;
+}
+.ag-theme-blue .ag-icon-checkbox-unchecked{
+  color:#666!important;
+}
+.ag-theme-blue .ag-input-wrapper{
+  padding:2px;
+}
+.ag-header-cell-label .ag-sort-ascending-icon .ag-icon,.ag-header-cell-label .ag-sort-descending-icon .ag-icon{
+  color:#1890ff!important
+}
+.ag-theme-blue .ag-filter .ag-filter-apply-panel{
+  border-top: 1px solid #e9e9e9!important;
+  background: #fafafa;
+  -webkit-box-pack: center!important;
+      -ms-flex-pack: center!important;
+          justify-content: center!important;
+  padding:4px!important
+}
+.ag-theme-blue.ag-popup > div:not(.ag-tooltip-custom){
+  -webkit-box-shadow: 3px 5px 10px rgba(0, 0, 0, .3)!important;
+          box-shadow: 3px 5px 10px rgba(0, 0, 0, .3)!important;
+  border-radius: 2px;
+}
+.ag-theme-blue .ag-menu{
+  top:35px!important
+}
 .ag-theme-blue .ag-header-cell:after, .ag-theme-blue .ag-header-group-cell:after{
   background: none!important;
-}
-.ag-header-cell-resize:hover{
-  border-left:1px dashed #1890ff;
-  border-right:1px dashed #1890ff;
-  background: #d5d5d5;
 }
 .ag-theme-blue .ag-pinned-left-header{
   border-right:0!important;
@@ -854,31 +966,6 @@ input[type='number']::-webkit-outer-spin-button {
 }
 [role='yvGrid'] .ag-row-selected{
   border-color:#e9e9e9!important
-}
-.ag-theme-blue .ag-cell{
-  line-height: 32px!important
-}
-.ag-pinned-left-cols-container .ag-row-selected .ag-cell{
-  background: #eaf8fe!important
-}
-.yvan-checkbox-status{
-  width: 12px!important;
-  height: 12px!important;
-  border-radius: 4px!important;
-}
-.yvan-checkbox .yvan-checkbox-switch .yvan-checkbox-status::after{
-  width: 2px!important;
-  height: 7px!important;
-  left:2px!important;
-}
-.ag-pinned-left-cols-container .ag-cell-value{
-  border-right:1px solid #e9e9e9!important
-}
-.ag-theme-blue .ag-row:first-child{
-  border:0!important
-}
-.ag-theme-blue .ag-row-last{
-  border-bottom:1px solid #e9e9e9!important
 }
 .ctl-grid-page{
   border:1px solid #fff;
@@ -907,7 +994,8 @@ input[type='number']::-webkit-outer-spin-button {
   padding:2px 7px
 }
 .ag-theme-blue .ag-paging-panel{
-  color:#666!important
+  color:#666!important;
+  border-top:1px solid #f0f0f0!important;
 }
 .ag-theme-blue .ag-paging-panel>*{
   margin:0!important
@@ -918,9 +1006,11 @@ input[type='number']::-webkit-outer-spin-button {
 .ctl-grid-page span.ui-icon{
   border:1px solid #fff
 }
-.ctl-grid-page .svg-inline--fa{
-  width: 15px;
-  height: 15px;
+.ag-theme-blue .ag-row{
+  border-bottom:1px solid #f0f0f0!important
+}
+.ag-pinned-left-header .ag-header-cell{
+  padding-left:12px!important
 }
 /* ====================== checkbox =========================*/
 .yvan-checkbox {
@@ -991,8 +1081,8 @@ input[type='number']::-webkit-outer-spin-button {
   top: 0;
   left: 0;
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   background-color: #fff;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
@@ -1004,7 +1094,7 @@ input[type='number']::-webkit-outer-spin-button {
 .yvan-checkbox .yvan-checkbox-switch .yvan-checkbox-status::after {
   position: absolute;
   top: 50%;
-  left: 21%;
+  left: 20%;
   display: table;
   width: 5.71428571px;
   height: 9.14285714px;
