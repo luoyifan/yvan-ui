@@ -108,7 +108,7 @@ export class CtlDateRangePicker extends CtlInput<CtlDateRangePicker> {
     if (_.isPlainObject(value)) {
       let { start, end } = value
       if (!moment(start).isValid() || !moment(end).isValid()) {
-        return false
+        return true
       }
     }
     return true
