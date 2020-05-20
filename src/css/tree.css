@@ -30,3 +30,9 @@
 .webix_tree .webix_scroll_cont > .webix_tree_leaves{
   padding:0
 }
+.webix_tree_leaves .webix_tree_leaves{
+  padding-left:8px
+}
+.webix_tree .webix_selected{
+  background: #e6f7ff!important;
+}
