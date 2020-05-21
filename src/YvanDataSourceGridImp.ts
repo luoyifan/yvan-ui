@@ -131,7 +131,11 @@ export class YvanDataSourceGrid {
         that.ctl.gridPage.getPageData = (currentPage: number, pageSize: number) => {
           let params: any = {}
           params.successCallback = (data: [], rowCount: number) => {
-            that.ctl.setData(data)
+            // that.ctl.setData(data)
+            // 不能直接用 setData, 会造成 filter 被置空
+            // 使用 _transactionUpdate 也有 bug ，如果查询条件被改变，也不会分页回顶端
+            that.ctl._transactionUpdate(data)
+            // that.ctl.gridApi.setFilterModel(that.lastFilterModel)
             that.ctl.gridPage.itemCount = rowCount
             that.ctl.gridPage.currentPage = currentPage
           }
@@ -140,6 +144,7 @@ export class YvanDataSourceGrid {
           }
           params.startRow = (currentPage - 1) * pageSize
           params.endRow = currentPage * pageSize
+          params.filterModel = that.ctl.gridApi.getFilterModel()
 
           if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
             that.rowCount = 0

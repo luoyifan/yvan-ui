@@ -166,6 +166,10 @@ export declare class CtlGrid extends CtlBase<CtlGrid> {
      */
     flashCell(cols: any, condition: any): boolean;
     /**
+     * 无感知刷新
+     */
+    _transactionUpdate(targetDataList: any[]): void;
+    /**
      * 获取全部数据
      */
     getData(): any[] | undefined;
@@ -213,6 +217,7 @@ export declare class CtlGrid extends CtlBase<CtlGrid> {
     private isGridReadReady;
     private dataSourceBind?;
     private _gridOptions;
+    private _filterChanged;
     private _gridReady;
     private _resetGrid;
     _rowDoubleClicked(e: any): void;
