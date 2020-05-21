@@ -278,7 +278,7 @@
       _.forEach(__spreadArrays(names, [
           'debugger',
           'ctlName',
-          // 'entityName',
+          'entityName',
           'onRender'
       ]), function (name) {
           if (_.has(vjson, name)) {
@@ -919,6 +919,12 @@
       CtlTree.prototype.collapseAll = function () {
           this._webix.closeAll();
       };
+      /**
+       * 递归查找每个节点, 直到寻找到想要的节点
+       */
+      CtlTree.prototype.find = function (condition) {
+          return this._webix.find(condition);
+      };
       //重新绑定数据源
       CtlTree.prototype._rebindDataSource = function () {
           var _this = this;
@@ -1225,6 +1231,12 @@
       CtlTreeTable.prototype.collapseAll = function () {
           this._webix.closeAll();
       };
+      /**
+       * 过滤, 如果不设置 condition 代表不过滤，否则带入过滤函数
+       */
+      CtlTreeTable.prototype.filter = function (condition) {
+          this._webix.filter(condition);
+      };
       //重新绑定数据源
       CtlTreeTable.prototype._rebindDataSource = function () {
           var _this = this;
@@ -1234,7 +1246,7 @@
                   _this.dataSourceBind = undefined;
               }
               if (_this._webix && _this._module) {
-                  _this.dataSourceBind = new YvDataSource(_this, _this.dataSource);
+                  _this.dataSourceBind = new YvDataSource(_this, _this.dataSource, _this._dataSourceProcess.bind(_this));
                   _this.dataSourceBind.init();
               }
           };
@@ -1246,6 +1258,52 @@
               // 否则实时调用 rebind
               innerMethod();
           }
+      };
+      CtlTreeTable.prototype._dataSourceProcess = function (data) {
+          if (!this.dataSource || _.isArray(this.dataSource) || _.isFunction(this.dataSource)) {
+              return data;
+          }
+          if (this.dataSource.type !== 'SQL' && this.dataSource.type !== 'function') {
+              return data;
+          }
+          if (!this.dataSource.parentField || !this.dataSource.valueField) {
+              return data;
+          }
+          var idField = this.dataSource.valueField;
+          var parentField = this.dataSource.parentField;
+          data = _.cloneDeep(data);
+          // 第一遍扫描, 建立映射关系
+          var nodeMap = {};
+          var rootNode = [];
+          for (var i = 0; i < data.length; i++) {
+              var row = data[i];
+              nodeMap[row[idField]] = row;
+          }
+          // 第二遍扫描，建立父子关系
+          for (var i = 0; i < data.length; i++) {
+              var row = data[i];
+              var parent_1 = row[parentField];
+              var id = row[idField];
+              if (!parent_1 || parent_1 === '0') {
+                  // 没有父亲，作为根节点
+                  rootNode.push(nodeMap[id]);
+              }
+              else if (nodeMap.hasOwnProperty(parent_1)) {
+                  //找到父亲
+                  var parentNode = nodeMap[parent_1];
+                  if (parentNode.hasOwnProperty('data')) {
+                      parentNode.data.push(nodeMap[id]);
+                  }
+                  else {
+                      parentNode.data = [nodeMap[id]];
+                  }
+              }
+              else {
+                  // 没有找到父亲，作为根节点
+                  rootNode.push(nodeMap[id]);
+              }
+          }
+          return rootNode;
       };
       //刷新状态时，自动重绑数据源
       CtlTreeTable.prototype.refreshState = function () {
@@ -1761,7 +1819,7 @@
               delete vjson[key];
           });
           _.merge(vjson, {
-              view: 'grid',
+              view: 'echarts',
               template: "<div role=\"echarts\"></div>",
               on: {
                   onAfterRender: function () {
@@ -2077,7 +2135,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   onAfterRender: function () {
                       var $input = $(this.$view).find('input');
@@ -2502,7 +2560,6 @@
       };
       return CtlInput;
   }(CtlBase));
-  //# sourceMappingURL=CtlInput.js.map
 
   var CtlText = /** @class */ (function (_super) {
       __extends(CtlText, _super);
@@ -2562,7 +2619,6 @@
       });
       return CtlText;
   }(CtlInput));
-  //# sourceMappingURL=CtlText.js.map
 
   var CtlCheckBox = /** @class */ (function (_super) {
       __extends(CtlCheckBox, _super);
@@ -2677,7 +2733,6 @@
       });
       return CtlCheckBox;
   }(CtlInput));
-  //# sourceMappingURL=CtlCheckBox.js.map
 
   /**
    * 下拉框组件
@@ -2829,7 +2884,6 @@
       };
       return CtlCombo;
   }(CtlInput));
-  //# sourceMappingURL=CtlCombo.js.map
 
   var CtlDatePicker = /** @class */ (function (_super) {
       __extends(CtlDatePicker, _super);
@@ -2910,7 +2964,6 @@
       };
       return CtlDatePicker;
   }(CtlInput));
-  //# sourceMappingURL=CtlDatePicker.js.map
 
   var CtlDateRangePicker = /** @class */ (function (_super) {
       __extends(CtlDateRangePicker, _super);
@@ -3048,7 +3101,6 @@
       };
       return CtlDateRangePicker;
   }(CtlInput));
-  //# sourceMappingURL=CtlDateRangePicker.js.map
 
   var CtlForm = /** @class */ (function (_super) {
       __extends(CtlForm, _super);
@@ -3207,7 +3259,6 @@
       });
       return CtlMultiCombo;
   }(CtlInput));
-  //# sourceMappingURL=CtlMultiCombo.js.map
 
   var CtlSearch = /** @class */ (function (_super) {
       __extends(CtlSearch, _super);
@@ -3397,7 +3448,6 @@
       };
       return CtlSearch;
   }(CtlInput));
-  //# sourceMappingURL=CtlSearch.js.map
 
   var CtlCarousel = /** @class */ (function (_super) {
       __extends(CtlCarousel, _super);
@@ -4940,8 +4990,16 @@
    * 扩展 grid 组件
    */
   webix.protoUI({
-      name: 'grid'
-  }, webix.ui.template);
+      name: 'grid',
+      $init: function (config) {
+          this._domid = webix.uid();
+          this.$view.innerHTML = "<div id='" + this._domid + "' role=\"yvGrid\" class=\"ag-theme-blue\"></div>";
+          _.extend(this.config, config);
+          if (config.on && typeof config.on.onMyRender === 'function') {
+              config.on.onMyRender.call(this);
+          }
+      }
+  }, webix.ui.view);
   var CtlGrid = /** @class */ (function (_super) {
       __extends(CtlGrid, _super);
       function CtlGrid() {
@@ -4983,11 +5041,14 @@
           });
           _.merge(vjson, {
               view: 'grid',
-              template: "<div role=\"yvGrid\" class=\"ag-theme-blue\"></div>",
+              // template: `<div role="yvGrid" class="ag-theme-blue"></div>`,
               on: {
-                  onAfterRender: function () {
-                      that.attachHandle(this, vjson);
-                      that._resetGrid();
+                  onMyRender: function () {
+                      var _this = this;
+                      _.defer(function () {
+                          that.attachHandle(_this, vjson);
+                          that._resetGrid();
+                      });
                   },
                   onDestruct: function () {
                       if (that.gridApi) {
@@ -5022,9 +5083,9 @@
            */
           set: function (nv) {
               this.vjson.dataSource = nv;
-              if (this._module.loadFinished) {
-                  throw new Error('Grid 不允许动态设置数据源');
-              }
+              // if (this._module.loadFinished) {
+              //   throw new Error('Grid 不允许动态设置数据源')
+              // }
           },
           enumerable: true,
           configurable: true
@@ -6150,7 +6211,6 @@
       });
       return CtlSwitch;
   }(CtlInput));
-  //# sourceMappingURL=CtlSwitch.js.map
 
   var CtlNumber = /** @class */ (function (_super) {
       __extends(CtlNumber, _super);
@@ -6246,7 +6306,6 @@
       });
       return CtlNumber;
   }(CtlInput));
-  //# sourceMappingURL=CtlNumber.js.map
 
   var CtlRadio = /** @class */ (function (_super) {
       __extends(CtlRadio, _super);
@@ -6291,7 +6350,6 @@
       });
       return CtlRadio;
   }(CtlInput));
-  //# sourceMappingURL=CtlRadio.js.map
 
   webix.protoUI({
       name: 'codemirror-editor',
@@ -8317,18 +8375,6 @@
   }
   //# sourceMappingURL=YvanUIMessage.js.map
 
-  /**
-   * 扩展 grid 组件
-   */
-  webix.protoUI({
-      name: 'grid'
-  }, webix.ui.template);
-  /**
-   * 扩展 echarts 组件
-   */
-  webix.protoUI({
-      name: 'echarts'
-  }, webix.ui.template);
   var BaseModule = /** @class */ (function (_super) {
       __extends(BaseModule, _super);
       function BaseModule() {
@@ -8364,7 +8410,7 @@
                       if (_.has(ctl, '_validate')) {
                           var validateResult = ctl._validate(ctl.value);
                           if (validateResult) {
-                              _.set(result, ctl.vjson.label, validateResult);
+                              _.set(result, key, validateResult);
                           }
                       }
                   });
