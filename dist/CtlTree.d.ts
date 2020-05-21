@@ -132,6 +132,10 @@ export declare class CtlTree extends CtlBase<CtlTree> {
      * 收起所有节点
      */
     collapseAll(): void;
+    /**
+     * 递归查找每个节点, 直到寻找到想要的节点
+     */
+    find(condition: (node: any) => boolean): any;
     private _dataSource;
     private dataSourceBind?;
     private _rebindDataSource;

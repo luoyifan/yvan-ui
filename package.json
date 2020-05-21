@@ -1,6 +1,6 @@
 {
   "name": "yvan-ui",
-  "version": "0.1.15",
+  "version": "0.1.21",
   "description": "WinForm style web framework.",
   "license": "Apache",
   "main": "dist/yvan-ui.js",

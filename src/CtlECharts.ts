@@ -33,7 +33,7 @@ export class CtlECharts extends CtlBase<CtlECharts> {
       delete vjson[key]
     })
     _.merge(vjson, {
-      view: 'grid',
+      view: 'echarts',
       template: `<div role="echarts"></div>`,
       on: {
         onAfterRender: function (this: any) {

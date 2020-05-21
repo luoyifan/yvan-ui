@@ -96,8 +96,13 @@ export declare class CtlTreeTable extends CtlBase<CtlTreeTable> {
      * 收起所有节点
      */
     collapseAll(): void;
+    /**
+     * 过滤, 如果不设置 condition 代表不过滤，否则带入过滤函数
+     */
+    filter(condition?: (v: any) => boolean): void;
     private _dataSource;
     private dataSourceBind?;
     private _rebindDataSource;
+    private _dataSourceProcess;
     protected refreshState(): void;
 }

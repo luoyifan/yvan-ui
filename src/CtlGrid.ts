@@ -46,9 +46,17 @@ export interface CtlGridRowButtonClickArgs {
  */
 webix.protoUI(
   {
-    name: 'grid'
+    name: 'grid',
+    $init: function (config: any) {
+      this._domid = webix.uid();
+      this.$view.innerHTML = `<div id='${this._domid}' role="yvGrid" class="ag-theme-blue"></div>`
+      _.extend(this.config, config)
+      if (config.on && typeof config.on.onMyRender === 'function') {
+        config.on.onMyRender.call(this)
+      }
+    }
   },
-  webix.ui.template
+  webix.ui.view
 )
 
 export class CtlGrid extends CtlBase<CtlGrid> {
@@ -72,11 +80,13 @@ export class CtlGrid extends CtlBase<CtlGrid> {
     })
     _.merge(vjson, {
       view: 'grid',
-      template: `<div role="yvGrid" class="ag-theme-blue"></div>`,
+      // template: `<div role="yvGrid" class="ag-theme-blue"></div>`,
       on: {
-        onAfterRender: function (this: any) {
-          that.attachHandle(this, vjson)
-          that._resetGrid()
+        onMyRender: function (this: any) {
+          _.defer(() => {
+            that.attachHandle(this, vjson)
+            that._resetGrid()
+          });
         },
         onDestruct(this: any) {
           if (that.gridApi) {
@@ -106,9 +116,9 @@ export class CtlGrid extends CtlBase<CtlGrid> {
    */
   set dataSource(nv: GridDataSource) {
     this.vjson.dataSource = nv
-    if (this._module.loadFinished) {
-      throw new Error('Grid 不允许动态设置数据源')
-    }
+    // if (this._module.loadFinished) {
+    //   throw new Error('Grid 不允许动态设置数据源')
+    // }
   }
 
   /**

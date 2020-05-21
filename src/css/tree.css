@@ -36,3 +36,6 @@
 .webix_tree .webix_selected{
   background: #e6f7ff!important;
 }
+.mainLeft .webix_tree_leaves .webix_tree_leaves{
+  padding-left:0
+}
