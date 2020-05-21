@@ -8,7 +8,7 @@ const CtlGridLocale: any = {
     last: "上一页",
     first: "首页",
     previous: "上一页",
-    loadingOoo: "加载中...",
+    loadingOoo: `<i class="fa fa-spinner fa-pulse"></i>`,
     selectAll: "查询全部",
     searchOoo: "查询...",
     blanks: "空白",
