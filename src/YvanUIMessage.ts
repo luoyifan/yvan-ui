@@ -94,7 +94,7 @@ export function msg(message: string): void {
 
   $body.find('[xtype=msg]').remove()
   const $w = $(
-    '<div xtype="msg" class="yvan-msg yvan-anim yvan-anim-00">' +
+    '<div xtype="tooltip" class="yvan-msg yvan-anim yvan-anim-00">' +
     '  <div class="yvan-msg-content">' +
     message +
     '</div></div>'
@@ -119,6 +119,37 @@ export function msg(message: string): void {
   setTimeout(() => {
     $w.remove()
   }, 3000)
+}
+
+/**
+ * 显示tooltip
+ */
+export function showTooltip(obj: any, message: string): void {
+  const $body = $('body')
+  const tooptipId = obj.id + '_tooltip';
+
+  if ($body.find(`#${tooptipId}`).length > 0) {
+    return;
+  }
+
+  const $w = $(
+    '<div xtype="tooltip" class="yvan-tooltip">' +
+    '<em></em><div class="yvan-tooltip-msg">' +
+    message +
+    '</div></div>'
+  )
+  $w[0].id = tooptipId
+  $body.append($w)
+
+  const xxoffset: any = $(obj._webix.$view).offset()
+  const xxLeft: any = $(obj._webix.$view).width() + xxoffset.left + 10
+  $w.css({ left: xxLeft, top: xxoffset?.top })
+}
+
+export function hideTooltip(obj: any): void {
+  const $body = $('body')
+  const tooptipId = obj.id + '_tooltip';
+  $body.find(`#${tooptipId}`).remove()
 }
 
 /**

@@ -1,6 +1,7 @@
 import { CtlBase } from '../../CtlBase'
 import { parseYvanPropChangeVJson } from '../../CtlUtils'
 import * as YvanUI from '../../YvanUIExtend'
+import * as YvanMessage from '../../YvanUIMessage'
 import { YvEvent, YvEventDispatch } from '../../YvanEvent'
 
 type CtlInputWidth = number | undefined | 'auto'
@@ -22,9 +23,6 @@ export class CtlInput<M> extends CtlBase<M> {
       'onFocus',
       'onChange',
       'onBlur',
-      // 'onTouchEnd',
-      // 'onTouchStart',
-      // 'onTouchMove',
       'maxlength',
       'changeValueImplete',
       'ff',
@@ -63,7 +61,11 @@ export class CtlInput<M> extends CtlBase<M> {
           $input.on('keydown', onKeydown)
           if (that._validate) {
             const result = that._validate(null);
-            that._addTooltip(result);
+            if (result) {
+              that._showValidateError()
+            } else {
+              that._hideValidateError()
+            }
             that._addEnvent($input);
           }
           if (that.constructor.name !== 'CtlSelect' && that._webixConfig.required) {
@@ -94,6 +96,7 @@ export class CtlInput<M> extends CtlBase<M> {
           $input.off('keydown')
           that._removeEnvent($input)
           that.removeHandle()
+          that._hideTootip()
         },
         onItemClick(this: any) {
           YvEventDispatch(that.onClick, that, undefined)
@@ -102,20 +105,19 @@ export class CtlInput<M> extends CtlBase<M> {
           YvEventDispatch(that.onEnter, that, undefined)
         },
         onFocus(this: any) {
-          that._showTootip()
+          if (that._validate) {
+            const result = that._validate(that.value);
+            if (result) {
+              that._showTootip(result)
+              that._showValidateError()
+            }
+            else {
+              that._hideTootip()
+              that._hideValidateError()
+            }
+          }
           YvEventDispatch(that.onFocus, that, undefined)
         },
-        // onTouchStart(this: any) {
-        //   that._showTootip()
-        //   YvEventDispatch(that.onTouchStart, that, undefined)
-        // },
-        // onTouchMove(this: any) {
-
-        // },
-        // onTouchEnd(this: any) {
-        //   that._hideTootip()
-        //   YvEventDispatch(that.onTouchEnd, that, undefined)
-        // },
         onChange(this: any, newValue: any, oldValue: any) {
           if (!that.valueValid(newValue)) {
             // 不允许触发更改
@@ -143,6 +145,15 @@ export class CtlInput<M> extends CtlBase<M> {
           YvEventDispatch(that.onChange, that, newValue)
         },
         onBlur(this: any) {
+          if (that._validate) {
+            const result = that._validate(that.value);
+            if (result) {
+              that._showValidateError()
+            }
+            else {
+              that._hideValidateError()
+            }
+          }
           that._hideTootip()
           if (that._webixConfig.required) {
             if (that.constructor.name === 'CtlDateRangePicker') {
@@ -231,14 +242,6 @@ export class CtlInput<M> extends CtlBase<M> {
    */
   onBlur?: YvEvent<M, void>
 
-  // /**
-  //  * 触摸后触发
-  //  */
-  // onTouchStart?: YvEvent<M, void>
-  // /**
-  //  * 触摸离开后触发
-  //  */
-  // onTouchEnd?: YvEvent<M, void>
   /**
    * 按下任何键之后触发事件
    */
@@ -485,21 +488,24 @@ export class CtlInput<M> extends CtlBase<M> {
 
   _maxlength: any
 
-  _addTooltip(msg: any) {
-    $(this._webix.$view).css({
-      'position': 'relative'
-    })
-    $(this._webix.$view).append(
-      `<div id="${this.id}_tooptip" role="alert" aria-atomic="true" class="webix_tooltip" style="display: none; right: 0px; top: 0px;">${msg}</div>`
-    )
-  }
-
   anonymous_showTootip: any = () => {
-    this._showTootip()
+    if (this._validate) {
+      const result = this._validate(this.value);
+      if (result) {
+        this._showTootip(result)
+        this._showValidateError()
+      } else {
+        this._hideTootip()
+        this._hideValidateError()
+      }
+    }
   }
 
   anonymous_hideTootip: any = () => {
-    this._hideTootip()
+    const $input = $(this._webix.$view).find('input')
+    if (document.activeElement !== $input[0]) {
+      this._hideTootip()
+    }
   }
 
   _addEnvent(input: any) {
@@ -512,16 +518,20 @@ export class CtlInput<M> extends CtlBase<M> {
     input.context.removeEventListener('mouseleave', this.anonymous_hideTootip);
   }
 
-  _showTootip() {
-    $(`#${this.id}_tooptip`).css({
-      'display': 'block'
-    })
+  _showValidateError() {
+    $(this._webix.$view).addClass('yvan-validate-error');
+  }
+
+  _hideValidateError() {
+    $(this._webix.$view).removeClass('yvan-validate-error');
+  }
+
+  _showTootip(msg: string) {
+    YvanMessage.showTooltip(this, msg);
   }
 
   _hideTootip() {
-    $(`#${this.id}_tooptip`).css({
-      'display': 'none'
-    })
+    YvanMessage.hideTooltip(this);
   }
 
   _showValidate(

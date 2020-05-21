@@ -474,8 +474,12 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       return
     }
     if (newValue) {
+      // 盖着
       this.gridApi.showLoadingOverlay()
+      $($(this._webix.$view).find('.ag-paging-panel')[0]).append(`<div class="maskBox"></div>`);
     } else {
+      // 放开
+      $(this._webix.$view).find('.maskBox').remove()
       this.gridApi.hideOverlay()
     }
   }

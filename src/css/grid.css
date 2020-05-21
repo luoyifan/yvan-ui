@@ -402,3 +402,63 @@ input[type='number']::-webkit-outer-spin-button {
 .ag-theme-blue .ag-icon-menu:before{
   content: "\f002"!important;
 }
+/* =======================treegrid=========================== */
+.webix_ss_header, .webix_ss_header TD, .webix_ss_vscroll_header, .webix_dd_drag_column{
+  background: #e7e7e7;
+}
+.webix_dtable .webix_ss_header td.webix_last_row{
+  border-bottom: 1px solid #cdcdcd;
+  transition: all .3s ease;
+}
+.webix_dtable .webix_ss_header td.webix_last_row:hover{
+  background: #d9d9d9;
+}
+.webix_ss_header{
+  height: 35px!important;
+}
+.webix_dtable .webix_ss_header td.webix_last_row .webix_hcell{
+  height: 34px!important;
+  line-height: 34px!important;
+}
+.webix_dtable .webix_select_mark > div.webix_row_select{
+  box-shadow: 0 0 0;
+}
+.webix_dtable_focused .webix_column > div.webix_row_select, .webix_dtable_focused .webix_column > div.webix_column_select{
+  background: #eaf8fe;
+}
+.webix_dtable .webix_ss_body .webix_column > div, .webix_dtable .webix_ss_body .webix_table_cell{
+  height: 32px!important;
+  line-height: 32px!important;
+  border-right: 1px solid #f0f0f0!important;
+  padding: 0 12px;
+  border-bottom: 1px solid #f0f0f0!important;
+}
+.webix_hcell{
+  font-size: 13px;
+  font-weight: bold;
+}
+.webix_ss_vscroll_header{
+  height: 35px!important;
+}
+.webix_vscroll_y{
+  margin-top:35px!important;
+}
+.ag-theme-blue .ag-overlay-loading-center{
+  border:none!important
+}
+.ag-theme-blue .ag-overlay-loading-center{
+  font-size: 21px;
+}
+.ag-theme-blue .ag-overlay-loading-wrapper{
+  margin-top:35px;
+  background-color: rgba(255, 255, 255, 1);
+}
+.ag-theme-blue .ag-paging-panel{
+  position: relative;
+}
+.maskBox{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, .5);
+}
