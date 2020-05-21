@@ -96,6 +96,7 @@ export class CtlInput<M> extends CtlBase<M> {
           $input.off('keydown')
           that._removeEnvent($input)
           that.removeHandle()
+          that._hideTootip()
         },
         onItemClick(this: any) {
           YvEventDispatch(that.onClick, that, undefined)

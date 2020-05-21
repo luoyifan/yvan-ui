@@ -47,6 +47,8 @@ export class CtlSearch extends CtlInput<CtlSearch> {
     const that = new CtlSearch(vjson)
     that._module = module
 
+    const vvjson = _.cloneDeep(vjson);
+
     _.defaultsDeep(vjson, CtlSearchDefault)
 
     // 基础属性先执行
@@ -67,7 +69,7 @@ export class CtlSearch extends CtlInput<CtlSearch> {
     _.merge(vjson, that._webixConfig, {
       on: {
         onInited(this: any) {
-          that.attachHandle(this, { ...vjson, ...yvanProp })
+          that.attachHandle(this, vvjson)
           that._refreshIcon()
         },
         // onAfterRender(this: any) {
