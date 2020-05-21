@@ -55,7 +55,7 @@ export class CtlInput<M> extends CtlBase<M> {
     _.merge(vjson, that._webixConfig, {
       on: {
         onInited: function (this: any) {
-          that.attachHandle(this, vjson)
+          that.attachHandle(this, { ...vjson, ...yvanProp })
         },
         onAfterRender: function (this: any) {
           const $input = $(this.$view).find('input')
