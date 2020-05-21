@@ -94,8 +94,8 @@ export function msg(message: string): void {
 
   $body.find('[xtype=msg]').remove()
   const $w = $(
-    '<div xtype="msg" class="yvan-msg yvan-anim yvan-anim-00">' +
-    '  <div class="yvan-msg-content">' +
+    '<div xtype="tooltip" class="yvan-tooltip">' +
+    '<em></em><div class="yvan-tooltip-msg">' +
     message +
     '</div></div>'
   )
@@ -133,8 +133,8 @@ export function showTooltip(obj: any, message: string): void {
   }
 
   const $w = $(
-    '<div xtype="tooltip" class="yvan-msg yvan-anim yvan-anim-00">' +
-    '  <div class="yvan-msg-content">' +
+    '<div xtype="tooltip" class="yvan-tooltip">' +
+    '<em></em><div class="yvan-tooltip-msg">' +
     message +
     '</div></div>'
   )
@@ -142,7 +142,7 @@ export function showTooltip(obj: any, message: string): void {
   $body.append($w)
 
   const xxoffset: any = $(obj._webix.$view).offset()
-  const xxLeft: any = $(obj._webix.$view).width() + xxoffset.left
+  const xxLeft: any = $(obj._webix.$view).width() + xxoffset.left+10
   $w.css({ left: xxLeft, top: xxoffset?.top })
 }
 
