@@ -141,21 +141,10 @@ export function showTooltip(obj: any, message: string): void {
   $w.css({ left: xxLeft, top: xxoffset?.top })
 }
 
-export function hideTooltip(obj: any, message: string): void {
+export function hideTooltip(obj: any): void {
   const $body = $('body')
 
   $body.find('[xtype=tooltip]').remove()
-  const $w = $(
-    '<div xtype="tooltip" class="yvan-msg yvan-anim yvan-anim-00">' +
-    '  <div class="yvan-msg-content">' +
-    message +
-    '</div></div>'
-  )
-  $body.append($w)
-
-  const xxoffset: any = $(obj._webix.$view).offset()
-  const xxLeft: any = $(obj._webix.$view).width() + xxoffset.left
-  $w.css({ left: xxLeft, top: xxoffset?.top })
 }
 
 /**

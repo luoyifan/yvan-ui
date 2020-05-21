@@ -1,6 +1,7 @@
 import { CtlBase } from '../../CtlBase'
 import { parseYvanPropChangeVJson } from '../../CtlUtils'
 import * as YvanUI from '../../YvanUIExtend'
+import * as YvanMessage from '../../YvanUIMessage'
 import { YvEvent, YvEventDispatch } from '../../YvanEvent'
 
 type CtlInputWidth = number | undefined | 'auto'
@@ -63,7 +64,6 @@ export class CtlInput<M> extends CtlBase<M> {
           $input.on('keydown', onKeydown)
           if (that._validate) {
             const result = that._validate(null);
-            that._addTooltip(result);
             that._addEnvent($input);
           }
           if (that.constructor.name !== 'CtlSelect' && that._webixConfig.required) {
@@ -120,6 +120,15 @@ export class CtlInput<M> extends CtlBase<M> {
           if (!that.valueValid(newValue)) {
             // 不允许触发更改
             return
+          }
+          if(that._validate) {
+            const result = that._validate(that.value);
+            if(result) {
+              // 校验错误
+              that._showTootip();
+            }else{
+              that._hideTootip();
+            }
           }
           if (that.onValueChange && typeof that.onValueChange === 'function') {
             that.onValueChange(newValue, oldValue)
@@ -485,15 +494,6 @@ export class CtlInput<M> extends CtlBase<M> {
 
   _maxlength: any
 
-  _addTooltip(msg: any) {
-    $(this._webix.$view).css({
-      'position': 'relative'
-    })
-    $(this._webix.$view).append(
-      `<div id="${this.id}_tooptip" role="alert" aria-atomic="true" class="webix_tooltip" style="display: none; right: 0px; top: 0px;">${msg}</div>`
-    )
-  }
-
   anonymous_showTootip: any = () => {
     this._showTootip()
   }
@@ -513,15 +513,24 @@ export class CtlInput<M> extends CtlBase<M> {
   }
 
   _showTootip() {
-    $(`#${this.id}_tooptip`).css({
-      'display': 'block'
-    })
+    if(this._validate) {
+      const result = this._validate(this.value);
+      if(result) {
+        YvanMessage.showTooltip(this, result);
+        $(this._webix.$view).addClass('yvan-validate-error');
+      }
+    }
+    
   }
 
   _hideTootip() {
-    $(`#${this.id}_tooptip`).css({
-      'display': 'none'
-    })
+    if(this._validate) {
+      const result = this._validate(this.value);
+      if(!result) {
+        YvanMessage.hideTooltip(this);
+        $(this._webix.$view).removeClass('yvan-validate-error');
+      }
+    }
   }
 
   _showValidate(

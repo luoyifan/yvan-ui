@@ -1,7 +1,4 @@
 /*======================== button =======================*/
-.inputButton .webix_el_box{
-  height:34px
-}
 .webix_el_label .webix_el_box {
   color: #4b4c4c;
   padding-left: 5px;
@@ -107,4 +104,13 @@
   color: #fff;
   background-color: #67c23a;
   border-color: #67c23a;
+}
+.webix_layout_line .webix_el_button,.webix_layout_line .webix_el_button .webix_el_box{
+  height:34px!important
+}
+.webix_layout_line .webix_el_button button{
+  line-height: 14px!important
+}
+.webix_toolbar .webix_el_button,.webix_toolbar .webix_el_button .webix_el_box{
+  height:38px!important
 }
