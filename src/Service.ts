@@ -22,7 +22,7 @@ export type Broker<T> = {
  * 服务调用
  */
 export function brokerInvoke(serverUrl: string, method: string, args: any): Promise<any> {
-    return new Promise(resolve => {
+    return new Promise((resolve,reject) => {
         const ajax: Ajax.Function = _.get(window, 'YvanUI.ajax');
 
         ajax({
@@ -32,6 +32,9 @@ export function brokerInvoke(serverUrl: string, method: string, args: any): Prom
 
         }).then(res => {
             resolve(res);
+            
+        }).catch(e=>{
+            reject(e);
         });
     })
 }
