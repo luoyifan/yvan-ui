@@ -97,6 +97,16 @@ export class CtlSearch extends CtlInput<CtlSearch> {
           YvEventDispatch(that.onFocus, that, undefined)
         },
         onBlur(this: any) {
+          if (that._validate) {
+            const result = that._validate(that.value);
+            if (result) {
+              that._showValidateError()
+            }
+            else {
+              that._hideValidateError()
+            }
+          }
+          that._hideTootip()
           //离开焦点时，用户输入的置为无效
           if (!that.suppressRestore) {
             that._webix.setValue(that.valueOrigin)
