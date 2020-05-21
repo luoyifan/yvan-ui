@@ -79,7 +79,6 @@
           return targetFunc.apply(vue, [sender, args]);
       }
   }
-  //# sourceMappingURL=YvanEvent.js.map
 
   var designMode = false;
   function initDesign() {
@@ -88,7 +87,6 @@
   function isDesignMode() {
       return designMode;
   }
-  //# sourceMappingURL=DesignHelper.js.map
 
   var CtlBase = /** @class */ (function () {
       function CtlBase(vjson) {
@@ -266,7 +264,6 @@
       });
       return CtlBase;
   }());
-  //# sourceMappingURL=CtlBase.js.map
 
   /**
    * 内部函数
@@ -288,7 +285,6 @@
       });
       return yvanProp;
   }
-  //# sourceMappingURL=CtlUtils.js.map
 
   var version = "3.0.2";
   /**
@@ -349,13 +345,12 @@
           exports.componentRenderFilter = option.componentRenderFilter;
       }
   }
-  //# sourceMappingURL=YvanUIExtend.js.map
 
   /**
    * 服务调用
    */
   function brokerInvoke(serverUrl, method, args) {
-      return new Promise(function (resolve) {
+      return new Promise(function (resolve, reject) {
           var ajax = _.get(window, 'YvanUI.ajax');
           ajax({
               url: serverUrl + '@' + method,
@@ -363,6 +358,8 @@
               data: args
           }).then(function (res) {
               resolve(res);
+          }).catch(function (e) {
+              reject(e);
           });
       });
   }
@@ -382,7 +379,6 @@
       });
       return result;
   }
-  //# sourceMappingURL=Service.js.map
 
   var YvDataSource = /** @class */ (function () {
       function YvDataSource(ctl, option, dataSourceProcess) {
@@ -540,7 +536,6 @@
       };
       return YvDataSource;
   }());
-  //# sourceMappingURL=YvanDataSourceImp.js.map
 
   var CtlButtonDefault = {
       text: '',
@@ -610,12 +605,10 @@
       labelWidth: 110,
       labelAlign: 'right',
   };
-  //# sourceMappingURL=CtlDefaultValue.js.map
 
   function getFirstPinyin(msg) {
       return _.get(window, 'getFirstPinyin')(msg);
   }
-  //# sourceMappingURL=Utils.js.map
 
   var CtlTree = /** @class */ (function (_super) {
       __extends(CtlTree, _super);
@@ -661,7 +654,7 @@
               },
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -1010,7 +1003,6 @@
       };
       return CtlTree;
   }(CtlBase));
-  //# sourceMappingURL=CtlTree.js.map
 
   var CtlTreeTable = /** @class */ (function (_super) {
       __extends(CtlTreeTable, _super);
@@ -1053,7 +1045,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -1312,7 +1304,6 @@
       };
       return CtlTreeTable;
   }(CtlBase));
-  //# sourceMappingURL=CtlTreeTable.js.map
 
   /**
    * 创建快捷菜单
@@ -1416,7 +1407,6 @@
       //     }
       // });
   }
-  //# sourceMappingURL=CtlContextMenu.js.map
 
   var CtlTab = /** @class */ (function (_super) {
       __extends(CtlTab, _super);
@@ -1450,7 +1440,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                       _.defer(function () {
                           if (yvanProp.defaultTabIndex > 0) {
                               // 默认打开的 tab 序号
@@ -1625,7 +1615,6 @@
       };
       return CtlTab;
   }(CtlBase));
-  //# sourceMappingURL=CtlTab.js.map
 
   var CtlDataview = /** @class */ (function (_super) {
       __extends(CtlDataview, _super);
@@ -1653,7 +1642,7 @@
               select: true,
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -1791,7 +1780,6 @@
       };
       return CtlDataview;
   }(CtlBase));
-  //# sourceMappingURL=CtlDataview.js.map
 
   /**
    * 扩展 echarts 组件
@@ -1823,7 +1811,7 @@
               template: "<div role=\"echarts\"></div>",
               on: {
                   onAfterRender: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                       that._resetECharts();
                   },
                   onDestruct: function () {
@@ -1884,7 +1872,6 @@
       };
       return CtlECharts;
   }(CtlBase));
-  //# sourceMappingURL=CtlECharts.js.map
 
   /**
    * 按钮组件
@@ -1920,7 +1907,7 @@
               type: 'text',
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   onDestruct: function () {
                       that.removeHandle();
@@ -2071,7 +2058,6 @@
       };
       return CtlButton;
   }(CtlBase));
-  //# sourceMappingURL=CtlButton.js.map
 
   var CtlInput = /** @class */ (function (_super) {
       __extends(CtlInput, _super);
@@ -2092,6 +2078,12 @@
           _this.maxlength = undefined;
           /**================ 私有属性 ===================**/
           _this._validateResult = true;
+          _this.anonymous_showTootip = function () {
+              _this._showTootip();
+          };
+          _this.anonymous_hideTootip = function () {
+              _this._hideTootip();
+          };
           return _this;
       }
       CtlInput.prototype._create = function (vjson, me) {
@@ -2109,6 +2101,9 @@
               'onFocus',
               'onChange',
               'onBlur',
+              // 'onTouchEnd',
+              // 'onTouchStart',
+              // 'onTouchMove',
               'maxlength',
               'changeValueImplete',
               'ff',
@@ -2141,8 +2136,12 @@
                       var $input = $(this.$view).find('input');
                       $input.on('input', that.onInputEvent.bind(that));
                       $input.on('keydown', onKeydown);
-                      if (that.constructor.name !== 'CtlSelect' &&
-                          that._webixConfig.required) {
+                      if (that._validate) {
+                          var result = that._validate(null);
+                          that._addTooltip(result);
+                          that._addEnvent($input);
+                      }
+                      if (that.constructor.name !== 'CtlSelect' && that._webixConfig.required) {
                           if (that.constructor.name === 'CtlDateRangePicker') {
                               that._showValidate(!this.getValue().end || this.getValue().end.length <= 0, 'requiredValidate');
                           }
@@ -2163,6 +2162,7 @@
                       var $input = $(this.$view).find('input');
                       $input.off('input');
                       $input.off('keydown');
+                      that._removeEnvent($input);
                       that.removeHandle();
                   },
                   onItemClick: function () {
@@ -2172,8 +2172,19 @@
                       YvEventDispatch(that.onEnter, that, undefined);
                   },
                   onFocus: function () {
+                      that._showTootip();
                       YvEventDispatch(that.onFocus, that, undefined);
                   },
+                  // onTouchStart(this: any) {
+                  //   that._showTootip()
+                  //   YvEventDispatch(that.onTouchStart, that, undefined)
+                  // },
+                  // onTouchMove(this: any) {
+                  // },
+                  // onTouchEnd(this: any) {
+                  //   that._hideTootip()
+                  //   YvEventDispatch(that.onTouchEnd, that, undefined)
+                  // },
                   onChange: function (newValue, oldValue) {
                       if (!that.valueValid(newValue)) {
                           // 不允许触发更改
@@ -2195,6 +2206,7 @@
                       YvEventDispatch(that.onChange, that, newValue);
                   },
                   onBlur: function () {
+                      that._hideTootip();
                       if (that._webixConfig.required) {
                           if (that.constructor.name === 'CtlDateRangePicker') {
                               that._showValidate(!this.getValue().end || this.getValue().end.length <= 0, 'requiredValidate');
@@ -2468,6 +2480,30 @@
       });
       CtlInput.prototype.getValidate = function () {
           return this._validate;
+      };
+      CtlInput.prototype._addTooltip = function (msg) {
+          $(this._webix.$view).css({
+              'position': 'relative'
+          });
+          $(this._webix.$view).append("<div id=\"" + this.id + "_tooptip\" role=\"alert\" aria-atomic=\"true\" class=\"webix_tooltip\" style=\"display: none; right: 0px; top: 0px;\">" + msg + "</div>");
+      };
+      CtlInput.prototype._addEnvent = function (input) {
+          input.context.addEventListener('mouseenter', this.anonymous_showTootip);
+          input.context.addEventListener('mouseleave', this.anonymous_hideTootip);
+      };
+      CtlInput.prototype._removeEnvent = function (input) {
+          input.context.removeEventListener('mouseenter', this.anonymous_showTootip);
+          input.context.removeEventListener('mouseleave', this.anonymous_hideTootip);
+      };
+      CtlInput.prototype._showTootip = function () {
+          $("#" + this.id + "_tooptip").css({
+              'display': 'block'
+          });
+      };
+      CtlInput.prototype._hideTootip = function () {
+          $("#" + this.id + "_tooptip").css({
+              'display': 'none'
+          });
       };
       CtlInput.prototype._showValidate = function (msg, type) {
           var $input;
@@ -3122,7 +3158,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   // onAfterLoad: function (this: any) {
                   //   that.attachHandle(this)
@@ -3148,7 +3184,6 @@
       };
       return CtlForm;
   }(CtlBase));
-  //# sourceMappingURL=CtlForm.js.map
 
   var CtlMultiCombo = /** @class */ (function (_super) {
       __extends(CtlMultiCombo, _super);
@@ -3288,7 +3323,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                       that._refreshIcon();
                   },
                   // onAfterRender(this: any) {
@@ -3465,7 +3500,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   onDestruct: function () {
                       that.removeHandle();
@@ -3480,7 +3515,6 @@
       };
       return CtlCarousel;
   }(CtlBase));
-  //# sourceMappingURL=CtlCarousel.js.map
 
   var CtlGridLocale = {
       rownumber: " ",
@@ -3552,7 +3586,6 @@
       paste: "粘贴",
       ctrlV: "ctrl + V"
   };
-  //# sourceMappingURL=CtlGridLocale.js.map
 
   var CtlGridPage = /** @class */ (function () {
       function CtlGridPage(grid) {
@@ -3813,7 +3846,6 @@
       };
       return CtlGridPage;
   }());
-  //# sourceMappingURL=CtlGridPage.js.map
 
   function CtlGridIdRender (params, grid) {
       if (params.node.cstate) {
@@ -3842,7 +3874,6 @@
       }
       return 1 + params.node.rowIndex;
   }
-  //# sourceMappingURL=CtlGridIdRender.js.map
 
   var YvGridProp = {
       editable: false,
@@ -3891,7 +3922,6 @@
       datetimeformat: 'yyyy-MM-dd HH:mm:ss',
       data: []
   };
-  //# sourceMappingURL=CtlGridDefault.js.map
 
   var CtlGridCellCheckbox = /** @class */ (function () {
       function CtlGridCellCheckbox() {
@@ -3979,7 +4009,6 @@
       };
       return CtlGridCellCheckbox;
   }());
-  //# sourceMappingURL=CtlGridCellCheckbox.js.map
 
   var CtlGridHeadCheckbox = /** @class */ (function () {
       function CtlGridHeadCheckbox() {
@@ -4072,7 +4101,6 @@
       };
       return CtlGridHeadCheckbox;
   }());
-  //# sourceMappingURL=CtlGridHeadCheckbox.js.map
 
   var YvanDataSourceGrid = /** @class */ (function () {
       function YvanDataSourceGrid(ctl, option) {
@@ -4396,7 +4424,6 @@
       };
       return YvanDataSourceGrid;
   }());
-  //# sourceMappingURL=YvanDataSourceGridImp.js.map
 
   var CtlGridCellButton = /** @class */ (function () {
       function CtlGridCellButton() {
@@ -4462,7 +4489,6 @@
       };
       return CtlGridCellButton;
   }());
-  //# sourceMappingURL=CtlGridCellButton.js.map
 
   var CtlGridFilterSet = /** @class */ (function () {
       function CtlGridFilterSet() {
@@ -4674,7 +4700,6 @@
       };
       return CtlGridFilterSet;
   }());
-  //# sourceMappingURL=CtlGridFilterSet.js.map
 
   var CtlGridEditor = /** @class */ (function () {
       function CtlGridEditor() {
@@ -4745,7 +4770,6 @@
       };
       return CtlGridEditor;
   }());
-  //# sourceMappingURL=CtlGridEditor.js.map
 
   var isInput = false;
   var CtlGridEditorText = /** @class */ (function (_super) {
@@ -4918,7 +4942,6 @@
       };
       return CtlGridEditorText;
   }(CtlGridEditor));
-  //# sourceMappingURL=CtlGridEditorText.js.map
 
   var CtlGridEditorCombo = /** @class */ (function (_super) {
       __extends(CtlGridEditorCombo, _super);
@@ -4984,7 +5007,6 @@
       };
       return CtlGridEditorCombo;
   }(CtlGridEditor));
-  //# sourceMappingURL=CtlGridEditorCombo.js.map
 
   /**
    * 扩展 grid 组件
@@ -5046,7 +5068,7 @@
                   onMyRender: function () {
                       var _this = this;
                       _.defer(function () {
-                          that.attachHandle(_this, vjson);
+                          that.attachHandle(_this, __assign(__assign({}, vjson), yvanProp));
                           that._resetGrid();
                       });
                   },
@@ -6156,7 +6178,6 @@
       };
       return CtlGrid;
   }(CtlBase));
-  //# sourceMappingURL=CtlGrid.js.map
 
   var CtlSwitch = /** @class */ (function (_super) {
       __extends(CtlSwitch, _super);
@@ -6491,7 +6512,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -6609,7 +6630,6 @@
       });
       return CtlCodeMirror;
   }(CtlBase));
-  //# sourceMappingURL=CtlCodeMirror.js.map
 
   var CtlSidebar = /** @class */ (function (_super) {
       __extends(CtlSidebar, _super);
@@ -6638,7 +6658,7 @@
               },
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -6852,7 +6872,6 @@
       };
       return CtlSidebar;
   }(CtlBase));
-  //# sourceMappingURL=CtlSidebar.js.map
 
   webix.protoUI({
       name: 'xterm',
@@ -6920,7 +6939,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -6965,7 +6984,6 @@
       });
       return CtlXterm;
   }(CtlBase));
-  //# sourceMappingURL=CtlXterm.js.map
 
   webix.protoUI({
       name: 'xconsolelog',
@@ -7024,7 +7042,7 @@
               on: {
                   onInited: function () {
                       var _this = this;
-                      that.attachHandle(this, vjson);
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                       _.defer(function () {
                           $(_this.$view).on('click', '.vc-fold', function (e) {
                               that.vcfoldclick(this);
@@ -7341,7 +7359,6 @@
       };
       return CtlConsoleLog;
   }(CtlBase));
-  //# sourceMappingURL=CtlConsoleLog.js.map
 
   // export const webix = require("../webix/webix");
   webix.i18n.setLocale('zh-CN');
@@ -7891,7 +7908,6 @@
       wrapperWebixConfig(module, vjson);
       webix.ui(vjson, webix.$$(module.instanceId + '$' + spaceId));
   }
-  //# sourceMappingURL=YvanRender.js.map
 
   function downLoad(downLoadUrl, filename, data, header) {
       var YvanUI = _.get(window, 'YvanUI');
@@ -7997,7 +8013,6 @@
           });
       };
   }
-  //# sourceMappingURL=YvanUIAjax.js.map
 
   (function (Db) {
       var Client = /** @class */ (function () {
@@ -8081,7 +8096,6 @@
   function createDb(createOption) {
       return new exports.Db.Client(createOption);
   }
-  //# sourceMappingURL=YvanUIDb.js.map
 
   /**
    * 获取页面 URL 问号之后的参数
@@ -8175,7 +8189,6 @@
       }
       return queryString;
   }
-  //# sourceMappingURL=YvanUIUtils.js.map
 
   /**
    * 显示正在读取
@@ -8373,7 +8386,6 @@
       }
       // https://docs.webix.com/desktop__message_boxes.html
   }
-  //# sourceMappingURL=YvanUIMessage.js.map
 
   var BaseModule = /** @class */ (function (_super) {
       __extends(BaseModule, _super);
@@ -8410,6 +8422,7 @@
                       if (_.has(ctl, '_validate')) {
                           var validateResult = ctl._validate(ctl.value);
                           if (validateResult) {
+                              ctl._showTootip();
                               _.set(result, key, validateResult);
                           }
                       }
@@ -8545,7 +8558,6 @@
           target.watches.push(watch);
       };
   }
-  //# sourceMappingURL=YvanUIModule.js.map
 
   // eslint-disable-next-line import/no-extraneous-dependencies
   /**
@@ -8615,7 +8627,6 @@
       return result;
   }
   var contentText = "export type Refs = {\n};\n\nexport default abstract class<M, INP> extends YvanUI.BaseDialog<M, Refs, INP> {\n\n    main: {\n        FADMINID:string,\n        FADMINNAME: string,\n        FADMINPHONE: string,\n        FEMAIL: string\n    } = {\n        FADMINID:'',\n        FADMINNAME: '',\n        FADMINPHONE:'',\n        FEMAIL:''\n    };\n\n    viewResolver(): any {\n        console.log(this, this.inParamter);\n\n        return {\n            title: '\u8054\u7CFB\u65B9\u5F0F\u7EF4\u62A4',\n            modal: true,\n            width: 400,\n            height: 200,\n            body: {\n                rows: [\n                    {\n                        view: 'text',\n                        entityName: \"main.FADMINNAME\",\n                        label: \"\u7BA1\u7406\u5458\u540D\u79F0\",\n                        required: true,\n                        width: 320,\n                    },\n                    {\n                        view: 'text',\n                        entityName: 'main.FADMINPHONE',\n                        label: '\u7BA1\u7406\u5458\u8054\u7CFB\u65B9\u5F0F',\n                        width: 320,\n                        required: true,\n                    },\n                    {\n                        view: 'text',\n                        entityName: \"main.FEMAIL\",\n                        label: \"\u8054\u7CFBEMAIL\",\n                        width: 320,\n                        required: true,\n                    },\n                    {\n                        cols: [\n                            {width: 110},\n                            {\n                                view: \"button\", text: \"\u786E\u5B9A\", cssType: \"primary\", width: 0,\n                                onClick: {\n                                    type: 'function',\n                                    bind: 'ok'\n                                }\n                            },\n                            {\n                                view: \"button\", text: \"\u53D6\u6D88\", cssType: 'default', width: 0,\n                                onClick: {\n                                    type: 'function',\n                                    bind: 'cancel'\n                                }\n                            }\n                        ]\n                    }\n                ]\n            }\n        }\n    }\n}";
-  //# sourceMappingURL=YvanUICode.js.map
 
   var PropertyDescription = /** @class */ (function () {
       function PropertyDescription() {
@@ -8657,7 +8668,6 @@
       };
       return PropertyDescription;
   }());
-  //# sourceMappingURL=PropertyDescription.js.map
 
   var PropertyDescriptionTable = new Map();
   PropertyDescriptionTable.set('layout', new PropertyDescription({
@@ -8958,7 +8968,6 @@
           { name: 'onNodeDblClick', desc: '节点被双击后触发' }
       ]
   }));
-  //# sourceMappingURL=PropertyDescriptionTable.js.map
 
   function userComponentFactory(Component, name) {
   }
@@ -8976,7 +8985,6 @@
       }
       return UserComponentBase;
   }());
-  //# sourceMappingURL=UserComponent.js.map
 
   exports.BaseDialog = BaseDialog;
   exports.BaseModule = BaseModule;
