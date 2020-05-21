@@ -126,14 +126,19 @@ export function msg(message: string): void {
  */
 export function showTooltip(obj: any, message: string): void {
   const $body = $('body')
+  const tooptipId = obj.id + '_tooltip';
 
-  $body.find('[xtype=tooltip]').remove()
+  if ($body.find(`#${tooptipId}`).length > 0) {
+    return;
+  }
+
   const $w = $(
     '<div xtype="tooltip" class="yvan-msg yvan-anim yvan-anim-00">' +
     '  <div class="yvan-msg-content">' +
     message +
     '</div></div>'
   )
+  $w[0].id = tooptipId
   $body.append($w)
 
   const xxoffset: any = $(obj._webix.$view).offset()
@@ -143,8 +148,8 @@ export function showTooltip(obj: any, message: string): void {
 
 export function hideTooltip(obj: any): void {
   const $body = $('body')
-
-  $body.find('[xtype=tooltip]').remove()
+  const tooptipId = obj.id + '_tooltip';
+  $body.find(`#${tooptipId}`).remove()
 }
 
 /**

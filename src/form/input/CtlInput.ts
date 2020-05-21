@@ -121,15 +121,6 @@ export class CtlInput<M> extends CtlBase<M> {
             // 不允许触发更改
             return
           }
-          if(that._validate) {
-            const result = that._validate(that.value);
-            if(result) {
-              // 校验错误
-              that._showTootip();
-            }else{
-              that._hideTootip();
-            }
-          }
           if (that.onValueChange && typeof that.onValueChange === 'function') {
             that.onValueChange(newValue, oldValue)
           }
@@ -499,7 +490,10 @@ export class CtlInput<M> extends CtlBase<M> {
   }
 
   anonymous_hideTootip: any = () => {
-    this._hideTootip()
+    const $input = $(this._webix.$view).find('input')
+    if (document.activeElement !== $input[0]) {
+      this._hideTootip()
+    }
   }
 
   _addEnvent(input: any) {
@@ -512,25 +506,25 @@ export class CtlInput<M> extends CtlBase<M> {
     input.context.removeEventListener('mouseleave', this.anonymous_hideTootip);
   }
 
+  _showValidateError() {
+    $(this._webix.$view).addClass('yvan-validate-error');
+  }
+
+  _hideValidateError() {
+    $(this._webix.$view).removeClass('yvan-validate-error');
+  }
+
   _showTootip() {
-    if(this._validate) {
+    if (this._validate) {
       const result = this._validate(this.value);
-      if(result) {
+      if (result) {
         YvanMessage.showTooltip(this, result);
-        $(this._webix.$view).addClass('yvan-validate-error');
       }
     }
-    
   }
 
   _hideTootip() {
-    if(this._validate) {
-      const result = this._validate(this.value);
-      if(!result) {
-        YvanMessage.hideTooltip(this);
-        $(this._webix.$view).removeClass('yvan-validate-error');
-      }
-    }
+    YvanMessage.hideTooltip(this);
   }
 
   _showValidate(
