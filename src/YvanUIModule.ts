@@ -84,6 +84,7 @@ export abstract class BaseModule<M, Refs, INP> extends Vue implements Module<M, 
           if (_.has(ctl, '_validate')) {
             const validateResult = ctl._validate(ctl.value);
             if (validateResult) {
+              ctl._showTootip()
               _.set(result, key, validateResult)
             }
           }
