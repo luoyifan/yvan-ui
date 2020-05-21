@@ -11,6 +11,11 @@ export declare function clearLoading(): void;
  */
 export declare function msg(message: string): void;
 /**
+ * 显示tooltip
+ */
+export declare function showTooltip(obj: any, message: string): void;
+export declare function hideTooltip(obj: any): void;
+/**
  * 弹出输入框
  * @param title 输入框标题
  * @param defValue 默认值

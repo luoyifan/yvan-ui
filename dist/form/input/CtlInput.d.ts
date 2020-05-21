@@ -106,12 +106,13 @@ export declare class CtlInput<M> extends CtlBase<M> {
     _validate: any;
     _id: any;
     _maxlength: any;
-    _addTooltip(msg: any): void;
     anonymous_showTootip: any;
     anonymous_hideTootip: any;
     _addEnvent(input: any): void;
     _removeEnvent(input: any): void;
-    _showTootip(): void;
+    _showValidateError(): void;
+    _hideValidateError(): void;
+    _showTootip(msg: string): void;
     _hideTootip(): void;
     _showValidate(msg: any, type: 'inputValidate' | 'changedValidate' | 'requiredValidate'): boolean;
 }
