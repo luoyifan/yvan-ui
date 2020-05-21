@@ -22,20 +22,20 @@ export class CtlForm extends CtlBase<CtlForm> {
     _.merge(vjson, that._webixConfig, {
       on: {
         onInited: function (this: any) {
-          that.attachHandle(this)
+          that.attachHandle(this, vjson)
         },
-        onAfterLoad: function (this: any) {
-          that.attachHandle(this)
-        },
-        onBeforeLoad: function (this: any) {
-          that.attachHandle(this)
-        },
-        onChange: function (this: any) {
-          that.attachHandle(this)
-        },
-        onViewShow: function (this: any) {
-          that.attachHandle(this)
-        },
+        // onAfterLoad: function (this: any) {
+        //   that.attachHandle(this)
+        // },
+        // onBeforeLoad: function (this: any) {
+        //   that.attachHandle(this)
+        // },
+        // onChange: function (this: any) {
+        //   that.attachHandle(this)
+        // },
+        // onViewShow: function (this: any) {
+        //   that.attachHandle(this)
+        // },
         onDestruct: function () {
           that.removeHandle()
         }

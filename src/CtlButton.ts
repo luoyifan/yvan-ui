@@ -43,7 +43,7 @@ export class CtlButton extends CtlBase<CtlButton> {
       type: 'text',
       on: {
         onInited: function (this: any) {
-          that.attachHandle(this)
+          that.attachHandle(this, vjson)
         },
         onDestruct() {
           that.removeHandle()

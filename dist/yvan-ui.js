@@ -136,11 +136,52 @@
       /**
        * 组件被渲染后触发
        */
-      CtlBase.prototype.attachHandle = function (webixHandler) {
+      CtlBase.prototype.attachHandle = function (webixHandler, vjson) {
           this._webix = webixHandler;
           this._module = this._webix.$scope;
           YvEventDispatch(this.onRender, this, undefined);
           this.refreshState();
+          if (_.has(vjson, 'entityName')) {
+              _.set(this._module, '_entityCtlMapping.' + vjson['entityName'], this);
+          }
+      };
+      CtlBase.prototype.getCtlElements = function (element) {
+          var _this = this;
+          var entityArray = [];
+          if (_.isArray(element)) {
+              element.forEach(function (item) {
+                  entityArray = _.union(entityArray, _this.getCtlElements(item));
+              });
+          }
+          else if (_.isObject(element)) {
+              if (element.hasOwnProperty("view")) {
+                  var items = _.get(element, "view");
+                  entityArray = _.union(entityArray, [items]);
+              }
+              if (element.hasOwnProperty("rows")) {
+                  var items = _.get(element, "rows");
+                  items.forEach(function (item) {
+                      entityArray = _.union(entityArray, _this.getCtlElements(item));
+                  });
+              }
+              else if (element.hasOwnProperty("cols")) {
+                  var items = _.get(element, "cols");
+                  items.forEach(function (item) {
+                      entityArray = _.union(entityArray, _this.getCtlElements(item));
+                  });
+              }
+              else if (element.hasOwnProperty("elements")) {
+                  var items = _.get(element, "elements");
+                  items.forEach(function (item) {
+                      entityArray = _.union(entityArray, _this.getCtlElements(item));
+                  });
+              }
+              else if (element.hasOwnProperty("body")) {
+                  var item = _.get(element, "body");
+                  entityArray = _.union(entityArray, this.getCtlElements(item));
+              }
+          }
+          return entityArray;
       };
       /**
        * 组件被移除后触发
@@ -225,6 +266,7 @@
       });
       return CtlBase;
   }());
+  //# sourceMappingURL=CtlBase.js.map
 
   /**
    * 内部函数
@@ -236,7 +278,7 @@
       _.forEach(__spreadArrays(names, [
           'debugger',
           'ctlName',
-          'entityName',
+          // 'entityName',
           'onRender'
       ]), function (name) {
           if (_.has(vjson, name)) {
@@ -619,7 +661,7 @@
               },
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -1005,7 +1047,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -1350,7 +1392,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                       _.defer(function () {
                           if (yvanProp.defaultTabIndex > 0) {
                               // 默认打开的 tab 序号
@@ -1553,7 +1595,7 @@
               select: true,
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -1723,7 +1765,7 @@
               template: "<div role=\"echarts\"></div>",
               on: {
                   onAfterRender: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                       that._resetECharts();
                   },
                   onDestruct: function () {
@@ -1820,7 +1862,7 @@
               type: 'text',
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
                   onDestruct: function () {
                       that.removeHandle();
@@ -2035,7 +2077,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
                   onAfterRender: function () {
                       var $input = $(this.$view).find('input');
@@ -2366,6 +2408,9 @@
           enumerable: true,
           configurable: true
       });
+      CtlInput.prototype.getValidate = function () {
+          return this._validate;
+      };
       CtlInput.prototype._showValidate = function (msg, type) {
           var $input;
           if (this.constructor.name === 'CtlText' ||
@@ -3025,20 +3070,20 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
-                  onAfterLoad: function () {
-                      that.attachHandle(this);
-                  },
-                  onBeforeLoad: function () {
-                      that.attachHandle(this);
-                  },
-                  onChange: function () {
-                      that.attachHandle(this);
-                  },
-                  onViewShow: function () {
-                      that.attachHandle(this);
-                  },
+                  // onAfterLoad: function (this: any) {
+                  //   that.attachHandle(this)
+                  // },
+                  // onBeforeLoad: function (this: any) {
+                  //   that.attachHandle(this)
+                  // },
+                  // onChange: function (this: any) {
+                  //   that.attachHandle(this)
+                  // },
+                  // onViewShow: function (this: any) {
+                  //   that.attachHandle(this)
+                  // },
                   onDestruct: function () {
                       that.removeHandle();
                   }
@@ -3192,7 +3237,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                       that._refreshIcon();
                   },
                   // onAfterRender(this: any) {
@@ -3352,6 +3397,7 @@
       };
       return CtlSearch;
   }(CtlInput));
+  //# sourceMappingURL=CtlSearch.js.map
 
   var CtlCarousel = /** @class */ (function (_super) {
       __extends(CtlCarousel, _super);
@@ -3369,7 +3415,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
                   onDestruct: function () {
                       that.removeHandle();
@@ -4940,7 +4986,7 @@
               template: "<div role=\"yvGrid\" class=\"ag-theme-blue\"></div>",
               on: {
                   onAfterRender: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                       that._resetGrid();
                   },
                   onDestruct: function () {
@@ -6387,7 +6433,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -6534,7 +6580,7 @@
               },
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -6816,7 +6862,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                   },
                   onAfterDelete: function () {
                       that.removeHandle();
@@ -6920,7 +6966,7 @@
               on: {
                   onInited: function () {
                       var _this = this;
-                      that.attachHandle(this);
+                      that.attachHandle(this, vjson);
                       _.defer(function () {
                           $(_this.$view).on('click', '.vc-fold', function (e) {
                               that.vcfoldclick(this);
@@ -7787,6 +7833,7 @@
       wrapperWebixConfig(module, vjson);
       webix.ui(vjson, webix.$$(module.instanceId + '$' + spaceId));
   }
+  //# sourceMappingURL=YvanRender.js.map
 
   function downLoad(downLoadUrl, filename, data, header) {
       var YvanUI = _.get(window, 'YvanUI');
@@ -8301,6 +8348,35 @@
       BaseModule.prototype.getPlace = function (placeId) {
           return webix.$$(_.get(this, 'instanceId') + '$' + placeId);
       };
+      BaseModule.prototype.validate = function (entityName) {
+          var _this = this;
+          return new Promise(function (resolver, reject) {
+              var ctlMappings = _.get(_this, '_entityCtlMapping.' + entityName);
+              var result = {};
+              if (_.has(ctlMappings, '_validate')) {
+                  var validateResult = ctlMappings._validate(ctlMappings.value);
+                  if (validateResult) {
+                      _.set(result, ctlMappings.vjson.label, validateResult);
+                  }
+              }
+              else {
+                  _.forEach(ctlMappings, function (ctl, key) {
+                      if (_.has(ctl, '_validate')) {
+                          var validateResult = ctl._validate(ctl.value);
+                          if (validateResult) {
+                              _.set(result, ctl.vjson.label, validateResult);
+                          }
+                      }
+                  });
+              }
+              if (_.size(result) > 0) {
+                  reject(result);
+              }
+              else {
+                  resolver(_.get(_this, entityName));
+              }
+          });
+      };
       Object.defineProperty(BaseModule.prototype, "title", {
           get: function () {
               if (this._webixId) {
@@ -8423,6 +8499,7 @@
           target.watches.push(watch);
       };
   }
+  //# sourceMappingURL=YvanUIModule.js.map
 
   // eslint-disable-next-line import/no-extraneous-dependencies
   /**

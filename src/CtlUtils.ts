@@ -11,7 +11,7 @@ export function parseYvanPropChangeVJson(vjson: any, names: string[]): any {
         ...names,
         'debugger',
         'ctlName',
-        'entityName',
+        // 'entityName',
         'onRender'
 
     ], name => {

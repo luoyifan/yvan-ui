@@ -51,10 +51,10 @@ export class CtlInput<M> extends CtlBase<M> {
     // 将 _webixConfig 合并至 vjson, 最终合交给 webix 做渲染
     _.merge(vjson, that._webixConfig, {
       on: {
-        onInited: function(this: any) {
-          that.attachHandle(this)
+        onInited: function (this: any) {
+          that.attachHandle(this, vjson)
         },
-        onAfterRender: function(this: any) {
+        onAfterRender: function (this: any) {
           const $input = $(this.$view).find('input')
           $input.on('input', that.onInputEvent.bind(that))
           $input.on('keydown', onKeydown)
@@ -82,7 +82,7 @@ export class CtlInput<M> extends CtlBase<M> {
             }, that.ff)
           }
         },
-        onDestruct: function(this: any) {
+        onDestruct: function (this: any) {
           this.callEvent('onCtlRemove', [])
           const $input = $(this.$view).find('input')
           $input.off('input')
@@ -166,7 +166,7 @@ export class CtlInput<M> extends CtlBase<M> {
       this.maxlength &&
       _.size((event.target as any).value) > this.maxlength
     ) {
-      ;(event.target as any).value = (event.target as any).value.substring(
+      ; (event.target as any).value = (event.target as any).value.substring(
         0,
         this.maxlength
       )
@@ -432,7 +432,7 @@ export class CtlInput<M> extends CtlBase<M> {
     if (typeof nv === 'function') {
       this._validate = nv
     } else if (typeof nv === 'string') {
-      const vl = function(value: any, data: any) {
+      const vl = function (value: any, data: any) {
         let msg = YvanUI.complexValid['fun'](nv, value)
 
         return that._showValidate(msg, 'inputValidate')
@@ -442,6 +442,10 @@ export class CtlInput<M> extends CtlBase<M> {
   }
 
   get validate(): any {
+    return this._validate
+  }
+
+  getValidate(): any {
     return this._validate
   }
 

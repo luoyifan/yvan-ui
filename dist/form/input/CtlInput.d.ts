@@ -100,6 +100,7 @@ export declare class CtlInput<M> extends CtlBase<M> {
      */
     set validate(nv: any);
     get validate(): any;
+    getValidate(): any;
     /**================ 私有属性 ===================**/
     _validateResult: boolean;
     _validate: any;

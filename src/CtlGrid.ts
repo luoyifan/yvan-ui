@@ -75,7 +75,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       template: `<div role="yvGrid" class="ag-theme-blue"></div>`,
       on: {
         onAfterRender: function (this: any) {
-          that.attachHandle(this)
+          that.attachHandle(this, vjson)
           that._resetGrid()
         },
         onDestruct(this: any) {

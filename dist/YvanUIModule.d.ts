@@ -47,6 +47,7 @@ export declare abstract class BaseModule<M, Refs, INP> extends Vue implements Mo
      * 从外部设置输入参数
      */
     setInParamter: (inParamter: INP) => void;
+    validate(entityName: string): Promise<any>;
     /**
      * 获取或设置 window 标题
      */

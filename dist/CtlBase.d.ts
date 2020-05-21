@@ -55,7 +55,8 @@ export declare abstract class CtlBase<T> {
     /**
      * 组件被渲染后触发
      */
-    protected attachHandle(webixHandler: any): void;
+    protected attachHandle(webixHandler: any, vjson: any): void;
+    protected getCtlElements(element: any): any[];
     /**
      * 组件被移除后触发
      */

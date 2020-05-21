@@ -92,12 +92,54 @@ export abstract class CtlBase<T> {
   /**
    * 组件被渲染后触发
    */
-  protected attachHandle(webixHandler: any) {
+  protected attachHandle(webixHandler: any, vjson: any) {
     this._webix = webixHandler
     this._module = this._webix.$scope
 
     YvEventDispatch(this.onRender, this, undefined)
     this.refreshState()
+
+    if (_.has(vjson, 'entityName')) {
+      _.set(this._module, '_entityCtlMapping.' + vjson['entityName'], this)
+    }
+  }
+
+  protected getCtlElements(element: any) {
+    let entityArray: any[] = []
+    if (_.isArray(element)) {
+      element.forEach((item: any) => {
+        entityArray = _.union(entityArray, this.getCtlElements(item))
+      })
+    }
+    else if (_.isObject(element)) {
+      if (element.hasOwnProperty("view")) {
+        let items = _.get(element, "view");
+        entityArray = _.union(entityArray, [items]);
+      }
+      if (element.hasOwnProperty("rows")) {
+        let items = _.get(element, "rows");
+        items.forEach((item: any) => {
+          entityArray = _.union(entityArray, this.getCtlElements(item))
+        });
+      }
+      else if (element.hasOwnProperty("cols")) {
+        let items = _.get(element, "cols");
+        items.forEach((item: any) => {
+          entityArray = _.union(entityArray, this.getCtlElements(item))
+        });
+      }
+      else if (element.hasOwnProperty("elements")) {
+        let items = _.get(element, "elements");
+        items.forEach((item: any) => {
+          entityArray = _.union(entityArray, this.getCtlElements(item))
+        });
+      }
+      else if (element.hasOwnProperty("body")) {
+        let item = _.get(element, "body");
+        entityArray = _.union(entityArray, this.getCtlElements(item))
+      }
+    }
+    return entityArray;
   }
 
   /**

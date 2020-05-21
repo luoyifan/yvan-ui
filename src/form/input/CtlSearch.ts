@@ -67,7 +67,7 @@ export class CtlSearch extends CtlInput<CtlSearch> {
     _.merge(vjson, that._webixConfig, {
       on: {
         onInited(this: any) {
-          that.attachHandle(this)
+          that.attachHandle(this, vjson)
           that._refreshIcon()
         },
         // onAfterRender(this: any) {

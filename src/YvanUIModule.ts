@@ -88,6 +88,35 @@ export abstract class BaseModule<M, Refs, INP> extends Vue implements Module<M, 
    */
   setInParamter!: (inParamter: INP) => void
 
+  validate(entityName: string): Promise<any> {
+    return new Promise<any>((resolver, reject) => {
+      const ctlMappings: any = _.get(this, '_entityCtlMapping.' + entityName);
+
+      const result = {};
+      if (_.has(ctlMappings, '_validate')) {
+        const validateResult = ctlMappings._validate(ctlMappings.value);
+        if (validateResult) {
+          _.set(result, ctlMappings.vjson.label, validateResult)
+        }
+      }
+      else {
+        _.forEach(ctlMappings, (ctl, key) => {
+          if (_.has(ctl, '_validate')) {
+            const validateResult = ctl._validate(ctl.value);
+            if (validateResult) {
+              _.set(result, ctl.vjson.label, validateResult)
+            }
+          }
+        });
+      }
+      if (_.size(result) > 0) {
+        reject(result)
+      } else {
+        resolver(_.get(this, entityName));
+      }
+    });
+  }
+
   /**
    * 获取或设置 window 标题
    */

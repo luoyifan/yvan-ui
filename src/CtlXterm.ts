@@ -77,7 +77,7 @@ export class CtlXterm extends CtlBase<CtlXterm> {
         _.merge(vjson, that._webixConfig, {
             on: {
                 onInited(this: any) {
-                    that.attachHandle(this)
+                    that.attachHandle(this, vjson)
                 },
                 onAfterDelete() {
                     that.removeHandle()

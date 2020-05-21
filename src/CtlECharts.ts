@@ -37,7 +37,7 @@ export class CtlECharts extends CtlBase<CtlECharts> {
       template: `<div role="echarts"></div>`,
       on: {
         onAfterRender: function (this: any) {
-          that.attachHandle(this)
+          that.attachHandle(this, vjson)
           that._resetECharts()
         },
         onDestruct(this: any) {
