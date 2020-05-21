@@ -90,12 +90,11 @@ export class CtlSearch extends CtlInput<CtlSearch> {
         // },
         onEnter() {
           // 从键盘响应查询
-          that.suppressRestore = true
-          that._searchRequest(that._webix.getValue(), that.valueOrigin)
+          that._searchRequest(that._webix.getValue(), that.valueEdit)
         },
         onFocus(this: any) {
           //进入焦点时，用户输入的值既为有效值
-          that.valueOrigin = that._webix.getValue()
+          that.valueReal = that._webix.getValue()
           YvEventDispatch(that.onFocus, that, undefined)
         },
         onBlur(this: any) {
@@ -110,9 +109,7 @@ export class CtlSearch extends CtlInput<CtlSearch> {
           }
           that._hideTootip()
           //离开焦点时，用户输入的置为无效
-          if (!that.suppressRestore) {
-            that._webix.setValue(that.valueOrigin)
-          }
+          that._webix.setValue(that.valueReal)
           YvEventDispatch(that.onBlur, that, undefined)
         },
         // onDestruct(this: any) {
@@ -130,8 +127,7 @@ export class CtlSearch extends CtlInput<CtlSearch> {
             that.clear()
           } else {
             // 查询
-            that.suppressRestore = true
-            that._searchRequest(that._webix.getValue(), that.valueOrigin)
+            that._searchRequest(that._webix.getValue(), that.valueEdit)
           }
         }
       }
@@ -155,6 +151,8 @@ export class CtlSearch extends CtlInput<CtlSearch> {
       return
     }
 
+    this.supportChangeValue = true
+
     YvEventDispatch(this.widget.onClear, this, undefined)
 
     //清空
@@ -167,7 +165,7 @@ export class CtlSearch extends CtlInput<CtlSearch> {
     if (!this._webix) {
       return this._webixConfig.value
     }
-    return this.valueOrigin
+    return this.valueReal
   }
 
   set value(nv: string | undefined) {
@@ -175,7 +173,12 @@ export class CtlSearch extends CtlInput<CtlSearch> {
       this._webixConfig.value = nv
     } else {
       this._webix.setValue(nv)
-      this.valueOrigin = nv
+      this.valueEdit = nv
+    }
+
+    if (this.supportChangeValue) {
+      this.valueReal = nv
+      this.supportChangeValue = false
     }
 
     YvEventDispatch(this.onChange, this, nv)
@@ -202,10 +205,12 @@ export class CtlSearch extends CtlInput<CtlSearch> {
   }
 
   /*============================ 私有部分 ============================*/
-  // 原始值
-  private valueOrigin?: string = undefined
-  //抑制还原动作
-  private suppressRestore: boolean = false
+  // 编辑值
+  private valueEdit?: string = undefined
+  // 是否设置真实值
+  private supportChangeValue: boolean = false
+  // 真实值
+  private valueReal?: string = undefined
 
   /**
    * 进入查询框
@@ -238,6 +243,7 @@ export class CtlSearch extends CtlInput<CtlSearch> {
         console.error('没有设置 widget 属性')
         return
       }
+      searchCtl.supportChangeValue = true
 
       YvEventDispatch(searchCtl.widget.onConfirm, searchCtl, undefined)
 
@@ -252,7 +258,7 @@ export class CtlSearch extends CtlInput<CtlSearch> {
     widgetParamter.onClose = function () {
       //弹窗关闭后恢复原值，并开启还原
       searchCtl.value = restoreValue
-      searchCtl.suppressRestore = false
+      searchCtl.supportChangeValue = false
       searchCtl.focus()
     }
     const dlg: BaseDialog<any, any, any> = new searchCtl.widget.content()
