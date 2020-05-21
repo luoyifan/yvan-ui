@@ -26,6 +26,57 @@ legend.webix_forminput_label,
   box-shadow: 0 0 0 2px rgba(24,144,255,.2);
   border-color:#1890ff
 }
+.yvan-validate-error.webix_el_text input,
+.yvan-validate-error.webix_el_search input,
+.yvan-validate-error.webix_el_combo input,
+.yvan-validate-error.webix_el_datepicker input,
+.yvan-validate-error.webix_el_colorpicker input {
+  border:1px solid #ff8400
+}
+.yvan-validate-error{
+  overflow: visible!important;
+}
+.yvan-validate-error .webix_el_box{
+  overflow: visible!important;
+}
+.yvan-tooltip{
+  min-width: 100px;
+  color: #fff;
+  border: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 2px;
+  position: fixed;
+  pointer-events: auto;
+  z-index: 10000;
+  padding-top: 3px;
+}
+.yvan-tooltip-msg{
+  pointer-events: auto;
+  color: #fff;
+  padding: 0px 14px;
+  position: relative;
+  height: 32px;
+  line-height: 32px;
+  word-break: break-all;
+  font-size: 13px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: 2px;
+  background-color: #ff8400;
+}
+.yvan-tooltip em{
+  width: 0px;
+  height: 0px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #ff8400;
+  position: absolute;
+  top: 10px;
+  left: -8px;
+}
 .webix_inp_label, .webix_inp_top_label, legend.webix_forminput_label, .webix_el_label .webix_el_box{
   line-height: 28px;
   font-size: 13px
