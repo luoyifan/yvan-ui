@@ -38,7 +38,7 @@ export class CtlTree extends CtlBase<CtlTree> {
       },
       on: {
         onInited(this: any) {
-          that.attachHandle(this, vjson)
+          that.attachHandle(this, { ...vjson, ...yvanProp })
         },
         onAfterDelete() {
           that.removeHandle()

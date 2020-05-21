@@ -31,7 +31,7 @@ export class CtlTab extends CtlBase<CtlTab> {
     _.merge(vjson, that._webixConfig, {
       on: {
         onInited(this: any) {
-          that.attachHandle(this, vjson)
+          that.attachHandle(this, { ...vjson, ...yvanProp })
           _.defer(() => {
             if (yvanProp.defaultTabIndex > 0) {
               // 默认打开的 tab 序号

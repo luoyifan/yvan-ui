@@ -32,7 +32,7 @@ export class CtlDataview extends CtlBase<CtlDataview> {
       select: true,
       on: {
         onInited(this: any) {
-          that.attachHandle(this, vjson)
+          that.attachHandle(this, { ...vjson, ...yvanProp })
         },
         onAfterDelete() {
           that.removeHandle()

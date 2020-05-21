@@ -20,7 +20,7 @@ export class CtlCarousel extends CtlBase<CtlCarousel> {
     _.merge(vjson, that._webixConfig, {
       on: {
         onInited() {
-          that.attachHandle(this, vjson)
+          that.attachHandle(this, { ...vjson, ...yvanProp })
         },
         onDestruct: function () {
           that.removeHandle()

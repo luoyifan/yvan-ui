@@ -33,7 +33,7 @@ export class CtlTreeTable extends CtlBase<CtlTreeTable> {
     _.merge(vjson, that._webixConfig, {
       on: {
         onInited(this: any) {
-          that.attachHandle(this, vjson)
+          that.attachHandle(this, { ...vjson, ...yvanProp })
         },
         onAfterDelete() {
           that.removeHandle()

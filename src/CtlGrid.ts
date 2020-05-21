@@ -84,7 +84,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       on: {
         onMyRender: function (this: any) {
           _.defer(() => {
-            that.attachHandle(this, vjson)
+            that.attachHandle(this, { ...vjson, ...yvanProp })
             that._resetGrid()
           });
         },

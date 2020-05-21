@@ -22,7 +22,7 @@ export class CtlForm extends CtlBase<CtlForm> {
     _.merge(vjson, that._webixConfig, {
       on: {
         onInited: function (this: any) {
-          that.attachHandle(this, vjson)
+          that.attachHandle(this, { ...vjson, ...yvanProp })
         },
         // onAfterLoad: function (this: any) {
         //   that.attachHandle(this)

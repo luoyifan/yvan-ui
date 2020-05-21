@@ -34,7 +34,7 @@ export class CtlSidebar extends CtlBase<CtlSidebar> {
       },
       on: {
         onInited(this: any) {
-          that.attachHandle(this, vjson)
+          that.attachHandle(this, { ...vjson, ...yvanProp })
         },
         onAfterDelete() {
           that.removeHandle()

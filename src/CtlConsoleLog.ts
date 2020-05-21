@@ -60,7 +60,7 @@ export class CtlConsoleLog extends CtlBase<CtlConsoleLog> {
     _.merge(vjson, that._webixConfig, {
       on: {
         onInited(this: any) {
-          that.attachHandle(this, vjson)
+          that.attachHandle(this, { ...vjson, ...yvanProp })
           _.defer(() => {
             $(this.$view).on('click', '.vc-fold', function (e) {
               that.vcfoldclick(this)
