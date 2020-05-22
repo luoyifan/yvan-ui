@@ -1332,6 +1332,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
               return params.value
             }
           }
+
         } else if (easyuiCol.editMode === 'area') {
           //大型富文本框编辑
           formatable = true
@@ -1343,10 +1344,8 @@ export class CtlGrid extends CtlBase<CtlGrid> {
               maxLength: editParams.maxlength
             }
           })
-        } else if (
-          easyuiCol.editMode === 'text' ||
-          easyuiCol.editMode === 'number'
-        ) {
+
+        } else if (easyuiCol.editMode === 'text' || easyuiCol.editMode === 'number') {
           //普通文本框编辑
           formatable = true
           _.assign(col, {
@@ -1372,10 +1371,8 @@ export class CtlGrid extends CtlBase<CtlGrid> {
               }
             }
           })
-        } else if (
-          easyuiCol.editMode === 'date' ||
-          easyuiCol.editMode === 'datetime'
-        ) {
+
+        } else if (easyuiCol.editMode === 'date' || easyuiCol.editMode === 'datetime') {
           formatable = true
           // _.assign(col, {
           //     editable: true,
@@ -1471,12 +1468,13 @@ export class CtlGrid extends CtlBase<CtlGrid> {
               suppressAndOrCondition: true,
               filterOptions: [
                 // 服务器已经设置条件，浏览器不进行实际比对
-                { displayKey: '=', displayName: '等于', test() { return true; } },
-                { displayKey: '<>', displayName: '不等于', test() { return true; } },
-                { displayKey: '<', displayName: '小于', test() { return true; } },
-                { displayKey: '>', displayName: '大于', test() { return true; } },
-                { displayKey: '<=', displayName: '小于等于', test() { return true; } },
-                { displayKey: '>=', displayName: '大于等于', test() { return true; } },
+                { displayKey: 'equals', displayName: '等于', test() { return true; } },
+                { displayKey: 'notEqual', displayName: '不等于', test() { return true; } },
+                { displayKey: 'lessThan', displayName: '小于', test() { return true; } },
+                { displayKey: 'greaterThan', displayName: '大于', test() { return true; } },
+                { displayKey: 'lessThanOrEqual', displayName: '小于等于', test() { return true; } },
+                { displayKey: 'greaterThanOrEqual', displayName: '大于等于', test() { return true; } },
+                { displayKey: 'inRange', displayName: '范围', test() { return true; } },
               ]
             }
           })

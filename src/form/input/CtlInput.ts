@@ -59,14 +59,14 @@ export class CtlInput<M> extends CtlBase<M> {
           const $input = $(this.$view).find('input')
           $input.on('input', that.onInputEvent.bind(that))
           $input.on('keydown', onKeydown)
-          if (that._validate) {
-            const result = that._validate(null);
-            if (result) {
-              that._showValidateError()
-            } else {
-              that._hideValidateError()
-            }
+          if (that._validate || that._required) {
             that._addEnvent($input);
+          }
+          const result = that._resultToShowOrHide()
+          if (result) {
+            that._showValidateError()
+          } else {
+            that._hideValidateError()
           }
           if (that.constructor.name !== 'CtlSelect' && that._webixConfig.required) {
             if (that.constructor.name === 'CtlDateRangePicker') {
@@ -105,8 +105,8 @@ export class CtlInput<M> extends CtlBase<M> {
           YvEventDispatch(that.onEnter, that, undefined)
         },
         onFocus(this: any) {
-          if (that._validate) {
-            const result = that._validate(that.value);
+          if (that._validate || that._required) {
+            const result = that._resultToShowOrHide();
             if (result) {
               that._showTootip(result)
               that._showValidateError()
@@ -145,8 +145,8 @@ export class CtlInput<M> extends CtlBase<M> {
           YvEventDispatch(that.onChange, that, newValue)
         },
         onBlur(this: any) {
-          if (that._validate) {
-            const result = that._validate(that.value);
+          if (that._validate || that._required) {
+            const result = that._resultToShowOrHide();
             if (result) {
               that._showValidateError()
             }
@@ -362,6 +362,7 @@ export class CtlInput<M> extends CtlBase<M> {
    * 必填
    */
   set required(nv: boolean) {
+    this._required = nv
     if (!this._webix) {
       this._webixConfig.required = nv
       return
@@ -475,29 +476,25 @@ export class CtlInput<M> extends CtlBase<M> {
     return this._validate
   }
 
-  getValidate(): any {
-    return this._validate
-  }
-
   /**================ 私有属性 ===================**/
   _validateResult: boolean = true
 
   _validate: any
+
+  _required: boolean | undefined
 
   _id: any
 
   _maxlength: any
 
   anonymous_showTootip: any = () => {
-    if (this._validate) {
-      const result = this._validate(this.value);
-      if (result) {
-        this._showTootip(result)
-        this._showValidateError()
-      } else {
-        this._hideTootip()
-        this._hideValidateError()
-      }
+    const result = this._resultToShowOrHide();
+    if (result) {
+      this._showTootip(result)
+      this._showValidateError()
+    } else {
+      this._hideTootip()
+      this._hideValidateError()
     }
   }
 
@@ -532,6 +529,24 @@ export class CtlInput<M> extends CtlBase<M> {
 
   _hideTootip() {
     YvanMessage.hideTooltip(this);
+  }
+
+  _resultToShowOrHide(): any {
+    if (!this.value) {
+      if (this._required) {
+        return "该项为必填项";
+      }
+    }
+    else {
+      if (this._validate) {
+        // 只有校验值
+        const result = this._validate(this.value);
+        if (result) {
+          return result
+        }
+      }
+    }
+    return null
   }
 
   _showValidate(
