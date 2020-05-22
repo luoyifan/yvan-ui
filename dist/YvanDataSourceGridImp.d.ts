@@ -7,7 +7,7 @@ export declare class YvanDataSourceGrid {
     private isFirstAutoLoad;
     private reload;
     private rowCount;
-    private lastFilterModel;
+    lastFilterModel: any;
     serverQuery: ((option: GridDataSourceServer | GridDataSourceAjax | GridDataSourceSql, paramFunction: (() => any) | undefined, params: any) => void) & import("lodash").Cancelable;
     /**
      * SQL取值

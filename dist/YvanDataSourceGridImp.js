@@ -1,6 +1,7 @@
 import { __assign } from "tslib";
 import * as YvanUI from './YvanUIExtend';
 import { isDesignMode } from './DesignHelper';
+import { brokerInvoke } from './Service';
 var YvanDataSourceGrid = /** @class */ (function () {
     function YvanDataSourceGrid(ctl, option) {
         var _this = this;
@@ -23,21 +24,62 @@ var YvanDataSourceGrid = /** @class */ (function () {
                     that.lastFilterModel = _.cloneDeep(params.filterModel);
                 }
             }
+            // 获取所有参数
             var queryParams = __assign({}, (typeof paramFunction === 'function' ? paramFunction() : undefined));
-            YvanUI.dbs[option.db]
-                .query({
-                params: queryParams,
-                limit: params.startRow,
-                limitOffset: params.endRow - params.startRow,
-                needCount: needCount,
-                orderByModel: params.sortModel,
-                filterModel: params.filterModel,
-                sqlId: option.sqlId
-            })
-                .then(function (res) {
-                var resultData = res.data, totalCount = res.totalCount, resParams = res.params;
+            var ajaxPromise;
+            if (option.type === 'SQL') {
+                ajaxPromise = YvanUI.dbs[option.db]
+                    .query({
+                    params: queryParams,
+                    limit: params.endRow - params.startRow,
+                    limitOffset: params.startRow,
+                    needCount: needCount,
+                    orderByModel: params.sortModel,
+                    filterModel: params.filterModel,
+                    sqlId: option.sqlId
+                });
+            }
+            else if (option.type === 'Server') {
+                var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
+                ajaxPromise = brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, {
+                    params: queryParams,
+                    limit: params.endRow - params.startRow,
+                    limitOffset: params.startRow,
+                    needCount: needCount,
+                    orderByModel: params.sortModel,
+                    filterModel: params.filterModel,
+                });
+            }
+            else if (option.type === 'Ajax') {
+                var ajax = _.get(window, 'YvanUI.ajax');
+                ajaxPromise = ajax({
+                    url: option.url,
+                    method: 'POST-JSON',
+                    data: {
+                        params: queryParams,
+                        limit: params.endRow - params.startRow,
+                        limitOffset: params.startRow,
+                        needCount: needCount,
+                        orderByModel: params.sortModel,
+                        filterModel: params.filterModel,
+                    }
+                });
+            }
+            else {
+                console.error('unSupport dataSource mode:', option);
+                params.failCallback();
+                return;
+            }
+            ajaxPromise.then(function (res) {
+                var resultData = res.data, pagination = res.pagination, resParams = res.params;
                 if (needCount) {
-                    that.rowCount = totalCount;
+                    if (_.has(res, 'totalCount')) {
+                        // 兼容老模式
+                        that.rowCount = _.get(res, 'totalCount');
+                    }
+                    else {
+                        that.rowCount = pagination.total;
+                    }
                 }
                 params.successCallback(resultData, that.rowCount);
                 /** 如果不分页就在这里设置总条目数量，避免多次刷新分页栏 **/
@@ -48,11 +90,9 @@ var YvanDataSourceGrid = /** @class */ (function () {
                 if (that.ctl.entityName) {
                     _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow());
                 }
-            })
-                .catch(function (r) {
+            }).catch(function (r) {
                 params.failCallback();
-            })
-                .finally(function () {
+            }).finally(function () {
                 _this.ctl.loading = false;
             });
         });
@@ -121,7 +161,7 @@ var YvanDataSourceGrid = /** @class */ (function () {
             }
             return;
         }
-        if (option.type === 'SQL') {
+        if (option.type === 'SQL' || option.type === 'Server' || option.type === 'Ajax') {
             this.setSqlMode(option, paramFunction);
             return;
         }
@@ -145,18 +185,32 @@ var YvanDataSourceGrid = /** @class */ (function () {
                 that.ctl.gridPage.getPageData = function (currentPage, pageSize) {
                     var params = {};
                     params.successCallback = function (data, rowCount) {
-                        if (data.length > 0) {
-                            that.ctl.setData(data);
-                            that.ctl.gridPage.itemCount = rowCount;
-                            that.ctl.gridPage.currentPage = currentPage;
-                        }
+                        // if (needClearRefresh) {
+                        //   that.ctl.setData(data)
+                        // } else {
+                        // 不能直接用 setData, 会造成 filter 被置空
+                        // 使用 _transactionUpdate 也有 bug ，如果查询条件被改变，也不会分页回顶端
+                        that.ctl._transactionUpdate(data);
+                        // }
+                        // that.ctl.setData(data)
+                        that.ctl.gridPage.itemCount = rowCount;
+                        that.ctl.gridPage.currentPage = currentPage;
                     };
                     params.failCallback = function () {
                         console.error('error');
                     };
                     params.startRow = (currentPage - 1) * pageSize;
                     params.endRow = currentPage * pageSize;
-                    that.serverQuery(option, paramFunction, params);
+                    params.filterModel = that.ctl.gridApi.getFilterModel();
+                    if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
+                        that.rowCount = 0;
+                        params.successCallback([], that.rowCount);
+                        that.ctl.loading = false;
+                        that.isFirstAutoLoad = false;
+                    }
+                    else {
+                        that.serverQuery(option, paramFunction, params);
+                    }
                 };
                 that.ctl.gridPage.getPageData(1, that.ctl.gridPage.pageSize);
             }

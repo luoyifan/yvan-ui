@@ -47,11 +47,52 @@ var CtlBase = /** @class */ (function () {
     /**
      * 组件被渲染后触发
      */
-    CtlBase.prototype.attachHandle = function (webixHandler) {
+    CtlBase.prototype.attachHandle = function (webixHandler, vjson) {
         this._webix = webixHandler;
         this._module = this._webix.$scope;
         YvEventDispatch(this.onRender, this, undefined);
         this.refreshState();
+        if (_.has(vjson, 'entityName')) {
+            _.set(this._module, '_entityCtlMapping.' + vjson['entityName'], this);
+        }
+    };
+    CtlBase.prototype.getCtlElements = function (element) {
+        var _this = this;
+        var entityArray = [];
+        if (_.isArray(element)) {
+            element.forEach(function (item) {
+                entityArray = _.union(entityArray, _this.getCtlElements(item));
+            });
+        }
+        else if (_.isObject(element)) {
+            if (element.hasOwnProperty("view")) {
+                var items = _.get(element, "view");
+                entityArray = _.union(entityArray, [items]);
+            }
+            if (element.hasOwnProperty("rows")) {
+                var items = _.get(element, "rows");
+                items.forEach(function (item) {
+                    entityArray = _.union(entityArray, _this.getCtlElements(item));
+                });
+            }
+            else if (element.hasOwnProperty("cols")) {
+                var items = _.get(element, "cols");
+                items.forEach(function (item) {
+                    entityArray = _.union(entityArray, _this.getCtlElements(item));
+                });
+            }
+            else if (element.hasOwnProperty("elements")) {
+                var items = _.get(element, "elements");
+                items.forEach(function (item) {
+                    entityArray = _.union(entityArray, _this.getCtlElements(item));
+                });
+            }
+            else if (element.hasOwnProperty("body")) {
+                var item = _.get(element, "body");
+                entityArray = _.union(entityArray, this.getCtlElements(item));
+            }
+        }
+        return entityArray;
     };
     /**
      * 组件被移除后触发

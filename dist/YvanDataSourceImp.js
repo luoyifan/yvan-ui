@@ -1,23 +1,13 @@
 import { YvEventDispatch } from './YvanEvent';
 import * as YvanUI from './YvanUIExtend';
 import { isDesignMode } from './DesignHelper';
+import { brokerInvoke } from './Service';
 var YvDataSource = /** @class */ (function () {
     function YvDataSource(ctl, option, dataSourceProcess) {
+        var _this = this;
         this.watches = [];
-        if (isDesignMode()) {
-            return;
-        }
-        this.ctl = ctl;
-        this.option = option;
-        this.dataSourceProcess = dataSourceProcess;
-        this.module = ctl._webix.$scope;
-    }
-    /**
-     * 自定义函数式取值
-     */
-    YvDataSource.prototype.setCustomFunctionMode = function (option) {
-        var that = this;
-        this.reload = function () {
+        this.customFunctionModeDebounce = _.debounce(function (option) {
+            var that = _this;
             that.ctl.loading = true;
             option.call(that.module, that.ctl, {
                 successCallback: function (data) {
@@ -37,25 +27,33 @@ var YvDataSource = /** @class */ (function () {
                     YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined);
                 }
             });
-        };
-        this.reload();
-    };
-    /**
-     * SQL取值
-     */
-    YvDataSource.prototype.setSqlMode = function (option) {
-        var _this = this;
-        var that = this;
-        this.reload = function () {
+        });
+        this.sqlModeDebounce = _.debounce(function (option) {
+            var that = _this;
             //异步请求数据内容
             that.ctl.loading = true;
-            YvanUI.dbs[option.db]
-                .query({
-                params: option.params,
-                needCount: false,
-                sqlId: option.sqlId
-            })
-                .then(function (res) {
+            var ajaxPromise;
+            if (option.type === 'SQL') {
+                ajaxPromise = YvanUI.dbs[option.db].query({
+                    params: option.params,
+                    needCount: false,
+                    sqlId: option.sqlId
+                });
+            }
+            else if (option.type === 'Server') {
+                var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
+                ajaxPromise = brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, {
+                    params: option.params,
+                    needCount: false,
+                });
+            }
+            else {
+                console.error('unSupport dataSource mode:', option);
+                that.ctl.dataReal = [];
+                that.ctl.loading = false;
+                return;
+            }
+            ajaxPromise.then(function (res) {
                 var resultData = res.data, resParams = res.params;
                 if (_this.dataSourceProcess) {
                     //自定义的数据处理过程
@@ -65,13 +63,37 @@ var YvDataSource = /** @class */ (function () {
                     that.ctl.dataReal = resultData;
                 }
                 YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined);
-            })
-                .catch(function (r) {
+            }).catch(function (r) {
                 that.ctl.dataReal = [];
-            })
-                .finally(function () {
+            }).finally(function () {
                 that.ctl.loading = false;
             });
+        });
+        if (isDesignMode()) {
+            return;
+        }
+        this.ctl = ctl;
+        this.option = option;
+        this.dataSourceProcess = dataSourceProcess;
+        this.module = ctl._webix.$scope;
+    }
+    /**
+     * 自定义函数式取值
+     */
+    YvDataSource.prototype.setCustomFunctionMode = function (option) {
+        var that = this;
+        this.reload = function () {
+            that.customFunctionModeDebounce(option);
+        };
+        this.reload();
+    };
+    /**
+     * SQL取值
+     */
+    YvDataSource.prototype.setSqlMode = function (option) {
+        var that = this;
+        this.reload = function () {
+            that.sqlModeDebounce(option);
         };
         this.reload();
     };
@@ -119,7 +141,7 @@ var YvDataSource = /** @class */ (function () {
                 this.setCustomFunctionMode(bindFunction);
             }
         }
-        else if (this.option.type === 'SQL') {
+        else if (this.option.type === 'SQL' || this.option.type === 'Server') {
             this.setSqlMode(this.option);
         }
         else {

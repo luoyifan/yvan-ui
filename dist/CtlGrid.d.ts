@@ -2,6 +2,12 @@ import { CtlGridPage } from './CtlGridPage';
 import { CtlBase } from './CtlBase';
 import { GridDataSource } from './YvanDataSourceGrid';
 import { YvEvent } from './YvanEvent';
+/** 在CtlGridPage.ts 里面有关于点击分页按钮时候设置 GridRefreshMode **/
+export declare enum GridRefreshMode {
+    refreshRows = 0,
+    refreshWithFilter = 1,
+    refreshAndClearFilter = 2
+}
 /**
  * 表格中的行按钮被点击后触发的事件参数
  */
@@ -23,6 +29,8 @@ export declare class CtlGrid extends CtlBase<CtlGrid> {
     static create(module: any, vjson: any): CtlGrid;
     gridApi: any;
     columnApi: any;
+    refreshMode: GridRefreshMode;
+    private paginationDefaultSelectRow;
     get webix(): any;
     /**
      * 设置数据源
@@ -186,7 +194,14 @@ export declare class CtlGrid extends CtlBase<CtlGrid> {
      * option:
      *   clearFilter=true 是否清空筛选
      */
-    reload(option?: any): void;
+    /**
+     * 无感刷新
+     * 清空缓存，从后台重新拉取数据，表格上临时修改的内容都会被清空
+     *
+     * option:
+     *   clearFilter=true 是否清空筛选
+     */
+    reload(refreshMode?: GridRefreshMode): void;
     /**
      * 获取被选中的行主键
      */

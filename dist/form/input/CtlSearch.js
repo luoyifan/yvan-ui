@@ -8,14 +8,18 @@ var CtlSearch = /** @class */ (function (_super) {
     function CtlSearch() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         /*============================ 私有部分 ============================*/
-        // 原始值
-        _this.valueOrigin = undefined;
-        //抑制还原动作
-        _this.suppressRestore = false;
+        // 编辑值
+        _this.valueEdit = undefined;
+        // 是否设置真实值
+        _this.supportChangeValue = false;
+        // 真实值
+        _this.valueReal = undefined;
         return _this;
     }
-    CtlSearch.create = function (vjson) {
+    CtlSearch.create = function (module, vjson) {
         var that = new CtlSearch(vjson);
+        that._module = module;
+        var vvjson = _.cloneDeep(vjson);
         _.defaultsDeep(vjson, CtlSearchDefault);
         // 基础属性先执行
         that._create(vjson, that);
@@ -30,7 +34,7 @@ var CtlSearch = /** @class */ (function (_super) {
         _.merge(vjson, that._webixConfig, {
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, vvjson);
                     that._refreshIcon();
                 },
                 // onAfterRender(this: any) {
@@ -51,19 +55,26 @@ var CtlSearch = /** @class */ (function (_super) {
                 // },
                 onEnter: function () {
                     // 从键盘响应查询
-                    that.suppressRestore = true;
-                    that._searchRequest(that._webix.getValue(), that.valueOrigin);
+                    that._searchRequest(that._webix.getValue(), that.valueEdit);
                 },
                 onFocus: function () {
                     //进入焦点时，用户输入的值既为有效值
-                    that.valueOrigin = that._webix.getValue();
+                    that.valueReal = that._webix.getValue();
                     YvEventDispatch(that.onFocus, that, undefined);
                 },
                 onBlur: function () {
-                    //离开焦点时，用户输入的置为无效
-                    if (!that.suppressRestore) {
-                        that._webix.setValue(that.valueOrigin);
+                    if (that._validate) {
+                        var result = that._validate(that.value);
+                        if (result) {
+                            that._showValidateError();
+                        }
+                        else {
+                            that._hideValidateError();
+                        }
                     }
+                    that._hideTootip();
+                    //离开焦点时，用户输入的置为无效
+                    that._webix.setValue(that.valueReal);
                     YvEventDispatch(that.onBlur, that, undefined);
                 },
                 // onDestruct(this: any) {
@@ -81,8 +92,7 @@ var CtlSearch = /** @class */ (function (_super) {
                     }
                     else {
                         // 查询
-                        that.suppressRestore = true;
-                        that._searchRequest(that._webix.getValue(), that.valueOrigin);
+                        that._searchRequest(that._webix.getValue(), that.valueEdit);
                     }
                 }
             }
@@ -97,6 +107,7 @@ var CtlSearch = /** @class */ (function (_super) {
         if (!this.widget) {
             return;
         }
+        this.supportChangeValue = true;
         YvEventDispatch(this.widget.onClear, this, undefined);
         //清空
         _.forOwn(this.widget.bind, function (value, key) {
@@ -108,7 +119,7 @@ var CtlSearch = /** @class */ (function (_super) {
             if (!this._webix) {
                 return this._webixConfig.value;
             }
-            return this.valueOrigin;
+            return this.valueReal;
         },
         set: function (nv) {
             if (!this._webix) {
@@ -116,7 +127,11 @@ var CtlSearch = /** @class */ (function (_super) {
             }
             else {
                 this._webix.setValue(nv);
-                this.valueOrigin = nv;
+                this.valueEdit = nv;
+            }
+            if (this.supportChangeValue) {
+                this.valueReal = nv;
+                this.supportChangeValue = false;
             }
             YvEventDispatch(this.onChange, this, nv);
             this._refreshIcon();
@@ -170,6 +185,7 @@ var CtlSearch = /** @class */ (function (_super) {
                 console.error('没有设置 widget 属性');
                 return;
             }
+            searchCtl.supportChangeValue = true;
             YvEventDispatch(searchCtl.widget.onConfirm, searchCtl, undefined);
             //写回
             _.forOwn(searchCtl.widget.bind, function (value, key) {
@@ -181,7 +197,7 @@ var CtlSearch = /** @class */ (function (_super) {
         widgetParamter.onClose = function () {
             //弹窗关闭后恢复原值，并开启还原
             searchCtl.value = restoreValue;
-            searchCtl.suppressRestore = false;
+            searchCtl.supportChangeValue = false;
             searchCtl.focus();
         };
         var dlg = new searchCtl.widget.content();

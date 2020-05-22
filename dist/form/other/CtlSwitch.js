@@ -7,8 +7,9 @@ var CtlSwitch = /** @class */ (function (_super) {
     function CtlSwitch() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlSwitch.create = function (vjson) {
+    CtlSwitch.create = function (module, vjson) {
         var that = new CtlSwitch(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlSwitchDefault);
         // 基础属性先执行
         that._create(vjson, that);

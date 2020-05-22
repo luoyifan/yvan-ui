@@ -7,8 +7,9 @@ var CtlDatePicker = /** @class */ (function (_super) {
     function CtlDatePicker() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlDatePicker.create = function (vjson) {
+    CtlDatePicker.create = function (module, vjson) {
         var that = new CtlDatePicker(vjson);
+        that._module = module;
         var baseConfig = {};
         if (vjson.view === 'datetime') {
             // 日期+时间输入

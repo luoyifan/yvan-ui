@@ -125,7 +125,8 @@ var CtlGridFilterSet = /** @class */ (function () {
     // with attributes node (the rowNode the grid creates that wraps the data) and data (the data
     // object that you provided to the grid for that row).
     CtlGridFilterSet.prototype.doesFilterPass = function () {
-        // console.log('doesFilterPass')
+        // 服务器已经设置条件，浏览器不进行实际比对
+        return true;
     };
     // Gets the filter state. If filter is not active, then should return null/undefined.
     // The grid calls getModel() on all active filters when gridApi.getFilterModel() is called.

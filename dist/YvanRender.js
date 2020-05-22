@@ -21,9 +21,13 @@ import { CtlSwitch } from './form/other/CtlSwitch';
 import { CtlNumber } from './form/input/CtlNumber';
 import { CtlRadio } from './form/other/CtlRadio';
 import { CtlCodeMirror } from './CtlCodeMirror';
+import { CtlSidebar } from './CtlSidebar';
+import { CtlXterm } from './CtlXterm';
+import { CtlConsoleLog } from './CtlConsoleLog';
 import webix from 'webix';
 // export const webix = require("../webix/webix");
 webix.i18n.setLocale('zh-CN');
+_.set(window, 'webix', webix);
 /**
  * 深度遍历 vjson
  * @param vjson 视图JSON
@@ -40,13 +44,6 @@ function deepTrav1(obj, resolver, marker) {
     if (marker && isMarker === true) {
         marker.unshift({ id: 0, keyName: '', object: obj });
     }
-    //设计器组件不扫描
-    if (obj.xtype === 'yvDesignCanvas')
-        return;
-    if (obj.xtype === 'yvDesignProperty')
-        return;
-    if (obj.xtype === 'yvDesignToolbox')
-        return;
     _.forOwn(obj, function (value, key) {
         if (typeof value !== 'object') {
             return;
@@ -78,179 +75,9 @@ function deepTrav1(obj, resolver, marker) {
             marker.unshift({ id: obj.id, keyName: key, object: value });
         }
     });
+    // 删除作废对象
+    _.remove(obj, function (v) { return v && v.isFiltered; });
     return isMarker;
-}
-function deepTravFindSuper(obj, targetId) {
-    //设计器组件不扫描
-    if (obj.xtype === 'yvDesignCanvas')
-        return;
-    if (obj.xtype === 'yvDesignProperty')
-        return;
-    if (obj.xtype === 'yvDesignToolbox')
-        return;
-    var rObj = null;
-    _.forOwn(obj, function (value, key) {
-        if (rObj) {
-            return;
-        }
-        if (typeof value !== 'object') {
-            return;
-        }
-        // 模型、数据、数据源不扫描
-        if (key === 'data' ||
-            key === 'dataSource' ||
-            key === 'suggest' ||
-            key === 'options') {
-            return;
-        }
-        //事件不扫描
-        if (key === 'on' && _.isObject(value)) {
-            return;
-        }
-        if (key.startsWith('on') && _.size(key) > 2) {
-            return;
-        }
-        if (value.id === targetId) {
-            rObj = obj;
-            return;
-        }
-        rObj = deepTravFindSuper(value, targetId);
-    });
-    return rObj;
-}
-/**
- * 根据id查找上级vjson
- * @param obj 原始 vjson 视图
- * @param targetId 子元素的id
- */
-export function getSuperVjson(obj, targetId) {
-    return deepTravFindSuper(obj, targetId);
-}
-function deepTravFindCurrent(obj, targetId) {
-    //设计器组件不扫描
-    if (obj.xtype === 'yvDesignCanvas')
-        return;
-    if (obj.xtype === 'yvDesignProperty')
-        return;
-    if (obj.xtype === 'yvDesignToolbox')
-        return;
-    var rObj = null;
-    _.forOwn(obj, function (value, key) {
-        if (rObj) {
-            return;
-        }
-        if (typeof value !== 'object') {
-            return;
-        }
-        // 模型、数据、数据源不扫描
-        if (key === 'data' ||
-            key === 'dataSource' ||
-            key === 'suggest' ||
-            key === 'options') {
-            return;
-        }
-        //事件不扫描
-        if (key === 'on' && _.isObject(value)) {
-            return;
-        }
-        if (key.startsWith('on') && _.size(key) > 2) {
-            return;
-        }
-        if (value.id === targetId) {
-            rObj = value;
-            return;
-        }
-        rObj = deepTravFindCurrent(value, targetId);
-    });
-    return rObj;
-}
-/**
- * 根据id查找vjson
- * @param obj 原始 vjson 视图
- * @param targetId 子元素的id
- */
-export function getCurrentVjson(obj, targetId) {
-    return deepTravFindCurrent(obj, targetId);
-}
-function deepTravDeleteVjson(obj, targetId) {
-    var isDelete = false;
-    //设计器组件不扫描
-    if (obj.xtype === 'yvDesignCanvas')
-        return isDelete;
-    if (obj.xtype === 'yvDesignProperty')
-        return isDelete;
-    if (obj.xtype === 'yvDesignToolbox')
-        return isDelete;
-    _.forOwn(obj, function (value, key) {
-        if (isDelete) {
-            return;
-        }
-        if (typeof value !== 'object') {
-            return;
-        }
-        // 模型、数据、数据源不扫描
-        if (key === 'data' ||
-            key === 'dataSource' ||
-            key === 'suggest' ||
-            key === 'options') {
-            return;
-        }
-        //事件不扫描
-        if (key === 'on' && _.isObject(value)) {
-            return;
-        }
-        if (key.startsWith('on') && _.size(key) > 2) {
-            return;
-        }
-        if (value.id === targetId) {
-            isDelete = true;
-            /** 如果是数组的元素*/
-            if (webix.isArray(obj)) {
-                obj.splice(key, 1);
-            }
-            else {
-                delete obj[key];
-            }
-            return;
-        }
-        isDelete = deepTravDeleteVjson(value, targetId);
-        /** 删除因为删除元素后造成的空元素 */
-        if (isDelete) {
-            if ((webix.isArray(value) && value.length <= 0) ||
-                Object.keys(value).length <= 0 ||
-                (Object.keys(value).length === 1 && value.id > 0) ||
-                value === undefined ||
-                value === null) {
-                if (webix.isArray(obj)) {
-                    obj.splice(key, 1);
-                }
-                else {
-                    delete obj[key];
-                }
-            }
-        }
-    });
-    return isDelete;
-}
-/**
- * 根据id删除Vjson 会删除因删除元素造成的空对象
- * @param obj 原始 vjson 视图
- * @param targetId 子元素的id
- */
-export function deletVjsonById(obj, targetId) {
-    var isDeleted = deepTravDeleteVjson(obj, targetId);
-    if (webix.isArray(obj)) {
-        if (obj.length <= 0) {
-            var T = {
-                view: 'template',
-                template: '拖动任何组件到此处',
-                role: 'placeholder',
-                id: webix.uid()
-            };
-            obj.push(T);
-        }
-    }
-    return isDeleted;
 }
 /**
  * 根据 vjson 中的 ctlName, 合并属性
@@ -395,93 +222,151 @@ function createCommonMix() {
     return {};
 }
 /**
+ * 判断组件是否被删除后，是否需要预占宽度
+ */
+function cmpNeedOccupied(code) {
+    switch (code.view) {
+        case 'text':
+        case 'combo':
+        case 'date':
+        case 'datetime':
+        case 'datepicker':
+        // case 'button': // button 按钮直接删除即可，不需要预占宽度
+        case 'checkbox':
+        case 'label':
+            return true;
+    }
+    // 高度和宽度可变的组件，不需要预占任何宽度
+    return false;
+}
+/**
  * 根据 vjson 格式，嵌入 yvan 组件, 生成能够为 webix 使用的 vjson
  */
 export function wrapperWebixConfig(module, vjson) {
     // 形成最终的 viewResolver 方法
     deepTravVJson(vjson, function (obj) {
+        // 检查组件是否被过滤(不渲染)
+        var isFiltered = false;
+        var componentRenderFilter = _.get(window, 'YvanUI.componentRenderFilter');
+        if (componentRenderFilter && componentRenderFilter(obj) === false) {
+            isFiltered = true;
+        }
+        if (isFiltered) {
+            // 组件不需要渲染
+            if (_.has(obj, 'hiddenPlaceholder')) {
+                // 如果有 hiddenPlaceholder 属性，最优先使用 hiddenPlaceholder, 替换现有的 vjson
+                var ph = obj.hiddenPlaceholder;
+                _.forOwn(obj, function (v, k) { return delete obj[k]; });
+                _.assign(obj, ph);
+            }
+            else if (cmpNeedOccupied(obj)) {
+                // 需要预占宽度的组件，变成 template
+                _.forOwn(obj, function (v, k) {
+                    if (k !== 'height' && k !== 'width') {
+                        delete obj[k];
+                    }
+                });
+                obj.view = "template";
+                obj.borderless = true;
+                obj.template = "";
+            }
+            else {
+                // 其他情况，直接告知外循环，删除本对象
+                obj.isFiltered = true;
+            }
+            return;
+        }
         if (obj.view === 'iframe') {
             return;
         }
-        if (module && _.has(obj, 'id')) {
-            if (obj.id !== 'MainWindowFirstPage') {
-                console.error('禁用 ID 属性', obj);
-            }
-        }
+        // if (module && _.has(obj, 'id')) {
+        //   if (obj.id !== 'MainWindowFirstPage') {
+        //     console.error('禁用 ID 属性', obj)
+        //   }
+        // }
         if (typeof obj.placeId === 'string') {
             obj.id = module.instanceId + '$' + obj.placeId;
         }
         if (typeof obj.view === 'string') {
             switch (obj.view) {
                 case 'button':
-                    CtlButton.create(obj);
+                    CtlButton.create(module, obj);
                     break;
                 case 'text':
-                    CtlText.create(obj);
+                    CtlText.create(module, obj);
                     break;
                 case 'number':
                 case 'counter':
-                    CtlNumber.create(obj);
+                    CtlNumber.create(module, obj);
                     break;
                 case 'datepicker':
                 case 'date':
                 case 'datetime':
-                    CtlDatePicker.create(obj);
+                    CtlDatePicker.create(module, obj);
                     break;
                 case 'codemirror-editor':
-                    CtlCodeMirror.create(obj);
+                    CtlCodeMirror.create(module, obj);
                     break;
                 case 'dataview':
-                    CtlDataview.create(obj);
+                    CtlDataview.create(module, obj);
+                    break;
+                case 'xterm':
+                    CtlXterm.create(module, obj);
+                    break;
+                case 'xconsolelog':
+                    CtlConsoleLog.create(module, obj);
                     break;
                 case 'echarts':
-                    CtlECharts.create(obj);
+                    CtlECharts.create(module, obj);
+                    break;
+                case 'sidebar':
+                    CtlSidebar.create(module, obj);
                     break;
                 case 'daterangepicker':
                 case 'daterange':
                 case 'datetimerange':
-                    CtlDateRangePicker.create(obj);
+                    CtlDateRangePicker.create(module, obj);
                     break;
                 case 'combo':
                 case 'combobox':
-                    CtlCombo.create(obj);
+                    CtlCombo.create(module, obj);
                     break;
                 case 'multicombo':
-                    CtlMultiCombo.create(obj);
+                    CtlMultiCombo.create(module, obj);
                     break;
                 case 'search':
                 case 'searchbox':
-                    CtlSearch.create(obj);
+                    CtlSearch.create(module, obj);
                     break;
                 case 'check':
                 case 'checkbox':
-                    CtlCheckBox.create(obj);
+                    CtlCheckBox.create(module, obj);
                     break;
                 case 'switch':
                 case 'switchbox':
-                    CtlSwitch.create(obj);
+                    CtlSwitch.create(module, obj);
                     break;
                 case 'radio':
                 case 'radiobox':
-                    CtlRadio.create(obj);
+                    CtlRadio.create(module, obj);
                     break;
                 case 'tree':
-                    CtlTree.create(obj);
+                    CtlTree.create(module, obj);
                     break;
                 case 'treetable':
-                    CtlTreeTable.create(obj);
+                    CtlTreeTable.create(module, obj);
                     break;
                 case 'tabview':
-                    CtlTab.create(obj);
+                    CtlTab.create(module, obj);
                     break;
                 case 'grid':
-                    CtlGrid.create(obj);
+                    CtlGrid.create(module, obj);
                     break;
                 case 'form':
-                    CtlForm.create(obj);
+                    CtlForm.create(module, obj);
                     break;
                 case 'carousel':
-                    CtlCarousel.create(obj);
+                    CtlCarousel.create(module, obj);
                     break;
             }
         }
@@ -491,7 +376,8 @@ export function wrapperWebixConfig(module, vjson) {
     }
 }
 /**
- * 将传统 Java Class 转换为 Vue 对象
+ * 将传统 ts Class 转换为 vue 对象.
+ * 普通模块对象和 dialog 对象都要经过转换
  */
 export function componentFactory(Component, options) {
     if (options === void 0) { options = {}; }
@@ -527,7 +413,7 @@ export function componentFactory(Component, options) {
     // 实例化Component构造函数，并收集其自身的(非原型上的)属性导出
     options.mixins.push({
         data: function () {
-            var data = __assign({ refs: {}, _layerIndex: undefined, inParamter: undefined, dialogParent: undefined, instanceId: _.uniqueId('_mins_id_') }, collectDataFromConstructor(this, Component));
+            var data = __assign({ refs: {}, dialog: undefined, inParamter: undefined, dialogParent: undefined, instanceId: _.uniqueId('_mins_id_'), loadFinished: false }, collectDataFromConstructor(this, Component));
             return data;
         },
         created: function () {
@@ -564,7 +450,10 @@ export function componentFactory(Component, options) {
                 return vjson;
             },
             closeDialog: function () {
-                layer.close(this._layerIndex);
+                this.dialog.close();
+            },
+            setInParamter: function (inParamter) {
+                this.inParamter = inParamter;
             },
             showDialog: function (inParamter, container, isFromSearchBox) {
                 if (isFromSearchBox === void 0) { isFromSearchBox = false; }
@@ -579,76 +468,79 @@ export function componentFactory(Component, options) {
                         template: 'dialog 没有 body'
                     };
                 }
-                var _a = vjson.title, title = _a === void 0 ? '未命名对话框' : _a, _b = vjson.width, width = _b === void 0 ? 500 : _b, _c = vjson.height, height = _c === void 0 ? 300 : _c, _d = vjson.modal, modal = _d === void 0 ? true : _d, body = vjson.body, btn = vjson.btn;
+                else {
+                    if (!_.has(vjson.body, 'padding')) {
+                        vjson.body.padding = 10;
+                    }
+                }
                 // 与 yvan 组件进行交换，使 vjson 能被 webix 使用
-                wrapperWebixConfig(module, body);
-                var layerConfig = {
-                    id: _.uniqueId('layerno_'),
-                    zIndex: layer.zIndex,
-                    type: 1,
-                    area: [width + "px", height + "px"],
-                    title: title,
-                    shade: modal ? 0.6 : false,
-                    maxmin: true,
-                    btn: btn,
-                    anim: 0,
-                    content: ''
-                };
-                // layer 打开后的回调
-                layerConfig.success = function (layero) {
-                    module.layero = layero;
-                    layer.setTop(layero);
-                    // 默认焦点在关闭上
-                    layero
-                        .find('a.layui-layer-close')
-                        .attr('tabindex', 1)
-                        .focus();
-                    // if (isFromSearchBox) {
-                    // 监听回车和取消键
-                    layero.on('keydown', function (event) {
-                        if (event.keyCode === 13) {
-                            module.onEnter();
-                            if (isFromSearchBox) {
-                                event.stopPropagation();
+                wrapperWebixConfig(module, vjson.body);
+                // 构建 window
+                _.merge(vjson, {
+                    view: 'window',
+                    close: vjson.close === undefined ? true : vjson.close,
+                    move: vjson.move === undefined ? true : vjson.move,
+                    modal: vjson.modal === undefined ? true : vjson.modal,
+                    position: 'center',
+                    resize: vjson.resize === undefined ? true : vjson.resize,
+                    head: {
+                        view: "toolbar", margin: -4, cols: [
+                            { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
+                            {
+                                view: "icon", icon: "fa fa-expand", click: function () {
+                                    dialog.config.fullscreen = !dialog.config.fullscreen;
+                                    if (dialog.config.fullscreen) {
+                                        dialog.config.oldtop = dialog.config.top;
+                                        dialog.config.oldleft = dialog.config.left;
+                                        dialog.config.left = 0;
+                                        dialog.config.top = 0;
+                                        this.define({ icon: 'fa fa-compress' });
+                                    }
+                                    else {
+                                        dialog.config.top = dialog.config.oldtop;
+                                        dialog.config.left = dialog.config.oldleft;
+                                        this.define({ icon: 'fa fa-expand' });
+                                    }
+                                    dialog.resize();
+                                    this.refresh();
+                                }
+                            },
+                            {
+                                view: "icon", icon: "fa fa-times", title: '关闭', tooltip: '关闭', click: function () {
+                                    dialog.close();
+                                }
                             }
-                            event.preventDefault();
+                        ]
+                    },
+                    on: {
+                        onShow: function () {
+                            module.onLoad();
+                            module.loadFinished = true;
+                        },
+                        onDestruct: function () {
+                            module.onClose();
                         }
-                        else if (event.keyCode === 27) {
-                            module.onEsc();
+                    },
+                });
+                var dialog = webix.ui(vjson);
+                module._webixId = this.dialog = dialog;
+                this.dialog.show();
+                $(this.dialog.$view).keypress(function (event) {
+                    if (event.keyCode === 27) {
+                        module.onEsc();
+                        event.stopPropagation();
+                        event.preventDefault();
+                        return;
+                    }
+                    if (event.keyCode === 13) {
+                        module.onEnter();
+                        if (isFromSearchBox) {
                             event.stopPropagation();
-                            event.preventDefault();
                         }
-                    });
-                    // }
-                    // DOM 结果出现之后, 渲染 webix
-                    body.container = layero.find('.layui-layer-content').attr('id'); // layero[0]; // layero.attr('id');
-                    module._layeroInner = body.container;
-                    var $innerDOM = $('#' + module._layeroInner);
-                    _.extend(body, {
-                        width: $innerDOM.innerWidth(),
-                        height: $innerDOM.innerHeight()
-                    });
-                    module._webixId = webix.ui(body);
-                    module.onLoad();
-                };
-                // layer 大小改变后的回调
-                layerConfig.restore = layerConfig.full = layerConfig.resizing = function (layero) {
-                    //$$(module._webixId).resize();
-                    var $innerDOM = $('#' + module._layeroInner);
-                    module._webixId.define({
-                        width: $innerDOM.innerWidth(),
-                        height: $innerDOM.innerHeight()
-                    });
-                    module._webixId.resize();
-                    console.log('resized');
-                };
-                // layer 关闭后的回调
-                layerConfig.end = function () {
-                    module.onClose();
-                    webix.$$(module._webixId).destructor();
-                    module.$destroy();
-                };
-                module._layerIndex = layer.open(layerConfig);
+                        event.preventDefault();
+                        return;
+                    }
+                });
             }
         }
     });

@@ -1,7 +1,8 @@
-import { __extends } from "tslib";
+import { __assign, __extends } from "tslib";
 import { CtlBase } from '../../CtlBase';
 import { parseYvanPropChangeVJson } from '../../CtlUtils';
 import * as YvanUI from '../../YvanUIExtend';
+import * as YvanMessage from '../../YvanUIMessage';
 import { YvEventDispatch } from '../../YvanEvent';
 var CtlInput = /** @class */ (function (_super) {
     __extends(CtlInput, _super);
@@ -22,6 +23,25 @@ var CtlInput = /** @class */ (function (_super) {
         _this.maxlength = undefined;
         /**================ 私有属性 ===================**/
         _this._validateResult = true;
+        _this.anonymous_showTootip = function () {
+            if (_this._validate) {
+                var result = _this._validate(_this.value);
+                if (result) {
+                    _this._showTootip(result);
+                    _this._showValidateError();
+                }
+                else {
+                    _this._hideTootip();
+                    _this._hideValidateError();
+                }
+            }
+        };
+        _this.anonymous_hideTootip = function () {
+            var $input = $(_this._webix.$view).find('input');
+            if (document.activeElement !== $input[0]) {
+                _this._hideTootip();
+            }
+        };
         return _this;
     }
     CtlInput.prototype._create = function (vjson, me) {
@@ -65,14 +85,23 @@ var CtlInput = /** @class */ (function (_super) {
         _.merge(vjson, that._webixConfig, {
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                 },
                 onAfterRender: function () {
                     var $input = $(this.$view).find('input');
                     $input.on('input', that.onInputEvent.bind(that));
                     $input.on('keydown', onKeydown);
-                    if (that.constructor.name !== 'CtlSelect' &&
-                        that._webixConfig.required) {
+                    if (that._validate) {
+                        var result = that._validate(null);
+                        if (result) {
+                            that._showValidateError();
+                        }
+                        else {
+                            that._hideValidateError();
+                        }
+                        that._addEnvent($input);
+                    }
+                    if (that.constructor.name !== 'CtlSelect' && that._webixConfig.required) {
                         if (that.constructor.name === 'CtlDateRangePicker') {
                             that._showValidate(!this.getValue().end || this.getValue().end.length <= 0, 'requiredValidate');
                         }
@@ -93,7 +122,9 @@ var CtlInput = /** @class */ (function (_super) {
                     var $input = $(this.$view).find('input');
                     $input.off('input');
                     $input.off('keydown');
+                    that._removeEnvent($input);
                     that.removeHandle();
+                    that._hideTootip();
                 },
                 onItemClick: function () {
                     YvEventDispatch(that.onClick, that, undefined);
@@ -102,6 +133,17 @@ var CtlInput = /** @class */ (function (_super) {
                     YvEventDispatch(that.onEnter, that, undefined);
                 },
                 onFocus: function () {
+                    if (that._validate) {
+                        var result = that._validate(that.value);
+                        if (result) {
+                            that._showTootip(result);
+                            that._showValidateError();
+                        }
+                        else {
+                            that._hideTootip();
+                            that._hideValidateError();
+                        }
+                    }
                     YvEventDispatch(that.onFocus, that, undefined);
                 },
                 onChange: function (newValue, oldValue) {
@@ -125,6 +167,16 @@ var CtlInput = /** @class */ (function (_super) {
                     YvEventDispatch(that.onChange, that, newValue);
                 },
                 onBlur: function () {
+                    if (that._validate) {
+                        var result = that._validate(that.value);
+                        if (result) {
+                            that._showValidateError();
+                        }
+                        else {
+                            that._hideValidateError();
+                        }
+                    }
+                    that._hideTootip();
                     if (that._webixConfig.required) {
                         if (that.constructor.name === 'CtlDateRangePicker') {
                             that._showValidate(!this.getValue().end || this.getValue().end.length <= 0, 'requiredValidate');
@@ -397,6 +449,29 @@ var CtlInput = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    CtlInput.prototype.getValidate = function () {
+        return this._validate;
+    };
+    CtlInput.prototype._addEnvent = function (input) {
+        input.context.addEventListener('mouseenter', this.anonymous_showTootip);
+        input.context.addEventListener('mouseleave', this.anonymous_hideTootip);
+    };
+    CtlInput.prototype._removeEnvent = function (input) {
+        input.context.removeEventListener('mouseenter', this.anonymous_showTootip);
+        input.context.removeEventListener('mouseleave', this.anonymous_hideTootip);
+    };
+    CtlInput.prototype._showValidateError = function () {
+        $(this._webix.$view).addClass('yvan-validate-error');
+    };
+    CtlInput.prototype._hideValidateError = function () {
+        $(this._webix.$view).removeClass('yvan-validate-error');
+    };
+    CtlInput.prototype._showTootip = function (msg) {
+        YvanMessage.showTooltip(this, msg);
+    };
+    CtlInput.prototype._hideTootip = function () {
+        YvanMessage.hideTooltip(this);
+    };
     CtlInput.prototype._showValidate = function (msg, type) {
         var $input;
         if (this.constructor.name === 'CtlText' ||

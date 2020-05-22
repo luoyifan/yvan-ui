@@ -10,8 +10,9 @@ var CtlCheckBox = /** @class */ (function (_super) {
         _this._label = '';
         return _this;
     }
-    CtlCheckBox.create = function (vjson) {
+    CtlCheckBox.create = function (module, vjson) {
         var that = new CtlCheckBox(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlCheckboxDefault);
         // 基础属性先执行
         that._create(vjson, that);
