@@ -47,8 +47,9 @@ export declare class CtlSearch extends CtlInput<CtlSearch> {
     get value(): string | undefined;
     set value(nv: string | undefined);
     _refreshIcon(): void;
-    private valueOrigin?;
-    private suppressRestore;
+    private valueEdit?;
+    private supportChangeValue;
+    private valueReal?;
     /**
      * 进入查询框
      */

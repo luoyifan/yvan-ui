@@ -4,6 +4,7 @@ import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSource
 import { isDesignMode } from './DesignHelper'
 import { brokerInvoke } from './Service'
 import { Db } from './YvanUIDb'
+import {GridRefreshMode} from "./CtlGrid";
 
 export class YvanDataSourceGrid {
   private option: GridDataSource
@@ -14,7 +15,7 @@ export class YvanDataSourceGrid {
 
   private reload: undefined | (() => void)
   private rowCount: number | undefined
-  private lastFilterModel: any
+  public lastFilterModel: any
 
   serverQuery = _.debounce((option: GridDataSourceSql | GridDataSourceServer | GridDataSourceAjax, paramFunction: undefined | (() => any), params: any) => {
     const that = this
@@ -131,11 +132,16 @@ export class YvanDataSourceGrid {
         that.ctl.gridPage.getPageData = (currentPage: number, pageSize: number) => {
           let params: any = {}
           params.successCallback = (data: [], rowCount: number) => {
+
+            // if (needClearRefresh) {
+            //   that.ctl.setData(data)
+
+            // } else {
+              // 不能直接用 setData, 会造成 filter 被置空
+              // 使用 _transactionUpdate 也有 bug ，如果查询条件被改变，也不会分页回顶端
+              that.ctl._transactionUpdate(data)
+            // }
             // that.ctl.setData(data)
-            // 不能直接用 setData, 会造成 filter 被置空
-            // 使用 _transactionUpdate 也有 bug ，如果查询条件被改变，也不会分页回顶端
-            that.ctl._transactionUpdate(data)
-            // that.ctl.gridApi.setFilterModel(that.lastFilterModel)
             that.ctl.gridPage.itemCount = rowCount
             that.ctl.gridPage.currentPage = currentPage
           }
@@ -156,7 +162,7 @@ export class YvanDataSourceGrid {
             that.serverQuery(option, paramFunction, params)
           }
         }
-        that.ctl.gridPage.getPageData(1, that.ctl.gridPage.pageSize)
+        that.ctl.gridPage.getPageData(1, that.ctl.gridPage.pageSize);
       } else {
         /** 无限滚动模式 **/
         that.ctl.gridApi.setDatasource({

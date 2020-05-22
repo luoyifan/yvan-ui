@@ -1,4 +1,4 @@
-import { CtlGrid } from './CtlGrid'
+import {CtlGrid, GridRefreshMode} from './CtlGrid'
 
 export class CtlGridPage {
   public grid: CtlGrid
@@ -164,6 +164,7 @@ export class CtlGridPage {
         if (cp <= 0) {
           cp = 1
         }
+        me.grid.refreshMode = GridRefreshMode.refreshWithFilter;
         me.getPageData(cp, me.pageSize)
       } else {
         if (event.keyCode !== 8 && (event.keyCode < 48 || event.keyCode > 57)) {
@@ -176,6 +177,7 @@ export class CtlGridPage {
       me.pageSize = v.srcElement.value
       me.grid.paginationSetPageSize(me.pageSize)
       if (typeof me.getPageData === 'function') {
+        me.grid.refreshMode = GridRefreshMode.refreshWithFilter;
         me.getPageData(1, me.pageSize)
       }
     }
@@ -220,6 +222,7 @@ export class CtlGridPage {
         }
 
         if (typeof me.getPageData === 'function') {
+          me.grid.refreshMode = GridRefreshMode.refreshWithFilter;
           me.getPageData(cp, me.pageSize)
         }
       }

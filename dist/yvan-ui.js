@@ -2075,6 +2075,228 @@
   }(CtlBase));
   //# sourceMappingURL=CtlButton.js.map
 
+  /**
+   * 显示正在读取
+   */
+  function loading(msg) {
+      clearLoading();
+      if (!msg) {
+          msg = '请稍后';
+      }
+      var $body = $('body');
+      $body.append("<div class=\"load-view\" style=\"z-index: 19850224;\"><div class=\"load-an-view\"><div class=\"fading-circle\">\n  <div class=\"sk-circle1 sk-circle\"></div>\n  <div class=\"sk-circle2 sk-circle\"></div>\n  <div class=\"sk-circle3 sk-circle\"></div>\n  <div class=\"sk-circle4 sk-circle\"></div>\n  <div class=\"sk-circle5 sk-circle\"></div>\n  <div class=\"sk-circle6 sk-circle\"></div>\n  <div class=\"sk-circle7 sk-circle\"></div> \n  <div class=\"sk-circle8 sk-circle\"></div>\n  <div class=\"sk-circle9 sk-circle\"></div>\n  <div class=\"sk-circle10 sk-circle\"></div>\n  <div class=\"sk-circle11 sk-circle\"></div>\n  <div class=\"sk-circle12 sk-circle\"></div>\n</div></div><div class=\"load-tip\">" + msg + "</div></div>");
+      $body.append($("<div class=\"webix_modal load-view-masker\" style=\"z-index: 19850223;\"></div>"));
+  }
+  /**
+   * 清空正在读取
+   */
+  function clearLoading() {
+      var $body = $('body');
+      $body.find('.load-view').remove();
+      $body.find('.load-view-masker').remove();
+  }
+  /**
+   * 中间灰底白字提示
+   */
+  function msg(message) {
+      var $body = $('body');
+      $body.find('[xtype=msg]').remove();
+      var $w = $('<div xtype="tooltip" class="yvan-msg yvan-anim yvan-anim-00">' +
+          '  <div class="yvan-msg-content">' +
+          message +
+          '</div></div>');
+      $body.append($w);
+      var iframeWidth = $w.parent().width();
+      var iframeHeight = $w.parent().height();
+      var windowWidth = $w.width();
+      var windowHeight = $w.height();
+      var setWidth = (iframeWidth - windowWidth) / 2;
+      var setHeight = (iframeHeight - windowHeight) / 2;
+      if (iframeHeight < windowHeight || setHeight < 0) {
+          setHeight = 0;
+      }
+      if (iframeWidth < windowWidth || setWidth < 0) {
+          setWidth = 0;
+      }
+      $w.css({ left: setWidth, top: setHeight });
+      setTimeout(function () {
+          $w.remove();
+      }, 3000);
+  }
+  /**
+   * 显示tooltip
+   */
+  function showTooltip(obj, message) {
+      var $body = $('body');
+      var tooptipId = obj.id + '_tooltip';
+      if ($body.find("#" + tooptipId).length > 0) {
+          return;
+      }
+      var $w = $('<div xtype="tooltip" class="yvan-tooltip">' +
+          '<em></em><div class="yvan-tooltip-msg">' +
+          message +
+          '</div></div>');
+      $w[0].id = tooptipId;
+      $body.append($w);
+      var xxoffset = $(obj._webix.$view).offset();
+      var xxLeft = $(obj._webix.$view).width() + xxoffset.left + 10;
+      $w.css({ left: xxLeft, top: xxoffset === null || xxoffset === void 0 ? void 0 : xxoffset.top });
+  }
+  function hideTooltip(obj) {
+      var $body = $('body');
+      var tooptipId = obj.id + '_tooltip';
+      $body.find("#" + tooptipId).remove();
+  }
+  /**
+   * 弹出输入框
+   * @param title 输入框标题
+   * @param defValue 默认值
+   */
+  function prompt(title, defValue) {
+      if (title === void 0) { title = '请输入内容'; }
+      if (defValue === void 0) { defValue = ''; }
+      var tid = webix.uid();
+      var dialog = undefined;
+      return new Promise(function (resolve, reject) {
+          function onConfirm() {
+              var value = webix.$$(tid.toString()).getValue();
+              if (value) {
+                  resolve(value);
+                  dialog.close();
+                  return;
+              }
+              msg('请输入内容');
+          }
+          function onCancel() {
+              reject();
+              dialog.close();
+          }
+          var vjson = {
+              view: 'window', close: false, move: true, modal: true, position: 'center', resize: true, fullscreen: false,
+              head: title,
+              on: {
+                  onShow: function () {
+                      // 进入后立刻获得焦点
+                      webix.$$(tid).focus();
+                  }
+              },
+              body: {
+                  rows: [
+                      { view: 'text', id: tid, placeholder: '请输入', value: defValue },
+                      {
+                          cols: [
+                              {},
+                              {
+                                  view: 'button',
+                                  value: '确定',
+                                  width: 100,
+                                  css: 'yvan_primary',
+                                  click: onConfirm,
+                              },
+                              {
+                                  view: 'button',
+                                  value: '取消',
+                                  width: 100,
+                                  css: 'default',
+                                  click: function () {
+                                      onCancel();
+                                  }
+                              }
+                          ]
+                      }
+                  ]
+              }
+          };
+          dialog = webix.ui(vjson);
+          dialog.show();
+          $(webix.$$(tid).$view).keydown(function (e) {
+              // 必须借助 jquery 拦截 keydown 事件
+              if (e.keyCode === 27) {
+                  onCancel();
+                  e.preventDefault();
+                  return;
+              }
+              if (e.keyCode === 13) {
+                  onConfirm();
+                  e.preventDefault();
+                  return;
+              }
+          });
+      });
+  }
+  /**
+   * 弹出提示框
+   * @param content 提示框内容
+   */
+  function alert(content) {
+      webix.alert({ title: "提示", text: content, });
+  }
+  /**
+   * 弹出错误框
+   * @param content 错误的提示内容
+   */
+  function error(content) {
+      webix.modalbox({ title: "错误", text: content, buttons: ["确认"], type: "confirm-error" });
+  }
+  /**
+   * 弹出确认框
+   * @param content 需要确认的文字内容
+   */
+  function confirm(content) {
+      return new Promise(function (resolve, reject) {
+          webix.confirm({
+              title: "提示",
+              text: content,
+              ok: "确认", cancel: "取消",
+          }).then(function () {
+              resolve();
+          }).catch(function () {
+              reject();
+          });
+      });
+  }
+  /**
+   * 右上角弹出错误消息
+   * @param content 消息内容
+   */
+  function msgError(content) {
+      var toastr = _.get(window, 'toastr');
+      if (!toastr) {
+          webix.message({ type: 'error', text: content, expire: -1 });
+      }
+      else {
+          toastr.error(content, '错误');
+      }
+  }
+  /**
+   * 右上角弹出成功消息
+   * @param content 消息内容
+   */
+  function msgSuccess(content) {
+      var toastr = _.get(window, 'toastr');
+      if (!toastr) {
+          webix.message({ type: 'success', text: content, expire: 2000 });
+      }
+      else {
+          toastr.success(content, '成功');
+      }
+  }
+  /**
+   * 右上角弹出通知消息
+   * @param content 消息内容
+   */
+  function msgInfo(content) {
+      var toastr = _.get(window, 'toastr');
+      if (!toastr) {
+          webix.message({ type: 'info', text: content, expire: 2000 });
+      }
+      else {
+          toastr.info(content);
+      }
+      // https://docs.webix.com/desktop__message_boxes.html
+  }
+  //# sourceMappingURL=YvanUIMessage.js.map
+
   var CtlInput = /** @class */ (function (_super) {
       __extends(CtlInput, _super);
       function CtlInput() {
@@ -2095,10 +2317,23 @@
           /**================ 私有属性 ===================**/
           _this._validateResult = true;
           _this.anonymous_showTootip = function () {
-              _this._showTootip();
+              if (_this._validate) {
+                  var result = _this._validate(_this.value);
+                  if (result) {
+                      _this._showTootip(result);
+                      _this._showValidateError();
+                  }
+                  else {
+                      _this._hideTootip();
+                      _this._hideValidateError();
+                  }
+              }
           };
           _this.anonymous_hideTootip = function () {
-              _this._hideTootip();
+              var $input = $(_this._webix.$view).find('input');
+              if (document.activeElement !== $input[0]) {
+                  _this._hideTootip();
+              }
           };
           return _this;
       }
@@ -2117,9 +2352,6 @@
               'onFocus',
               'onChange',
               'onBlur',
-              // 'onTouchEnd',
-              // 'onTouchStart',
-              // 'onTouchMove',
               'maxlength',
               'changeValueImplete',
               'ff',
@@ -2154,7 +2386,12 @@
                       $input.on('keydown', onKeydown);
                       if (that._validate) {
                           var result = that._validate(null);
-                          that._addTooltip(result);
+                          if (result) {
+                              that._showValidateError();
+                          }
+                          else {
+                              that._hideValidateError();
+                          }
                           that._addEnvent($input);
                       }
                       if (that.constructor.name !== 'CtlSelect' && that._webixConfig.required) {
@@ -2180,6 +2417,7 @@
                       $input.off('keydown');
                       that._removeEnvent($input);
                       that.removeHandle();
+                      that._hideTootip();
                   },
                   onItemClick: function () {
                       YvEventDispatch(that.onClick, that, undefined);
@@ -2188,19 +2426,19 @@
                       YvEventDispatch(that.onEnter, that, undefined);
                   },
                   onFocus: function () {
-                      that._showTootip();
+                      if (that._validate) {
+                          var result = that._validate(that.value);
+                          if (result) {
+                              that._showTootip(result);
+                              that._showValidateError();
+                          }
+                          else {
+                              that._hideTootip();
+                              that._hideValidateError();
+                          }
+                      }
                       YvEventDispatch(that.onFocus, that, undefined);
                   },
-                  // onTouchStart(this: any) {
-                  //   that._showTootip()
-                  //   YvEventDispatch(that.onTouchStart, that, undefined)
-                  // },
-                  // onTouchMove(this: any) {
-                  // },
-                  // onTouchEnd(this: any) {
-                  //   that._hideTootip()
-                  //   YvEventDispatch(that.onTouchEnd, that, undefined)
-                  // },
                   onChange: function (newValue, oldValue) {
                       if (!that.valueValid(newValue)) {
                           // 不允许触发更改
@@ -2222,6 +2460,15 @@
                       YvEventDispatch(that.onChange, that, newValue);
                   },
                   onBlur: function () {
+                      if (that._validate) {
+                          var result = that._validate(that.value);
+                          if (result) {
+                              that._showValidateError();
+                          }
+                          else {
+                              that._hideValidateError();
+                          }
+                      }
                       that._hideTootip();
                       if (that._webixConfig.required) {
                           if (that.constructor.name === 'CtlDateRangePicker') {
@@ -2497,12 +2744,6 @@
       CtlInput.prototype.getValidate = function () {
           return this._validate;
       };
-      CtlInput.prototype._addTooltip = function (msg) {
-          $(this._webix.$view).css({
-              'position': 'relative'
-          });
-          $(this._webix.$view).append("<div id=\"" + this.id + "_tooptip\" role=\"alert\" aria-atomic=\"true\" class=\"webix_tooltip\" style=\"display: none; right: 0px; top: 0px;\">" + msg + "</div>");
-      };
       CtlInput.prototype._addEnvent = function (input) {
           input.context.addEventListener('mouseenter', this.anonymous_showTootip);
           input.context.addEventListener('mouseleave', this.anonymous_hideTootip);
@@ -2511,15 +2752,17 @@
           input.context.removeEventListener('mouseenter', this.anonymous_showTootip);
           input.context.removeEventListener('mouseleave', this.anonymous_hideTootip);
       };
-      CtlInput.prototype._showTootip = function () {
-          $("#" + this.id + "_tooptip").css({
-              'display': 'block'
-          });
+      CtlInput.prototype._showValidateError = function () {
+          $(this._webix.$view).addClass('yvan-validate-error');
+      };
+      CtlInput.prototype._hideValidateError = function () {
+          $(this._webix.$view).removeClass('yvan-validate-error');
+      };
+      CtlInput.prototype._showTootip = function (msg) {
+          showTooltip(this, msg);
       };
       CtlInput.prototype._hideTootip = function () {
-          $("#" + this.id + "_tooptip").css({
-              'display': 'none'
-          });
+          hideTooltip(this);
       };
       CtlInput.prototype._showValidate = function (msg, type) {
           var $input;
@@ -3324,15 +3567,18 @@
       function CtlSearch() {
           var _this = _super !== null && _super.apply(this, arguments) || this;
           /*============================ 私有部分 ============================*/
-          // 原始值
-          _this.valueOrigin = undefined;
-          //抑制还原动作
-          _this.suppressRestore = false;
+          // 编辑值
+          _this.valueEdit = undefined;
+          // 是否设置真实值
+          _this.supportChangeValue = false;
+          // 真实值
+          _this.valueReal = undefined;
           return _this;
       }
       CtlSearch.create = function (module, vjson) {
           var that = new CtlSearch(vjson);
           that._module = module;
+          var vvjson = _.cloneDeep(vjson);
           _.defaultsDeep(vjson, CtlSearchDefault);
           // 基础属性先执行
           that._create(vjson, that);
@@ -3347,7 +3593,7 @@
           _.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
-                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
+                      that.attachHandle(this, vvjson);
                       that._refreshIcon();
                   },
                   // onAfterRender(this: any) {
@@ -3368,19 +3614,26 @@
                   // },
                   onEnter: function () {
                       // 从键盘响应查询
-                      that.suppressRestore = true;
-                      that._searchRequest(that._webix.getValue(), that.valueOrigin);
+                      that._searchRequest(that._webix.getValue(), that.valueEdit);
                   },
                   onFocus: function () {
                       //进入焦点时，用户输入的值既为有效值
-                      that.valueOrigin = that._webix.getValue();
+                      that.valueReal = that._webix.getValue();
                       YvEventDispatch(that.onFocus, that, undefined);
                   },
                   onBlur: function () {
-                      //离开焦点时，用户输入的置为无效
-                      if (!that.suppressRestore) {
-                          that._webix.setValue(that.valueOrigin);
+                      if (that._validate) {
+                          var result = that._validate(that.value);
+                          if (result) {
+                              that._showValidateError();
+                          }
+                          else {
+                              that._hideValidateError();
+                          }
                       }
+                      that._hideTootip();
+                      //离开焦点时，用户输入的置为无效
+                      that._webix.setValue(that.valueReal);
                       YvEventDispatch(that.onBlur, that, undefined);
                   },
                   // onDestruct(this: any) {
@@ -3398,8 +3651,7 @@
                       }
                       else {
                           // 查询
-                          that.suppressRestore = true;
-                          that._searchRequest(that._webix.getValue(), that.valueOrigin);
+                          that._searchRequest(that._webix.getValue(), that.valueEdit);
                       }
                   }
               }
@@ -3414,6 +3666,7 @@
           if (!this.widget) {
               return;
           }
+          this.supportChangeValue = true;
           YvEventDispatch(this.widget.onClear, this, undefined);
           //清空
           _.forOwn(this.widget.bind, function (value, key) {
@@ -3425,7 +3678,7 @@
               if (!this._webix) {
                   return this._webixConfig.value;
               }
-              return this.valueOrigin;
+              return this.valueReal;
           },
           set: function (nv) {
               if (!this._webix) {
@@ -3433,7 +3686,11 @@
               }
               else {
                   this._webix.setValue(nv);
-                  this.valueOrigin = nv;
+                  this.valueEdit = nv;
+              }
+              if (this.supportChangeValue) {
+                  this.valueReal = nv;
+                  this.supportChangeValue = false;
               }
               YvEventDispatch(this.onChange, this, nv);
               this._refreshIcon();
@@ -3487,6 +3744,7 @@
                   console.error('没有设置 widget 属性');
                   return;
               }
+              searchCtl.supportChangeValue = true;
               YvEventDispatch(searchCtl.widget.onConfirm, searchCtl, undefined);
               //写回
               _.forOwn(searchCtl.widget.bind, function (value, key) {
@@ -3498,7 +3756,7 @@
           widgetParamter.onClose = function () {
               //弹窗关闭后恢复原值，并开启还原
               searchCtl.value = restoreValue;
-              searchCtl.suppressRestore = false;
+              searchCtl.supportChangeValue = false;
               searchCtl.focus();
           };
           var dlg = new searchCtl.widget.content();
@@ -3552,7 +3810,7 @@
       last: "上一页",
       first: "首页",
       previous: "上一页",
-      loadingOoo: "加载中...",
+      loadingOoo: "<i class=\"fa fa-spinner fa-pulse\"></i>",
       selectAll: "查询全部",
       searchOoo: "查询...",
       blanks: "空白",
@@ -3706,6 +3964,7 @@
                   if (cp <= 0) {
                       cp = 1;
                   }
+                  me.grid.refreshMode = exports.GridRefreshMode.refreshWithFilter;
                   me.getPageData(cp, me.pageSize);
               }
               else {
@@ -3718,6 +3977,7 @@
               me.pageSize = v.srcElement.value;
               me.grid.paginationSetPageSize(me.pageSize);
               if (typeof me.getPageData === 'function') {
+                  me.grid.refreshMode = exports.GridRefreshMode.refreshWithFilter;
                   me.getPageData(1, me.pageSize);
               }
           };
@@ -3757,6 +4017,7 @@
                       }
                   }
                   if (typeof me.getPageData === 'function') {
+                      me.grid.refreshMode = exports.GridRefreshMode.refreshWithFilter;
                       me.getPageData(cp, me.pageSize);
                   }
               };
@@ -4316,11 +4577,14 @@
                   that.ctl.gridPage.getPageData = function (currentPage, pageSize) {
                       var params = {};
                       params.successCallback = function (data, rowCount) {
-                          // that.ctl.setData(data)
+                          // if (needClearRefresh) {
+                          //   that.ctl.setData(data)
+                          // } else {
                           // 不能直接用 setData, 会造成 filter 被置空
                           // 使用 _transactionUpdate 也有 bug ，如果查询条件被改变，也不会分页回顶端
                           that.ctl._transactionUpdate(data);
-                          // that.ctl.gridApi.setFilterModel(that.lastFilterModel)
+                          // }
+                          // that.ctl.setData(data)
                           that.ctl.gridPage.itemCount = rowCount;
                           that.ctl.gridPage.currentPage = currentPage;
                       };
@@ -4460,7 +4724,6 @@
       };
       return YvanDataSourceGrid;
   }());
-  //# sourceMappingURL=YvanDataSourceGridImp.js.map
 
   var CtlGridCellButton = /** @class */ (function () {
       function CtlGridCellButton() {
@@ -5051,6 +5314,11 @@
   }(CtlGridEditor));
   //# sourceMappingURL=CtlGridEditorCombo.js.map
 
+  (function (GridRefreshMode) {
+      GridRefreshMode[GridRefreshMode["refreshRows"] = 0] = "refreshRows";
+      GridRefreshMode[GridRefreshMode["refreshWithFilter"] = 1] = "refreshWithFilter";
+      GridRefreshMode[GridRefreshMode["refreshAndClearFilter"] = 2] = "refreshAndClearFilter";
+  })(exports.GridRefreshMode || (exports.GridRefreshMode = {}));
   /**
    * 扩展 grid 组件
    */
@@ -5069,6 +5337,7 @@
       __extends(CtlGrid, _super);
       function CtlGrid() {
           var _this = _super !== null && _super.apply(this, arguments) || this;
+          _this.refreshMode = exports.GridRefreshMode.refreshRows;
           /**
            * 是否自动读取数据
            */
@@ -5197,33 +5466,43 @@
        * 无感知刷新
        */
       CtlGrid.prototype._transactionUpdate = function (targetDataList) {
-          // if (targetDataList.length <= 0) {
-          //   //无数据，不用做更新
-          //   this.gridApi.setRowData([])
-          //   return
-          // }
-          // 不能用更新，这里会出 bug
-          var transaction = {
-              add: [],
-              remove: [],
-              update: []
-          };
-          var i = 0;
-          this.gridApi.forEachNode(function (node) {
-              if (i === targetDataList.length) {
-                  //已经越位
-                  transaction.remove.push(node.data);
+          var _this = this;
+          if (this.refreshMode === exports.GridRefreshMode.refreshWithFilter || this.refreshMode === exports.GridRefreshMode.refreshAndClearFilter) {
+              /** 更改当前的刷新模式， 避免重复刷新 **/
+              this.refreshMode = exports.GridRefreshMode.refreshRows;
+              this.setData(targetDataList);
+              if (this.dataSourceBind) {
+                  this.gridApi.setFilterModel(this.dataSourceBind.lastFilterModel);
               }
-              else {
-                  var newData = targetDataList[i++];
-                  node.setData(newData);
-                  transaction.update.push(node.data);
-              }
-          });
-          for (; i < targetDataList.length; i++) {
-              transaction.add.push(targetDataList[i]);
           }
-          this.gridApi.updateRowData(transaction);
+          else {
+              /** 更改当前的刷新模式， 避免重复刷新 **/
+              this.refreshMode = exports.GridRefreshMode.refreshRows;
+              var transaction_1 = {
+                  add: [],
+                  remove: [],
+                  update: []
+              };
+              var i_1 = 0;
+              this.gridApi.forEachNode(function (node) {
+                  if (i_1 === targetDataList.length) {
+                      //已经越位
+                      transaction_1.remove.push(node.data);
+                  }
+                  else {
+                      var newData = targetDataList[i_1++];
+                      node.setData(newData);
+                      transaction_1.update.push(node.data);
+                  }
+              });
+              for (; i_1 < targetDataList.length; i_1++) {
+                  transaction_1.add.push(targetDataList[i_1]);
+              }
+              this.gridApi.updateRowData(transaction_1);
+          }
+          if (this.paginationDefaultSelectRow && this.paginationDefaultSelectRow >= 0 && targetDataList && targetDataList.length > 0) {
+              this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+          }
       };
       /**
        * 获取全部数据
@@ -5250,8 +5529,52 @@
        * option:
        *   clearFilter=true 是否清空筛选
        */
-      CtlGrid.prototype.reload = function (option) {
+      // reload(option?: any) {
+      //   this.loading = true
+      //
+      //   //无感刷新之前，清空所有状态
+      //   this._clearCache()
+      //
+      //   //需要重新请求 rowCount(总数据行)
+      //   if (this.dataSourceBind) {
+      //     this.dataSourceBind.clearRowCount()
+      //   }
+      //
+      //   if (this.entityName) {
+      //     _.set(this.getModule(), this.entityName + '.selectedRow', undefined)
+      //   }
+      //
+      //   /** 有clearFilter 参数的时候 一定刷新数据 **/
+      //   if (option && option.clearFilter === true) {
+      //     this.pageAbleDataRefreshMode = "refreshAndReset"
+      //     this.gridApi.setFilterModel(null)
+      //     if (this.dataSourceBind) {
+      //       /** 表头筛选数据没有变化也要重新加载数据 **/
+      //       if (_.isEqual(this.gridApi.getFilterModel(), this.dataSourceBind.lastFilterModel)) {
+      //         this._filterChanged();
+      //       }
+      //     }
+      //   } else {
+      //     if (this.pagination) {
+      //       this.pageAbleDataRefreshMode = "refreshWithFilter"
+      //       this.gridPage.refreshGrid()
+      //     } else {
+      //       this.pageAbleDataRefreshMode = "refreshRows"
+      //       this.gridApi.refreshInfiniteCache()
+      //     }
+      //   }
+      // }
+      /**
+       * 无感刷新
+       * 清空缓存，从后台重新拉取数据，表格上临时修改的内容都会被清空
+       *
+       * option:
+       *   clearFilter=true 是否清空筛选
+       */
+      CtlGrid.prototype.reload = function (refreshMode) {
+          if (refreshMode === void 0) { refreshMode = exports.GridRefreshMode.refreshRows; }
           this.loading = true;
+          this.refreshMode = refreshMode;
           //无感刷新之前，清空所有状态
           this._clearCache();
           //需要重新请求 rowCount(总数据行)
@@ -5261,8 +5584,15 @@
           if (this.entityName) {
               _.set(this.getModule(), this.entityName + '.selectedRow', undefined);
           }
-          if (option && option.clearFilter === true) {
+          /** 有clearFilter 参数的时候 一定刷新数据 **/
+          if (refreshMode === exports.GridRefreshMode.refreshAndClearFilter) {
               this.gridApi.setFilterModel(null);
+              if (this.dataSourceBind) {
+                  /** 表头筛选数据没有变化也要重新加载数据 **/
+                  if (_.isEqual(this.gridApi.getFilterModel(), this.dataSourceBind.lastFilterModel)) {
+                      this._filterChanged();
+                  }
+              }
           }
           else {
               if (this.pagination) {
@@ -5339,9 +5669,13 @@
                   return;
               }
               if (newValue) {
+                  // 盖着
                   this.gridApi.showLoadingOverlay();
+                  $($(this._webix.$view).find('.ag-paging-panel')[0]).append("<div class=\"maskBox\"></div>");
               }
               else {
+                  // 放开
+                  $(this._webix.$view).find('.maskBox').remove();
                   this.gridApi.hideOverlay();
               }
           },
@@ -5497,10 +5831,14 @@
           return gridOptions;
       };
       CtlGrid.prototype._filterChanged = function () {
-          console.log('_filterChanged', this.gridApi.getFilterModel());
-          var reload = _.get(this.dataSourceBind, 'reload');
-          if (typeof reload === 'function') {
-              reload.call(this.dataSourceBind);
+          if (this.dataSourceBind) {
+              if ((!_.isEqual(this.gridApi.getFilterModel(), this.dataSourceBind.lastFilterModel)) || this.refreshMode == exports.GridRefreshMode.refreshAndClearFilter) {
+                  var reload = _.get(this.dataSourceBind, 'reload');
+                  if (typeof reload === 'function') {
+                      reload.call(this.dataSourceBind);
+                  }
+              }
+              console.log('_filterChanged', this.gridApi.getFilterModel());
           }
       };
       CtlGrid.prototype._gridReady = function () {
@@ -8258,204 +8596,6 @@
   }
   //# sourceMappingURL=YvanUIUtils.js.map
 
-  /**
-   * 显示正在读取
-   */
-  function loading(msg) {
-      clearLoading();
-      if (!msg) {
-          msg = '请稍后';
-      }
-      var $body = $('body');
-      $body.append("<div class=\"load-view\" style=\"z-index: 19850224;\"><div class=\"load-an-view\"><div class=\"fading-circle\">\n  <div class=\"sk-circle1 sk-circle\"></div>\n  <div class=\"sk-circle2 sk-circle\"></div>\n  <div class=\"sk-circle3 sk-circle\"></div>\n  <div class=\"sk-circle4 sk-circle\"></div>\n  <div class=\"sk-circle5 sk-circle\"></div>\n  <div class=\"sk-circle6 sk-circle\"></div>\n  <div class=\"sk-circle7 sk-circle\"></div> \n  <div class=\"sk-circle8 sk-circle\"></div>\n  <div class=\"sk-circle9 sk-circle\"></div>\n  <div class=\"sk-circle10 sk-circle\"></div>\n  <div class=\"sk-circle11 sk-circle\"></div>\n  <div class=\"sk-circle12 sk-circle\"></div>\n</div></div><div class=\"load-tip\">" + msg + "</div></div>");
-      $body.append($("<div class=\"webix_modal load-view-masker\" style=\"z-index: 19850223;\"></div>"));
-  }
-  /**
-   * 清空正在读取
-   */
-  function clearLoading() {
-      var $body = $('body');
-      $body.find('.load-view').remove();
-      $body.find('.load-view-masker').remove();
-  }
-  /**
-   * 中间灰底白字提示
-   */
-  function msg(message) {
-      var $body = $('body');
-      $body.find('[xtype=msg]').remove();
-      var $w = $('<div xtype="msg" class="yvan-msg yvan-anim yvan-anim-00">' +
-          '  <div class="yvan-msg-content">' +
-          message +
-          '</div></div>');
-      $body.append($w);
-      var iframeWidth = $w.parent().width();
-      var iframeHeight = $w.parent().height();
-      var windowWidth = $w.width();
-      var windowHeight = $w.height();
-      var setWidth = (iframeWidth - windowWidth) / 2;
-      var setHeight = (iframeHeight - windowHeight) / 2;
-      if (iframeHeight < windowHeight || setHeight < 0) {
-          setHeight = 0;
-      }
-      if (iframeWidth < windowWidth || setWidth < 0) {
-          setWidth = 0;
-      }
-      $w.css({ left: setWidth, top: setHeight });
-      setTimeout(function () {
-          $w.remove();
-      }, 3000);
-  }
-  /**
-   * 弹出输入框
-   * @param title 输入框标题
-   * @param defValue 默认值
-   */
-  function prompt(title, defValue) {
-      if (title === void 0) { title = '请输入内容'; }
-      if (defValue === void 0) { defValue = ''; }
-      var tid = webix.uid();
-      var dialog = undefined;
-      return new Promise(function (resolve, reject) {
-          function onConfirm() {
-              var value = webix.$$(tid.toString()).getValue();
-              if (value) {
-                  resolve(value);
-                  dialog.close();
-                  return;
-              }
-              msg('请输入内容');
-          }
-          function onCancel() {
-              reject();
-              dialog.close();
-          }
-          var vjson = {
-              view: 'window', close: false, move: true, modal: true, position: 'center', resize: true, fullscreen: false,
-              head: title,
-              on: {
-                  onShow: function () {
-                      // 进入后立刻获得焦点
-                      webix.$$(tid).focus();
-                  }
-              },
-              body: {
-                  rows: [
-                      { view: 'text', id: tid, placeholder: '请输入', value: defValue },
-                      {
-                          cols: [
-                              {},
-                              {
-                                  view: 'button',
-                                  value: '确定',
-                                  width: 100,
-                                  css: 'yvan_primary',
-                                  click: onConfirm,
-                              },
-                              {
-                                  view: 'button',
-                                  value: '取消',
-                                  width: 100,
-                                  css: 'default',
-                                  click: function () {
-                                      onCancel();
-                                  }
-                              }
-                          ]
-                      }
-                  ]
-              }
-          };
-          dialog = webix.ui(vjson);
-          dialog.show();
-          $(webix.$$(tid).$view).keydown(function (e) {
-              // 必须借助 jquery 拦截 keydown 事件
-              if (e.keyCode === 27) {
-                  onCancel();
-                  e.preventDefault();
-                  return;
-              }
-              if (e.keyCode === 13) {
-                  onConfirm();
-                  e.preventDefault();
-                  return;
-              }
-          });
-      });
-  }
-  /**
-   * 弹出提示框
-   * @param content 提示框内容
-   */
-  function alert(content) {
-      webix.alert({ title: "提示", text: content, });
-  }
-  /**
-   * 弹出错误框
-   * @param content 错误的提示内容
-   */
-  function error(content) {
-      webix.modalbox({ title: "错误", text: content, buttons: ["确认"], type: "confirm-error" });
-  }
-  /**
-   * 弹出确认框
-   * @param content 需要确认的文字内容
-   */
-  function confirm(content) {
-      return new Promise(function (resolve, reject) {
-          webix.confirm({
-              title: "提示",
-              text: content,
-              ok: "确认", cancel: "取消",
-          }).then(function () {
-              resolve();
-          }).catch(function () {
-              reject();
-          });
-      });
-  }
-  /**
-   * 右上角弹出错误消息
-   * @param content 消息内容
-   */
-  function msgError(content) {
-      var toastr = _.get(window, 'toastr');
-      if (!toastr) {
-          webix.message({ type: 'error', text: content, expire: -1 });
-      }
-      else {
-          toastr.error(content, '错误');
-      }
-  }
-  /**
-   * 右上角弹出成功消息
-   * @param content 消息内容
-   */
-  function msgSuccess(content) {
-      var toastr = _.get(window, 'toastr');
-      if (!toastr) {
-          webix.message({ type: 'success', text: content, expire: 2000 });
-      }
-      else {
-          toastr.success(content, '成功');
-      }
-  }
-  /**
-   * 右上角弹出通知消息
-   * @param content 消息内容
-   */
-  function msgInfo(content) {
-      var toastr = _.get(window, 'toastr');
-      if (!toastr) {
-          webix.message({ type: 'info', text: content, expire: 2000 });
-      }
-      else {
-          toastr.info(content);
-      }
-      // https://docs.webix.com/desktop__message_boxes.html
-  }
-  //# sourceMappingURL=YvanUIMessage.js.map
-
   var BaseModule = /** @class */ (function (_super) {
       __extends(BaseModule, _super);
       function BaseModule() {
@@ -8491,7 +8631,8 @@
                       if (_.has(ctl, '_validate')) {
                           var validateResult = ctl._validate(ctl.value);
                           if (validateResult) {
-                              ctl._showTootip();
+                              ctl._showTootip(validateResult);
+                              ctl._showValidateError();
                               _.set(result, key, validateResult);
                           }
                       }
@@ -9113,6 +9254,7 @@
   exports.getTS = getTS;
   exports.getTSDemo = getTSDemo;
   exports.getTSDemo2 = getTSDemo2;
+  exports.hideTooltip = hideTooltip;
   exports.initDesign = initDesign;
   exports.isDesignMode = isDesignMode;
   exports.loading = loading;
@@ -9124,6 +9266,7 @@
   exports.prompt = prompt;
   exports.render = render;
   exports.renderPlace = renderPlace;
+  exports.showTooltip = showTooltip;
   exports.snakeCase = snakeCase;
   exports.tsCodeGenerate = tsCodeGenerate;
   exports.tsCodeParse = tsCodeParse;

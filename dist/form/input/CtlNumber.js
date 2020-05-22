@@ -7,8 +7,9 @@ var CtlNumber = /** @class */ (function (_super) {
     function CtlNumber() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlNumber.create = function (vjson) {
+    CtlNumber.create = function (module, vjson) {
         var that = new CtlNumber(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlNumberDefault);
         // 基础属性先执行
         that._create(vjson, that);

@@ -8,8 +8,9 @@ var CtlText = /** @class */ (function (_super) {
     function CtlText() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlText.create = function (vjson) {
+    CtlText.create = function (module, vjson) {
         var that = new CtlText(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlTextDefault);
         // 基础属性先执行
         that._create(vjson, that);

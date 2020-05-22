@@ -1,4 +1,4 @@
-import { __extends } from "tslib";
+import { __assign, __extends } from "tslib";
 import { CtlBase } from './CtlBase';
 import { parseYvanPropChangeVJson } from './CtlUtils';
 import { YvEventDispatch } from './YvanEvent';
@@ -17,15 +17,17 @@ var CtlTab = /** @class */ (function (_super) {
         _this._menuConfig = undefined;
         return _this;
     }
-    CtlTab.create = function (vjson) {
+    CtlTab.create = function (module, vjson) {
         var that = new CtlTab(vjson);
+        that._module = module;
         if (vjson.hasOwnProperty('debugger')) {
             debugger;
         }
         var yvanProp = parseYvanPropChangeVJson(vjson, [
             'tabbarContextMenu',
             'defaultTabIndex',
-            'onTabChanged'
+            'onTabChanged',
+            'onTabClosed'
         ]);
         // 将 vjson 存至 _webixConfig
         that._webixConfig = vjson;
@@ -35,7 +37,7 @@ var CtlTab = /** @class */ (function (_super) {
         _.merge(vjson, that._webixConfig, {
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                     _.defer(function () {
                         if (yvanProp.defaultTabIndex > 0) {
                             // 默认打开的 tab 序号
@@ -56,6 +58,9 @@ var CtlTab = /** @class */ (function (_super) {
                     },
                     onChange: function (newBodyId) {
                         YvEventDispatch(that.onTabChanged, that, newBodyId);
+                    },
+                    onOptionRemove: function (newBodyId) {
+                        YvEventDispatch(that.onTabClosed, that, newBodyId);
                     }
                 }
             },
@@ -107,6 +112,9 @@ var CtlTab = /** @class */ (function (_super) {
                 id: id,
                 on: {
                     onDestruct: function () {
+                        if (vue.onClose) {
+                            vue.onClose();
+                        }
                         vue.$destroy();
                         delete vue._isLoadInvoked;
                     },
@@ -114,6 +122,8 @@ var CtlTab = /** @class */ (function (_super) {
                         if (!vue._isLoadInvoked) {
                             vue._webixId = tabId;
                             vue._isLoadInvoked = true;
+                            // 标题栏不允许被选中
+                            $(this.$view).parent().prev().addClass('ag-unselectable');
                             vue.onLoad();
                         }
                         vue.onShow();

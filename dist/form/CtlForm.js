@@ -1,4 +1,4 @@
-import { __extends } from "tslib";
+import { __assign, __extends } from "tslib";
 import { CtlBase } from '../CtlBase';
 import { parseYvanPropChangeVJson } from '../CtlUtils';
 var CtlForm = /** @class */ (function (_super) {
@@ -6,8 +6,9 @@ var CtlForm = /** @class */ (function (_super) {
     function CtlForm() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlForm.create = function (vjson) {
+    CtlForm.create = function (module, vjson) {
         var that = new CtlForm(vjson);
+        that._module = module;
         if (vjson.hasOwnProperty('debugger')) {
             debugger;
         }
@@ -20,20 +21,20 @@ var CtlForm = /** @class */ (function (_super) {
         _.merge(vjson, that._webixConfig, {
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                 },
-                onAfterLoad: function () {
-                    that.attachHandle(this);
-                },
-                onBeforeLoad: function () {
-                    that.attachHandle(this);
-                },
-                onChange: function () {
-                    that.attachHandle(this);
-                },
-                onViewShow: function () {
-                    that.attachHandle(this);
-                },
+                // onAfterLoad: function (this: any) {
+                //   that.attachHandle(this)
+                // },
+                // onBeforeLoad: function (this: any) {
+                //   that.attachHandle(this)
+                // },
+                // onChange: function (this: any) {
+                //   that.attachHandle(this)
+                // },
+                // onViewShow: function (this: any) {
+                //   that.attachHandle(this)
+                // },
                 onDestruct: function () {
                     that.removeHandle();
                 }

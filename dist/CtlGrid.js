@@ -15,10 +15,33 @@ import CtlGridCellButton from './CtlGridCellButton';
 import CtlGridFilterSet from './CtlGridFilterSet';
 import CtlGridEditorText from './CtlGridEditorText';
 import CtlGridEditorCombo from './CtlGridEditorCombo';
+import webix from 'webix';
+/** 在CtlGridPage.ts 里面有关于点击分页按钮时候设置 GridRefreshMode **/
+export var GridRefreshMode;
+(function (GridRefreshMode) {
+    GridRefreshMode[GridRefreshMode["refreshRows"] = 0] = "refreshRows";
+    GridRefreshMode[GridRefreshMode["refreshWithFilter"] = 1] = "refreshWithFilter";
+    GridRefreshMode[GridRefreshMode["refreshAndClearFilter"] = 2] = "refreshAndClearFilter";
+})(GridRefreshMode || (GridRefreshMode = {}));
+/**
+ * 扩展 grid 组件
+ */
+webix.protoUI({
+    name: 'grid',
+    $init: function (config) {
+        this._domid = webix.uid();
+        this.$view.innerHTML = "<div id='" + this._domid + "' role=\"yvGrid\" class=\"ag-theme-blue\"></div>";
+        _.extend(this.config, config);
+        if (config.on && typeof config.on.onMyRender === 'function') {
+            config.on.onMyRender.call(this);
+        }
+    }
+}, webix.ui.view);
 var CtlGrid = /** @class */ (function (_super) {
     __extends(CtlGrid, _super);
     function CtlGrid() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.refreshMode = GridRefreshMode.refreshRows;
         /**
          * 是否自动读取数据
          */
@@ -40,8 +63,9 @@ var CtlGrid = /** @class */ (function (_super) {
         _this.dataSourceBind = undefined;
         return _this;
     }
-    CtlGrid.create = function (vjson) {
+    CtlGrid.create = function (module, vjson) {
         var that = new CtlGrid(_.cloneDeep(vjson));
+        that._module = module;
         if (vjson.hasOwnProperty('debugger')) {
             debugger;
         }
@@ -55,11 +79,14 @@ var CtlGrid = /** @class */ (function (_super) {
         });
         _.merge(vjson, {
             view: 'grid',
-            template: "<div role=\"yvGrid\" class=\"ag-theme-blue\"></div>",
+            // template: `<div role="yvGrid" class="ag-theme-blue"></div>`,
             on: {
-                onAfterRender: function () {
-                    that.attachHandle(this);
-                    that._resetGrid();
+                onMyRender: function () {
+                    var _this = this;
+                    _.defer(function () {
+                        that.attachHandle(_this, __assign(__assign({}, vjson), yvanProp));
+                        that._resetGrid();
+                    });
                 },
                 onDestruct: function () {
                     if (that.gridApi) {
@@ -94,6 +121,9 @@ var CtlGrid = /** @class */ (function (_super) {
          */
         set: function (nv) {
             this.vjson.dataSource = nv;
+            // if (this._module.loadFinished) {
+            //   throw new Error('Grid 不允许动态设置数据源')
+            // }
         },
         enumerable: true,
         configurable: true
@@ -137,6 +167,48 @@ var CtlGrid = /** @class */ (function (_super) {
         return false;
     };
     /**
+     * 无感知刷新
+     */
+    CtlGrid.prototype._transactionUpdate = function (targetDataList) {
+        var _this = this;
+        if (this.refreshMode === GridRefreshMode.refreshWithFilter || this.refreshMode === GridRefreshMode.refreshAndClearFilter) {
+            /** 更改当前的刷新模式， 避免重复刷新 **/
+            this.refreshMode = GridRefreshMode.refreshRows;
+            this.setData(targetDataList);
+            if (this.dataSourceBind) {
+                this.gridApi.setFilterModel(this.dataSourceBind.lastFilterModel);
+            }
+        }
+        else {
+            /** 更改当前的刷新模式， 避免重复刷新 **/
+            this.refreshMode = GridRefreshMode.refreshRows;
+            var transaction_1 = {
+                add: [],
+                remove: [],
+                update: []
+            };
+            var i_1 = 0;
+            this.gridApi.forEachNode(function (node) {
+                if (i_1 === targetDataList.length) {
+                    //已经越位
+                    transaction_1.remove.push(node.data);
+                }
+                else {
+                    var newData = targetDataList[i_1++];
+                    node.setData(newData);
+                    transaction_1.update.push(node.data);
+                }
+            });
+            for (; i_1 < targetDataList.length; i_1++) {
+                transaction_1.add.push(targetDataList[i_1]);
+            }
+            this.gridApi.updateRowData(transaction_1);
+        }
+        if (this.paginationDefaultSelectRow && this.paginationDefaultSelectRow >= 0 && targetDataList && targetDataList.length > 0) {
+            this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+        }
+    };
+    /**
      * 获取全部数据
      */
     CtlGrid.prototype.getData = function () {
@@ -161,8 +233,52 @@ var CtlGrid = /** @class */ (function (_super) {
      * option:
      *   clearFilter=true 是否清空筛选
      */
-    CtlGrid.prototype.reload = function (option) {
+    // reload(option?: any) {
+    //   this.loading = true
+    //
+    //   //无感刷新之前，清空所有状态
+    //   this._clearCache()
+    //
+    //   //需要重新请求 rowCount(总数据行)
+    //   if (this.dataSourceBind) {
+    //     this.dataSourceBind.clearRowCount()
+    //   }
+    //
+    //   if (this.entityName) {
+    //     _.set(this.getModule(), this.entityName + '.selectedRow', undefined)
+    //   }
+    //
+    //   /** 有clearFilter 参数的时候 一定刷新数据 **/
+    //   if (option && option.clearFilter === true) {
+    //     this.pageAbleDataRefreshMode = "refreshAndReset"
+    //     this.gridApi.setFilterModel(null)
+    //     if (this.dataSourceBind) {
+    //       /** 表头筛选数据没有变化也要重新加载数据 **/
+    //       if (_.isEqual(this.gridApi.getFilterModel(), this.dataSourceBind.lastFilterModel)) {
+    //         this._filterChanged();
+    //       }
+    //     }
+    //   } else {
+    //     if (this.pagination) {
+    //       this.pageAbleDataRefreshMode = "refreshWithFilter"
+    //       this.gridPage.refreshGrid()
+    //     } else {
+    //       this.pageAbleDataRefreshMode = "refreshRows"
+    //       this.gridApi.refreshInfiniteCache()
+    //     }
+    //   }
+    // }
+    /**
+     * 无感刷新
+     * 清空缓存，从后台重新拉取数据，表格上临时修改的内容都会被清空
+     *
+     * option:
+     *   clearFilter=true 是否清空筛选
+     */
+    CtlGrid.prototype.reload = function (refreshMode) {
+        if (refreshMode === void 0) { refreshMode = GridRefreshMode.refreshRows; }
         this.loading = true;
+        this.refreshMode = refreshMode;
         //无感刷新之前，清空所有状态
         this._clearCache();
         //需要重新请求 rowCount(总数据行)
@@ -172,8 +288,15 @@ var CtlGrid = /** @class */ (function (_super) {
         if (this.entityName) {
             _.set(this.getModule(), this.entityName + '.selectedRow', undefined);
         }
-        if (option && option.clearFilter === true) {
+        /** 有clearFilter 参数的时候 一定刷新数据 **/
+        if (refreshMode === GridRefreshMode.refreshAndClearFilter) {
             this.gridApi.setFilterModel(null);
+            if (this.dataSourceBind) {
+                /** 表头筛选数据没有变化也要重新加载数据 **/
+                if (_.isEqual(this.gridApi.getFilterModel(), this.dataSourceBind.lastFilterModel)) {
+                    this._filterChanged();
+                }
+            }
         }
         else {
             if (this.pagination) {
@@ -250,9 +373,13 @@ var CtlGrid = /** @class */ (function (_super) {
                 return;
             }
             if (newValue) {
+                // 盖着
                 this.gridApi.showLoadingOverlay();
+                $($(this._webix.$view).find('.ag-paging-panel')[0]).append("<div class=\"maskBox\"></div>");
             }
             else {
+                // 放开
+                $(this._webix.$view).find('.maskBox').remove();
                 this.gridApi.hideOverlay();
             }
         },
@@ -376,6 +503,7 @@ var CtlGrid = /** @class */ (function (_super) {
             onModelUpdated: this._modelUpdated.bind(this),
             onCellFocused: this._cellFocused.bind(this),
             onCellClicked: this._cellClicked.bind(this),
+            onFilterChanged: this._filterChanged.bind(this),
             enterMovesDown: false,
             enterMovesDownAfterEdit: false,
             components: {
@@ -405,6 +533,17 @@ var CtlGrid = /** @class */ (function (_super) {
             });
         }
         return gridOptions;
+    };
+    CtlGrid.prototype._filterChanged = function () {
+        if (this.dataSourceBind) {
+            if ((!_.isEqual(this.gridApi.getFilterModel(), this.dataSourceBind.lastFilterModel)) || this.refreshMode == GridRefreshMode.refreshAndClearFilter) {
+                var reload = _.get(this.dataSourceBind, 'reload');
+                if (typeof reload === 'function') {
+                    reload.call(this.dataSourceBind);
+                }
+            }
+            console.log('_filterChanged', this.gridApi.getFilterModel());
+        }
     };
     CtlGrid.prototype._gridReady = function () {
         this.isGridReadReady = true;
@@ -524,11 +663,24 @@ var CtlGrid = /** @class */ (function (_super) {
      * 重新绑定数据源
      */
     CtlGrid.prototype._rebindDataSource = function () {
-        if (this.dataSourceBind) {
-            this.dataSourceBind.destory();
-            this.dataSourceBind = undefined;
+        var _this = this;
+        var innerMethod = function () {
+            if (_this.dataSourceBind) {
+                _this.dataSourceBind.destory();
+                _this.dataSourceBind = undefined;
+            }
+            if (_this._webix && _this._module) {
+                _this.dataSourceBind = new YvanDataSourceGrid(_this, _this.dataSource);
+            }
+        };
+        if (!this._module.loadFinished) {
+            // onload 函数还没有执行（模块还没加载完）, 延迟调用 rebind
+            _.defer(innerMethod);
         }
-        this.dataSourceBind = new YvanDataSourceGrid(this, this.dataSource);
+        else {
+            // 否则实时调用 rebind
+            innerMethod();
+        }
     };
     /**
      * 每次 AJAX 请求完毕之后会回调这里
@@ -1053,8 +1205,8 @@ var CtlGrid = /** @class */ (function (_super) {
                         filter: 'CtlGridFilterSet',
                         //suppressMenu: true,
                         filterParams: {
-                            data: datas
-                        }
+                            data: datas,
+                        },
                     });
                 }
                 else if (easyuiCol.editMode === 'number') {
@@ -1065,20 +1217,20 @@ var CtlGrid = /** @class */ (function (_super) {
                         filterParams: {
                             applyButton: true,
                             clearButton: true,
-                            suppressAndOrCondition: true
-                            //filterOptions: [
-                            //    'equals',
-                            //    'notEqual',
-                            //    'lessThan',
-                            //    'greaterThan',
-                            //    'lessThanOrEqual',
-                            //    'greaterThanOrEqual',
-                            //]
+                            suppressAndOrCondition: true,
+                            filterOptions: [
+                                // 服务器已经设置条件，浏览器不进行实际比对
+                                { displayKey: '=', displayName: '等于', test: function () { return true; } },
+                                { displayKey: '<>', displayName: '不等于', test: function () { return true; } },
+                                { displayKey: '<', displayName: '小于', test: function () { return true; } },
+                                { displayKey: '>', displayName: '大于', test: function () { return true; } },
+                                { displayKey: '<=', displayName: '小于等于', test: function () { return true; } },
+                                { displayKey: '>=', displayName: '大于等于', test: function () { return true; } },
+                            ]
                         }
                     });
                 }
-                else if (easyuiCol.editMode === 'date' ||
-                    easyuiCol.editMode === 'datetime') {
+                else if (easyuiCol.editMode === 'date' || easyuiCol.editMode === 'datetime') {
                     //日期筛选
                     _.assign(col, {
                         filter: 'agDateColumnFilter',
@@ -1087,24 +1239,10 @@ var CtlGrid = /** @class */ (function (_super) {
                             clearButton: true,
                             filterOptions: ['inRange'],
                             suppressAndOrCondition: true,
-                            comparator: function (filterLocalDateAtMidnight, cellValue) {
-                                var dateAsString = cellValue;
-                                if (dateAsString == null)
-                                    return 0;
-                                // In the example application, dates are stored as dd/mm/yyyy
-                                // We create a Date object for comparison against the filter date
-                                var dateParts = dateAsString.split('/');
-                                var day = Number(dateParts[2]);
-                                var month = Number(dateParts[1]) - 1;
-                                var year = Number(dateParts[0]);
-                                var cellDate = new Date(day, month, year);
-                                // Now that both parameters are Date objects, we can compare
-                                if (cellDate < filterLocalDateAtMidnight) {
-                                    return -1;
-                                }
-                                if (cellDate > filterLocalDateAtMidnight) {
-                                    return 1;
-                                }
+                            inRangeInclusive: true,
+                            comparator: function (v1, v2) {
+                                // 服务器已经设置条件，浏览器不进行实际比对
+                                // 0 的情况，一定要包含 inRangeInclusive 条件
                                 return 0;
                             }
                         }
@@ -1119,20 +1257,9 @@ var CtlGrid = /** @class */ (function (_super) {
                             clearButton: true,
                             filterOptions: ['startsWith', 'equals', 'contains'],
                             suppressAndOrCondition: true,
-                            textFormatter: function (r) {
-                                if (r == null)
-                                    return null;
-                                r = r.replace(new RegExp('[àáâãäå]', 'g'), 'a');
-                                r = r.replace(new RegExp('æ', 'g'), 'ae');
-                                r = r.replace(new RegExp('ç', 'g'), 'c');
-                                r = r.replace(new RegExp('[èéêë]', 'g'), 'e');
-                                r = r.replace(new RegExp('[ìíîï]', 'g'), 'i');
-                                r = r.replace(new RegExp('ñ', 'g'), 'n');
-                                r = r.replace(new RegExp('[òóôõøö]', 'g'), 'o');
-                                r = r.replace(new RegExp('œ', 'g'), 'oe');
-                                r = r.replace(new RegExp('[ùúûü]', 'g'), 'u');
-                                r = r.replace(new RegExp('[ýÿ]', 'g'), 'y');
-                                return r;
+                            textCustomComparator: function () {
+                                // 服务器已经设置条件，浏览器不进行实际比对
+                                return true;
                             }
                         }
                     });

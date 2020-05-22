@@ -12,6 +12,9 @@ export var CtlTreeDefault = {
     showLeftIcon: true,
     showIcon: true,
 };
+export var CtlSidebarDefault = {};
+export var CtlXtermDefault = {};
+export var CtlConsoleLogDefault = {};
 export var CtlCodeMirrorDefault = {
     mode: 'sql',
     indentWithTabs: true,

@@ -130,8 +130,9 @@ var CtlCodeMirror = /** @class */ (function (_super) {
     function CtlCodeMirror() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlCodeMirror.create = function (vjson) {
+    CtlCodeMirror.create = function (module, vjson) {
         var that = new CtlCodeMirror(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlCodeMirrorDefault);
         var yvanProp = parseYvanPropChangeVJson(vjson, ['value']);
         // 将 vjson 存至 _webixConfig
@@ -142,7 +143,7 @@ var CtlCodeMirror = /** @class */ (function (_super) {
         _.merge(vjson, that._webixConfig, {
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                 },
                 onAfterDelete: function () {
                     that.removeHandle();
@@ -162,6 +163,77 @@ var CtlCodeMirror = /** @class */ (function (_super) {
      */
     CtlCodeMirror.prototype.redo = function () {
         this._webix.getEditor().redo();
+    };
+    /**
+     * 添加内容
+     */
+    CtlCodeMirror.prototype.append = function (msg) {
+        var editor = this._webix.getEditor();
+        var CodeMirror = _.get(window, 'CodeMirror');
+        editor.replaceRange(msg, CodeMirror.Pos(editor.lastLine()));
+    };
+    /**
+     * 移动光标到文档开始处
+     */
+    CtlCodeMirror.prototype.goDocStart = function () {
+        this._webix.getEditor().execCommand('goDocStart');
+    };
+    /**
+     * 移动光标到文档结束处
+     */
+    CtlCodeMirror.prototype.goDocEnd = function () {
+        this.execCommand('goDocEnd');
+    };
+    /**
+     * 移动光标到行开始处
+     */
+    CtlCodeMirror.prototype.goLineStart = function () {
+        this.execCommand('goLineStart');
+    };
+    /**
+     * 移动光标到行结束处
+     */
+    CtlCodeMirror.prototype.goLineEnd = function () {
+        this.execCommand('goLineEnd');
+    };
+    /**
+     * 移动光标到上一行
+     */
+    CtlCodeMirror.prototype.goLineUp = function () {
+        this.execCommand('goLineUp');
+    };
+    /**
+     * 移动光标到下一行
+     */
+    CtlCodeMirror.prototype.goLineDown = function () {
+        this.execCommand('goLineDown');
+    };
+    /**
+     * 获取对应行的内容
+     */
+    CtlCodeMirror.prototype.getLine = function (n) {
+        return this._webix.getEditor().getLine(n);
+    };
+    /**
+     * 设置scroll到position位置
+     */
+    CtlCodeMirror.prototype.scrollTo = function (x, y) {
+        this._webix.getEditor().scrollTo(x, y);
+    };
+    CtlCodeMirror.prototype.clear = function () {
+        this.value = '';
+    };
+    /**
+     * 执行命令
+     */
+    CtlCodeMirror.prototype.execCommand = function (cmd) {
+        return this._webix.getEditor().execCommand(cmd);
+    };
+    /**
+     * 刷新编辑器
+     */
+    CtlCodeMirror.prototype.refresh = function () {
+        this._webix.getEditor().refresh();
     };
     Object.defineProperty(CtlCodeMirror.prototype, "value", {
         /**
