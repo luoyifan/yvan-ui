@@ -112,7 +112,7 @@ body,
   padding:0!important;
 }
 .mainLeft .webix_tree .webix_tree_item{
-  padding:8px;
+  /* padding:8px; */
   cursor: pointer;
   transition: all .3s ease;
 }
@@ -125,7 +125,7 @@ body,
   color:#1890ff
 }
 .mainLeft .webix_tree .webix_tree_branch_2 .webix_tree_item{
-  padding-left:16px
+  /* padding-left:16px */
 }
 .webix_tree_leaves .webix_tree_leaves{
   margin:0px!important;
@@ -143,6 +143,18 @@ body,
 }
 .mainLeft .webix_tree::-webkit-scrollbar-track {
   background-color: #f7f7f7
+}
+.mainLeft div[aria-level='1']{
+  padding:8px
+}
+.mainLeft div[aria-level='2']{
+  padding:8px 8px 8px 20px
+}
+.mainLeft div[aria-level='3']{
+  padding:8px 8px 8px 32px
+}
+.mainLeft div[aria-level='4']{
+  padding:8px 8px 8px 44px
 }
 .maintab{
   margin-left:3px!important
