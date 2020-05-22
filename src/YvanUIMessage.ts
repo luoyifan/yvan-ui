@@ -129,6 +129,8 @@ export function showTooltip(obj: any, message: string): void {
   const tooptipId = obj.id + '_tooltip';
 
   if ($body.find(`#${tooptipId}`).length > 0) {
+    const ddiv = $body.find(`#${tooptipId}`)[0].children[1]
+    _.set(ddiv, 'innerText', message);
     return;
   }
 

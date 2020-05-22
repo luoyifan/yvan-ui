@@ -73,30 +73,28 @@ export abstract class BaseModule<M, Refs, INP> extends Vue implements Module<M, 
       const ctlMappings: any = _.get(this, '_entityCtlMapping.' + entityName);
 
       const result = {};
-      if (_.get(ctlMappings, '_required') === true && !ctlMappings.value) {
-        ctlMappings._showTootip("该项为必填项")
-        ctlMappings._showValidateError()
-        _.set(result, ctlMappings.entityName, "该项为必填项")
-      }
-      else if (_.has(ctlMappings, '_validate')) {
-        const validateResult = ctlMappings._validate(ctlMappings.value);
+      if (_.get(ctlMappings, '_required') === true || _.has(ctlMappings, '_validate')) {
+        const validateResult = ctlMappings._resultToShowOrHide();
         if (validateResult) {
+          ctlMappings._showTootip(validateResult)
+          ctlMappings._showValidateError()
+          ctlMappings.focus()
           _.set(result, ctlMappings.entityName, validateResult)
         }
       }
       else {
+        let isShow = false;
         _.forEach(ctlMappings, (ctl, key) => {
-          if (_.get(ctl, '_required') === true && !ctl.value) {
-            ctl._showTootip("该项为必填项")
-            ctl._showValidateError()
-            _.set(result, key, "该项为必填项")
-          }
-          else if (_.has(ctl, '_validate')) {
-            const validateResult = ctl._validate(ctl.value);
+          if (_.get(ctl, '_required') === true || _.has(ctl, '_validate')) {
+            const validateResult = ctl._resultToShowOrHide();
             if (validateResult) {
-              ctl._showTootip(validateResult)
               ctl._showValidateError()
               _.set(result, key, validateResult)
+              if (!isShow) {
+                isShow = true
+                ctl._showTootip(validateResult)
+                ctl.focus()
+              }
             }
           }
         });
