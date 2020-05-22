@@ -81,7 +81,7 @@ export default class CtlGridFilterSet {
             } else {
                 //没有勾选，要加上他
                 const af = _.find(that.data, item => _.toString(item.id) === cv);
-                that.checkedData.push({...af})
+                that.checkedData.push({ ...af })
             }
 
             //刷新状态
@@ -145,7 +145,8 @@ export default class CtlGridFilterSet {
     // with attributes node (the rowNode the grid creates that wraps the data) and data (the data
     // object that you provided to the grid for that row).
     doesFilterPass() {
-        // console.log('doesFilterPass')
+        // 服务器已经设置条件，浏览器不进行实际比对
+        return true
     }
 
     // Gets the filter state. If filter is not active, then should return null/undefined.

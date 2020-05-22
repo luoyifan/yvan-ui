@@ -11,7 +11,7 @@ export default class CtlGridFilterSet {
     refreshState(): void;
     getGui(): any;
     isFilterActive(): boolean;
-    doesFilterPass(): void;
+    doesFilterPass(): boolean;
     getModel(): {
         filterType: string;
         filter: any[];

@@ -316,6 +316,41 @@ export class CtlGrid extends CtlBase<CtlGrid> {
     return false
   }
 
+
+  /**
+   * 无感知刷新
+   */
+  _transactionUpdate(targetDataList: any[]) {
+    // if (targetDataList.length <= 0) {
+    //   //无数据，不用做更新
+    //   this.gridApi.setRowData([])
+    //   return
+    // }
+    // 不能用更新，这里会出 bug
+
+    const transaction: any = {
+      add: [],
+      remove: [],
+      update: []
+    }
+    let i = 0
+    this.gridApi.forEachNode((node: any) => {
+      if (i === targetDataList.length) {
+        //已经越位
+        transaction.remove.push(node.data)
+      } else {
+        const newData = targetDataList[i++]
+        node.setData(newData)
+        transaction.update.push(node.data)
+      }
+    })
+    for (; i < targetDataList.length; i++) {
+      transaction.add.push(targetDataList[i])
+    }
+
+    this.gridApi.updateRowData(transaction)
+  }
+
   /**
    * 获取全部数据
    */
@@ -581,6 +616,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       onModelUpdated: this._modelUpdated.bind(this),
       onCellFocused: this._cellFocused.bind(this),
       onCellClicked: this._cellClicked.bind(this),
+      onFilterChanged: this._filterChanged.bind(this),
       enterMovesDown: false,
       enterMovesDownAfterEdit: false,
 
@@ -614,6 +650,14 @@ export class CtlGrid extends CtlBase<CtlGrid> {
     }
 
     return gridOptions
+  }
+
+  private _filterChanged() {
+    console.log('_filterChanged', this.gridApi.getFilterModel());
+    const reload = _.get(this.dataSourceBind, 'reload')
+    if (typeof reload === 'function') {
+      reload.call(this.dataSourceBind);
+    }
   }
 
   private _gridReady() {
@@ -1343,32 +1387,31 @@ export class CtlGrid extends CtlBase<CtlGrid> {
             filter: 'CtlGridFilterSet',
             //suppressMenu: true,
             filterParams: {
-              data: datas
-            }
+              data: datas,
+            },
           })
         } else if (easyuiCol.editMode === 'number') {
           //数字过滤
           _.assign(col, {
-            filter: 'agNumberColumnFilter',
+            filter: 'agNumberColumnFilter', //NumberFilter = 26850
             //suppressMenu: true,
             filterParams: {
               applyButton: true,
               clearButton: true,
-              suppressAndOrCondition: true
-              //filterOptions: [
-              //    'equals',
-              //    'notEqual',
-              //    'lessThan',
-              //    'greaterThan',
-              //    'lessThanOrEqual',
-              //    'greaterThanOrEqual',
-              //]
+              suppressAndOrCondition: true,
+              filterOptions: [
+                // 服务器已经设置条件，浏览器不进行实际比对
+                { displayKey: '=', displayName: '等于', test() { return true; } },
+                { displayKey: '<>', displayName: '不等于', test() { return true; } },
+                { displayKey: '<', displayName: '小于', test() { return true; } },
+                { displayKey: '>', displayName: '大于', test() { return true; } },
+                { displayKey: '<=', displayName: '小于等于', test() { return true; } },
+                { displayKey: '>=', displayName: '大于等于', test() { return true; } },
+              ]
             }
           })
-        } else if (
-          easyuiCol.editMode === 'date' ||
-          easyuiCol.editMode === 'datetime'
-        ) {
+
+        } else if (easyuiCol.editMode === 'date' || easyuiCol.editMode === 'datetime') {
           //日期筛选
           _.assign(col, {
             filter: 'agDateColumnFilter',
@@ -1377,28 +1420,10 @@ export class CtlGrid extends CtlBase<CtlGrid> {
               clearButton: true,
               filterOptions: ['inRange'],
               suppressAndOrCondition: true,
-              comparator: function (
-                filterLocalDateAtMidnight: any,
-                cellValue: any
-              ) {
-                const dateAsString = cellValue
-                if (dateAsString == null) return 0
-
-                // In the example application, dates are stored as dd/mm/yyyy
-                // We create a Date object for comparison against the filter date
-                const dateParts = dateAsString.split('/')
-                const day = Number(dateParts[2])
-                const month = Number(dateParts[1]) - 1
-                const year = Number(dateParts[0])
-                const cellDate = new Date(day, month, year)
-
-                // Now that both parameters are Date objects, we can compare
-                if (cellDate < filterLocalDateAtMidnight) {
-                  return -1
-                }
-                if (cellDate > filterLocalDateAtMidnight) {
-                  return 1
-                }
+              inRangeInclusive: true,
+              comparator(v1: any, v2: any) {
+                // 服务器已经设置条件，浏览器不进行实际比对
+                // 0 的情况，一定要包含 inRangeInclusive 条件
                 return 0
               }
             }
@@ -1412,19 +1437,9 @@ export class CtlGrid extends CtlBase<CtlGrid> {
               clearButton: true,
               filterOptions: ['startsWith', 'equals', 'contains'],
               suppressAndOrCondition: true,
-              textFormatter: function (r: any) {
-                if (r == null) return null
-                r = r.replace(new RegExp('[àáâãäå]', 'g'), 'a')
-                r = r.replace(new RegExp('æ', 'g'), 'ae')
-                r = r.replace(new RegExp('ç', 'g'), 'c')
-                r = r.replace(new RegExp('[èéêë]', 'g'), 'e')
-                r = r.replace(new RegExp('[ìíîï]', 'g'), 'i')
-                r = r.replace(new RegExp('ñ', 'g'), 'n')
-                r = r.replace(new RegExp('[òóôõøö]', 'g'), 'o')
-                r = r.replace(new RegExp('œ', 'g'), 'oe')
-                r = r.replace(new RegExp('[ùúûü]', 'g'), 'u')
-                r = r.replace(new RegExp('[ýÿ]', 'g'), 'y')
-                return r
+              textCustomComparator() {
+                // 服务器已经设置条件，浏览器不进行实际比对
+                return true;
               }
             }
           })
