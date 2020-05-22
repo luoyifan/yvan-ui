@@ -73,15 +73,25 @@ export abstract class BaseModule<M, Refs, INP> extends Vue implements Module<M, 
       const ctlMappings: any = _.get(this, '_entityCtlMapping.' + entityName);
 
       const result = {};
-      if (_.has(ctlMappings, '_validate')) {
+      if (_.get(ctlMappings, '_required') === true && !ctlMappings.value) {
+        ctlMappings._showTootip("该项为必填项")
+        ctlMappings._showValidateError()
+        _.set(result, ctlMappings.entityName, "该项为必填项")
+      }
+      else if (_.has(ctlMappings, '_validate')) {
         const validateResult = ctlMappings._validate(ctlMappings.value);
         if (validateResult) {
-          _.set(result, ctlMappings.vjson.label, validateResult)
+          _.set(result, ctlMappings.entityName, validateResult)
         }
       }
       else {
         _.forEach(ctlMappings, (ctl, key) => {
-          if (_.has(ctl, '_validate')) {
+          if (_.get(ctl, '_required') === true && !ctl.value) {
+            ctl._showTootip("该项为必填项")
+            ctl._showValidateError()
+            _.set(result, key, "该项为必填项")
+          }
+          else if (_.has(ctl, '_validate')) {
             const validateResult = ctl._validate(ctl.value);
             if (validateResult) {
               ctl._showTootip(validateResult)

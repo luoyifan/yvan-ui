@@ -362,6 +362,7 @@ export class CtlInput<M> extends CtlBase<M> {
    * 必填
    */
   set required(nv: boolean) {
+    this._required = nv
     if (!this._webix) {
       this._webixConfig.required = nv
       return
@@ -483,6 +484,8 @@ export class CtlInput<M> extends CtlBase<M> {
   _validateResult: boolean = true
 
   _validate: any
+
+  _required: boolean | undefined
 
   _id: any
 
