@@ -114,7 +114,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
   gridApi: any
   columnApi: any
   refreshMode: GridRefreshMode = GridRefreshMode.refreshRows;
-  private paginationDefaultSelectRow: number|undefined;
+  private paginationDefaultSelectRow: number | undefined;
   get webix() {
     return this._webix
   }
@@ -362,7 +362,7 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       }
       this.gridApi.updateRowData(transaction)
     }
-    if (this.paginationDefaultSelectRow && this.paginationDefaultSelectRow >=0 && targetDataList && targetDataList.length > 0) {
+    if (this.paginationDefaultSelectRow && this.paginationDefaultSelectRow >= 0 && targetDataList && targetDataList.length > 0) {
       this.selectRow(node => node.rowIndex === this.paginationDefaultSelectRow);
     }
   }
@@ -683,8 +683,10 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       onCellFocused: this._cellFocused.bind(this),
       onCellClicked: this._cellClicked.bind(this),
       onFilterChanged: this._filterChanged.bind(this),
+      onSortChanged: this._sortChanged.bind(this),
       enterMovesDown: false,
       enterMovesDownAfterEdit: false,
+      accentedSort: true,
 
       components: {
         CtlGridCellButton: CtlGridCellButton,
@@ -726,7 +728,19 @@ export class CtlGrid extends CtlBase<CtlGrid> {
           reload.call(this.dataSourceBind);
         }
       }
-      console.log('_filterChanged', this.gridApi.getFilterModel());
+      // console.log('_filterChanged', this.gridApi.getFilterModel());
+    }
+  }
+
+  private _sortChanged() {
+    if (this.dataSourceBind) {
+      if ((!_.isEqual(this.gridApi.getSortModel(), this.dataSourceBind.lastSortModel)) || this.refreshMode == GridRefreshMode.refreshAndClearFilter) {
+        const reload = _.get(this.dataSourceBind, 'reload')
+        if (typeof reload === 'function') {
+          reload.call(this.dataSourceBind);
+        }
+      }
+      // console.log('_sortChanged', this.gridApi.getSortModel());
     }
   }
 
@@ -1214,6 +1228,13 @@ export class CtlGrid extends CtlBase<CtlGrid> {
         sortable: easyuiCol.sortable,
         //unSortIcon: true,
         hide: easyuiCol.hidden
+      }
+
+      if (easyuiCol.sortable) {
+        // 走服务端排序，客户端排序可以让其无效
+        col.comparator = () => {
+          return 0;
+        }
       }
 
       if (typeof easyuiCol.width !== 'undefined') col.width = easyuiCol.width

@@ -4391,12 +4391,14 @@
                   //从来没有统计过 rowCount(记录数)
                   needCount = true;
                   that.lastFilterModel = _.cloneDeep(params.filterModel);
+                  that.lastSortModel = _.cloneDeep(params.sortModel);
               }
               else {
                   if (!_.isEqual(that.lastFilterModel, params.filterModel)) {
                       //深度对比，如果 filter 模型更改了，需要重新统计 rowCount(记录数)
                       needCount = true;
                       that.lastFilterModel = _.cloneDeep(params.filterModel);
+                      that.lastSortModel = _.cloneDeep(params.sortModel);
                   }
               }
               // 获取所有参数
@@ -4409,7 +4411,7 @@
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
                       needCount: needCount,
-                      orderByModel: params.sortModel,
+                      sortModel: params.sortModel,
                       filterModel: params.filterModel,
                       sqlId: option.sqlId
                   });
@@ -4421,7 +4423,7 @@
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
                       needCount: needCount,
-                      orderByModel: params.sortModel,
+                      sortModel: params.sortModel,
                       filterModel: params.filterModel,
                   });
               }
@@ -4435,7 +4437,7 @@
                           limit: params.endRow - params.startRow,
                           limitOffset: params.startRow,
                           needCount: needCount,
-                          orderByModel: params.sortModel,
+                          sortModel: params.sortModel,
                           filterModel: params.filterModel,
                       }
                   });
@@ -4577,6 +4579,7 @@
                       params.startRow = (currentPage - 1) * pageSize;
                       params.endRow = currentPage * pageSize;
                       params.filterModel = that.ctl.gridApi.getFilterModel();
+                      params.sortModel = that.ctl.gridApi.getSortModel();
                       if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
                           that.rowCount = 0;
                           params.successCallback([], that.rowCount);
@@ -5778,8 +5781,10 @@
               onCellFocused: this._cellFocused.bind(this),
               onCellClicked: this._cellClicked.bind(this),
               onFilterChanged: this._filterChanged.bind(this),
+              onSortChanged: this._sortChanged.bind(this),
               enterMovesDown: false,
               enterMovesDownAfterEdit: false,
+              accentedSort: true,
               components: {
                   CtlGridCellButton: CtlGridCellButton,
                   CtlGridCellCheckbox: CtlGridCellCheckbox,
@@ -5816,7 +5821,18 @@
                       reload.call(this.dataSourceBind);
                   }
               }
-              console.log('_filterChanged', this.gridApi.getFilterModel());
+              // console.log('_filterChanged', this.gridApi.getFilterModel());
+          }
+      };
+      CtlGrid.prototype._sortChanged = function () {
+          if (this.dataSourceBind) {
+              if ((!_.isEqual(this.gridApi.getSortModel(), this.dataSourceBind.lastSortModel)) || this.refreshMode == exports.GridRefreshMode.refreshAndClearFilter) {
+                  var reload = _.get(this.dataSourceBind, 'reload');
+                  if (typeof reload === 'function') {
+                      reload.call(this.dataSourceBind);
+                  }
+              }
+              // console.log('_sortChanged', this.gridApi.getSortModel());
           }
       };
       CtlGrid.prototype._gridReady = function () {
@@ -6248,6 +6264,12 @@
                   //unSortIcon: true,
                   hide: easyuiCol.hidden
               };
+              if (easyuiCol.sortable) {
+                  // 走服务端排序，客户端排序可以让其无效
+                  col.comparator = function () {
+                      return 0;
+                  };
+              }
               if (typeof easyuiCol.width !== 'undefined')
                   col.width = easyuiCol.width;
               if (typeof easyuiCol.minwidth !== 'undefined')
@@ -8435,7 +8457,7 @@
                       data: {
                           db: _this.defaultDb,
                           filterModel: option.filterModel,
-                          orderByModel: option.orderByModel,
+                          sortModel: option.sortModel,
                           limit: option.limit,
                           limitOffset: option.limitOffset,
                           needCount: option.needCount,

@@ -4,7 +4,7 @@ import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSource
 import { isDesignMode } from './DesignHelper'
 import { brokerInvoke } from './Service'
 import { Db } from './YvanUIDb'
-import {GridRefreshMode} from "./CtlGrid";
+import { GridRefreshMode } from "./CtlGrid";
 
 export class YvanDataSourceGrid {
   private option: GridDataSource
@@ -16,6 +16,7 @@ export class YvanDataSourceGrid {
   private reload: undefined | (() => void)
   private rowCount: number | undefined
   public lastFilterModel: any
+  public lastSortModel: any
 
   serverQuery = _.debounce((option: GridDataSourceSql | GridDataSourceServer | GridDataSourceAjax, paramFunction: undefined | (() => any), params: any) => {
     const that = this
@@ -27,11 +28,13 @@ export class YvanDataSourceGrid {
       //从来没有统计过 rowCount(记录数)
       needCount = true
       that.lastFilterModel = _.cloneDeep(params.filterModel)
+      that.lastSortModel = _.cloneDeep(params.sortModel)
     } else {
       if (!_.isEqual(that.lastFilterModel, params.filterModel)) {
         //深度对比，如果 filter 模型更改了，需要重新统计 rowCount(记录数)
         needCount = true
         that.lastFilterModel = _.cloneDeep(params.filterModel)
+        that.lastSortModel = _.cloneDeep(params.sortModel)
       }
     }
 
@@ -48,7 +51,7 @@ export class YvanDataSourceGrid {
           limit: params.endRow - params.startRow,
           limitOffset: params.startRow,
           needCount,
-          orderByModel: params.sortModel,
+          sortModel: params.sortModel,
           filterModel: params.filterModel,
           sqlId: option.sqlId
         })
@@ -60,7 +63,7 @@ export class YvanDataSourceGrid {
         limit: params.endRow - params.startRow,
         limitOffset: params.startRow,
         needCount,
-        orderByModel: params.sortModel,
+        sortModel: params.sortModel,
         filterModel: params.filterModel,
       })
 
@@ -74,7 +77,7 @@ export class YvanDataSourceGrid {
           limit: params.endRow - params.startRow,
           limitOffset: params.startRow,
           needCount,
-          orderByModel: params.sortModel,
+          sortModel: params.sortModel,
           filterModel: params.filterModel,
         }
       });
@@ -137,9 +140,9 @@ export class YvanDataSourceGrid {
             //   that.ctl.setData(data)
 
             // } else {
-              // 不能直接用 setData, 会造成 filter 被置空
-              // 使用 _transactionUpdate 也有 bug ，如果查询条件被改变，也不会分页回顶端
-              that.ctl._transactionUpdate(data)
+            // 不能直接用 setData, 会造成 filter 被置空
+            // 使用 _transactionUpdate 也有 bug ，如果查询条件被改变，也不会分页回顶端
+            that.ctl._transactionUpdate(data)
             // }
             // that.ctl.setData(data)
             that.ctl.gridPage.itemCount = rowCount
@@ -151,6 +154,7 @@ export class YvanDataSourceGrid {
           params.startRow = (currentPage - 1) * pageSize
           params.endRow = currentPage * pageSize
           params.filterModel = that.ctl.gridApi.getFilterModel()
+          params.sortModel = that.ctl.gridApi.getSortModel()
 
           if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
             that.rowCount = 0
@@ -252,10 +256,7 @@ export class YvanDataSourceGrid {
       if (that.ctl.pagination) {
         /** 分页模式 **/
 
-        that.ctl.gridPage.getPageData = (
-          currentPage: number,
-          pageSize: number
-        ) => {
+        that.ctl.gridPage.getPageData = (currentPage: number, pageSize: number) => {
           let d = []
           const startRow = (currentPage - 1) * pageSize
           let endRow = currentPage * pageSize
