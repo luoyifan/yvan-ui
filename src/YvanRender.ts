@@ -550,9 +550,9 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
           vjson.body = {
             template: 'dialog 没有 body'
           }
-        }else{
-          if(!_.has(vjson.body, 'padding')){
-            vjson.body.padding=10
+        } else {
+          if (!_.has(vjson.body, 'padding')) {
+            vjson.body.padding = 10
           }
         }
         // 与 yvan 组件进行交换，使 vjson 能被 webix 使用
@@ -584,6 +584,7 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
                   }
                   dialog.resize();
                   this.refresh();
+                  $(this.$view).closest('.webix_view.webix_window').find('.webix_win_head .webix_win_title .webix_el_box').html(dialog.config.title);
                 }
               },
               {
