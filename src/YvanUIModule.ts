@@ -111,10 +111,12 @@ export abstract class BaseModule<M, Refs, INP> extends Vue implements Module<M, 
    * 获取或设置 window 标题
    */
   set title(v: string) {
-    if (this._webixId) {
+    if (this._webixId && _.has(this, '_titleLabel')) {
       // webix 对象已经出现
       this._webixId.define('title', v)
-      $(this._webixId.$view).find('.webix_win_head .webix_win_title .webix_el_box').html(v);
+      const _titleLabel = _.get(this, '_titleLabel');
+      _titleLabel.define('label', v)
+      _titleLabel.refresh()
       return
     }
     console.error('无法设置 title')

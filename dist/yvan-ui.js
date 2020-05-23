@@ -8237,7 +8237,14 @@
                       resize: vjson.resize === undefined ? true : vjson.resize,
                       head: {
                           view: "toolbar", margin: -4, cols: [
-                              { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
+                              {
+                                  view: "label", label: vjson.title, css: 'webix_header webix_win_title',
+                                  on: {
+                                      onAfterRender: function () {
+                                          module._titleLabel = this;
+                                      }
+                                  }
+                              },
                               {
                                   view: "icon", icon: "fa fa-expand", click: function () {
                                       dialog.config.fullscreen = !dialog.config.fullscreen;
@@ -8255,7 +8262,6 @@
                                       }
                                       dialog.resize();
                                       this.refresh();
-                                      $(this.$view).closest('.webix_view.webix_window').find('.webix_win_head .webix_win_title .webix_el_box').html(dialog.config.title);
                                   }
                               },
                               {
@@ -8683,10 +8689,12 @@
            * 获取或设置 window 标题
            */
           set: function (v) {
-              if (this._webixId) {
+              if (this._webixId && _.has(this, '_titleLabel')) {
                   // webix 对象已经出现
                   this._webixId.define('title', v);
-                  $(this._webixId.$view).find('.webix_win_head .webix_win_title .webix_el_box').html(v);
+                  var _titleLabel = _.get(this, '_titleLabel');
+                  _titleLabel.define('label', v);
+                  _titleLabel.refresh();
                   return;
               }
               console.error('无法设置 title');

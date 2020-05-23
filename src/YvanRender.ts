@@ -567,7 +567,14 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
           resize: vjson.resize === undefined ? true : vjson.resize,
           head: {
             view: "toolbar", margin: -4, cols: [
-              { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
+              {
+                view: "label", label: vjson.title, css: 'webix_header webix_win_title',
+                on: {
+                  onAfterRender() {
+                    module._titleLabel = this;
+                  }
+                }
+              },
               {
                 view: "icon", icon: "fa fa-expand", click: function (this: any) {
                   dialog.config.fullscreen = !dialog.config.fullscreen;
@@ -584,7 +591,6 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
                   }
                   dialog.resize();
                   this.refresh();
-                  $(this.$view).closest('.webix_view.webix_window').find('.webix_win_head .webix_win_title .webix_el_box').html(dialog.config.title);
                 }
               },
               {
