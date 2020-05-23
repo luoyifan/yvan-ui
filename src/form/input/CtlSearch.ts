@@ -153,12 +153,14 @@ export class CtlSearch extends CtlInput<CtlSearch> {
 
     this.supportChangeValue = true
 
-    YvEventDispatch(this.widget.onClear, this, undefined)
-
-    //清空
-    _.forOwn(this.widget.bind, (value, key) => {
-      _.set(this._module, key, '')
-    })
+    // 发出 onClear 事件，如果事件返回 true，代表不用再清空
+    const hasHandle = YvEventDispatch(this.widget.onClear, this, undefined)
+    if (!hasHandle) {
+      //清空
+      _.forOwn(this.widget.bind, (value, key) => {
+        _.set(this._module, key, '')
+      })
+    }
   }
 
   get value(): string | undefined {
