@@ -362,8 +362,14 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       }
       this.gridApi.updateRowData(transaction)
     }
-    if (this.paginationDefaultSelectRow && this.paginationDefaultSelectRow >= 0 && targetDataList && targetDataList.length > 0) {
-      this.selectRow(node => node.rowIndex === this.paginationDefaultSelectRow);
+    if (this.paginationDefaultSelectRow != undefined && targetDataList && targetDataList.length > 0) {
+      if (this.paginationDefaultSelectRow >=0) {
+        if (targetDataList.length <= this.paginationDefaultSelectRow) {
+          this.selectRow(node => node.rowIndex === targetDataList.length-1);
+        } else {
+          this.selectRow(node => node.rowIndex === this.paginationDefaultSelectRow);
+        }
+      }
     }
   }
 
