@@ -2130,6 +2130,8 @@
       var $body = $('body');
       var tooptipId = obj.id + '_tooltip';
       if ($body.find("#" + tooptipId).length > 0) {
+          var ddiv = $body.find("#" + tooptipId)[0].children[1];
+          _.set(ddiv, 'innerText', message);
           return;
       }
       var $w = $('<div xtype="tooltip" class="yvan-tooltip">' +
@@ -2317,16 +2319,14 @@
           /**================ 私有属性 ===================**/
           _this._validateResult = true;
           _this.anonymous_showTootip = function () {
-              if (_this._validate) {
-                  var result = _this._validate(_this.value);
-                  if (result) {
-                      _this._showTootip(result);
-                      _this._showValidateError();
-                  }
-                  else {
-                      _this._hideTootip();
-                      _this._hideValidateError();
-                  }
+              var result = _this._resultToShowOrHide();
+              if (result) {
+                  _this._showTootip(result);
+                  _this._showValidateError();
+              }
+              else {
+                  _this._hideTootip();
+                  _this._hideValidateError();
               }
           };
           _this.anonymous_hideTootip = function () {
@@ -2384,15 +2384,15 @@
                       var $input = $(this.$view).find('input');
                       $input.on('input', that.onInputEvent.bind(that));
                       $input.on('keydown', onKeydown);
-                      if (that._validate) {
-                          var result = that._validate(null);
-                          if (result) {
-                              that._showValidateError();
-                          }
-                          else {
-                              that._hideValidateError();
-                          }
+                      if (that._validate || that._required) {
                           that._addEnvent($input);
+                      }
+                      var result = that._resultToShowOrHide();
+                      if (result) {
+                          that._showValidateError();
+                      }
+                      else {
+                          that._hideValidateError();
                       }
                       if (that.constructor.name !== 'CtlSelect' && that._webixConfig.required) {
                           if (that.constructor.name === 'CtlDateRangePicker') {
@@ -2426,8 +2426,8 @@
                       YvEventDispatch(that.onEnter, that, undefined);
                   },
                   onFocus: function () {
-                      if (that._validate) {
-                          var result = that._validate(that.value);
+                      if (that._validate || that._required) {
+                          var result = that._resultToShowOrHide();
                           if (result) {
                               that._showTootip(result);
                               that._showValidateError();
@@ -2460,8 +2460,8 @@
                       YvEventDispatch(that.onChange, that, newValue);
                   },
                   onBlur: function () {
-                      if (that._validate) {
-                          var result = that._validate(that.value);
+                      if (that._validate || that._required) {
+                          var result = that._resultToShowOrHide();
                           if (result) {
                               that._showValidateError();
                           }
@@ -2616,6 +2616,7 @@
            * 必填
            */
           set: function (nv) {
+              this._required = nv;
               if (!this._webix) {
                   this._webixConfig.required = nv;
                   return;
@@ -2741,9 +2742,6 @@
           enumerable: true,
           configurable: true
       });
-      CtlInput.prototype.getValidate = function () {
-          return this._validate;
-      };
       CtlInput.prototype._addEnvent = function (input) {
           input.context.addEventListener('mouseenter', this.anonymous_showTootip);
           input.context.addEventListener('mouseleave', this.anonymous_hideTootip);
@@ -2763,6 +2761,23 @@
       };
       CtlInput.prototype._hideTootip = function () {
           hideTooltip(this);
+      };
+      CtlInput.prototype._resultToShowOrHide = function () {
+          if (!this.value) {
+              if (this._required) {
+                  return "该项为必填项";
+              }
+          }
+          else {
+              if (this._validate) {
+                  // 只有校验值
+                  var result = this._validate(this.value);
+                  if (result) {
+                      return result;
+                  }
+              }
+          }
+          return null;
       };
       CtlInput.prototype._showValidate = function (msg, type) {
           var $input;
@@ -5500,8 +5515,15 @@
               }
               this.gridApi.updateRowData(transaction_1);
           }
-          if (this.paginationDefaultSelectRow && this.paginationDefaultSelectRow >= 0 && targetDataList && targetDataList.length > 0) {
-              this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+          if (this.paginationDefaultSelectRow != undefined && targetDataList && targetDataList.length > 0) {
+              if (this.paginationDefaultSelectRow >= 0) {
+                  if (targetDataList.length <= this.paginationDefaultSelectRow) {
+                      this.selectRow(function (node) { return node.rowIndex === targetDataList.length - 1; });
+                  }
+                  else {
+                      this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+                  }
+              }
           }
       };
       /**
@@ -6396,8 +6418,7 @@
                           }
                       });
                   }
-                  else if (easyuiCol.editMode === 'text' ||
-                      easyuiCol.editMode === 'number') {
+                  else if (easyuiCol.editMode === 'text' || easyuiCol.editMode === 'number') {
                       //普通文本框编辑
                       formatable = true;
                       _.assign(col, {
@@ -6424,8 +6445,7 @@
                           }
                       });
                   }
-                  else if (easyuiCol.editMode === 'date' ||
-                      easyuiCol.editMode === 'datetime') {
+                  else if (easyuiCol.editMode === 'date' || easyuiCol.editMode === 'datetime') {
                       formatable = true;
                       // _.assign(col, {
                       //     editable: true,
@@ -6516,12 +6536,13 @@
                               suppressAndOrCondition: true,
                               filterOptions: [
                                   // 服务器已经设置条件，浏览器不进行实际比对
-                                  { displayKey: '=', displayName: '等于', test: function () { return true; } },
-                                  { displayKey: '<>', displayName: '不等于', test: function () { return true; } },
-                                  { displayKey: '<', displayName: '小于', test: function () { return true; } },
-                                  { displayKey: '>', displayName: '大于', test: function () { return true; } },
-                                  { displayKey: '<=', displayName: '小于等于', test: function () { return true; } },
-                                  { displayKey: '>=', displayName: '大于等于', test: function () { return true; } },
+                                  { displayKey: 'equals', displayName: '等于', test: function () { return true; } },
+                                  { displayKey: 'notEqual', displayName: '不等于', test: function () { return true; } },
+                                  { displayKey: 'lessThan', displayName: '小于', test: function () { return true; } },
+                                  { displayKey: 'greaterThan', displayName: '大于', test: function () { return true; } },
+                                  { displayKey: 'lessThanOrEqual', displayName: '小于等于', test: function () { return true; } },
+                                  { displayKey: 'greaterThanOrEqual', displayName: '大于等于', test: function () { return true; } },
+                                  { displayKey: 'inRange', displayName: '范围', test: function () { return true; } },
                               ]
                           }
                       });
@@ -8620,20 +8641,28 @@
           return new Promise(function (resolver, reject) {
               var ctlMappings = _.get(_this, '_entityCtlMapping.' + entityName);
               var result = {};
-              if (_.has(ctlMappings, '_validate')) {
-                  var validateResult = ctlMappings._validate(ctlMappings.value);
+              if (_.get(ctlMappings, '_required') === true || _.has(ctlMappings, '_validate')) {
+                  var validateResult = ctlMappings._resultToShowOrHide();
                   if (validateResult) {
-                      _.set(result, ctlMappings.vjson.label, validateResult);
+                      ctlMappings._showTootip(validateResult);
+                      ctlMappings._showValidateError();
+                      ctlMappings.focus();
+                      _.set(result, ctlMappings.entityName, validateResult);
                   }
               }
               else {
+                  var isShow_1 = false;
                   _.forEach(ctlMappings, function (ctl, key) {
-                      if (_.has(ctl, '_validate')) {
-                          var validateResult = ctl._validate(ctl.value);
+                      if (_.get(ctl, '_required') === true || _.has(ctl, '_validate')) {
+                          var validateResult = ctl._resultToShowOrHide();
                           if (validateResult) {
-                              ctl._showTootip(validateResult);
                               ctl._showValidateError();
                               _.set(result, key, validateResult);
+                              if (!isShow_1) {
+                                  isShow_1 = true;
+                                  ctl._showTootip(validateResult);
+                                  ctl.focus();
+                              }
                           }
                       }
                   });

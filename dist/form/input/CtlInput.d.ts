@@ -100,10 +100,10 @@ export declare class CtlInput<M> extends CtlBase<M> {
      */
     set validate(nv: any);
     get validate(): any;
-    getValidate(): any;
     /**================ 私有属性 ===================**/
     _validateResult: boolean;
     _validate: any;
+    _required: boolean | undefined;
     _id: any;
     _maxlength: any;
     anonymous_showTootip: any;
@@ -114,6 +114,7 @@ export declare class CtlInput<M> extends CtlBase<M> {
     _hideValidateError(): void;
     _showTootip(msg: string): void;
     _hideTootip(): void;
+    _resultToShowOrHide(): any;
     _showValidate(msg: any, type: 'inputValidate' | 'changedValidate' | 'requiredValidate'): boolean;
 }
 export {};
