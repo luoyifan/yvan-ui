@@ -5,6 +5,7 @@ import { isDesignMode } from './DesignHelper'
 import { brokerInvoke } from './Service'
 import { Db } from './YvanUIDb'
 import { GridRefreshMode } from "./CtlGrid";
+import { YvEventDispatch } from './YvanEvent'
 
 export class YvanDataSourceGrid {
   private option: GridDataSource
@@ -21,8 +22,6 @@ export class YvanDataSourceGrid {
   serverQuery = _.debounce((option: GridDataSourceSql | GridDataSourceServer | GridDataSourceAjax, paramFunction: undefined | (() => any), params: any) => {
     const that = this
 
-    //异步请求数据内容
-    that.ctl.loading = true
     let needCount = false
     if (typeof that.rowCount === 'undefined') {
       //从来没有统计过 rowCount(记录数)
@@ -45,31 +44,42 @@ export class YvanDataSourceGrid {
 
     let ajaxPromise: Promise<Db.Response>;
     if (option.type === 'SQL') {
-      ajaxPromise = YvanUI.dbs[option.db]
-        .query({
-          params: queryParams,
-          limit: params.endRow - params.startRow,
-          limitOffset: params.startRow,
-          needCount,
-          sortModel: params.sortModel,
-          filterModel: params.filterModel,
-          sqlId: option.sqlId
-        })
-
-    } else if (option.type === 'Server') {
-      const [serverUrl, method] = _.split(option.method, '@');
-      ajaxPromise = <Promise<Db.Response>>brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, {
+      const ajaxParam = {
         params: queryParams,
         limit: params.endRow - params.startRow,
         limitOffset: params.startRow,
         needCount,
         sortModel: params.sortModel,
         filterModel: params.filterModel,
-      })
+        sqlId: option.sqlId
+      };
+      const allow = YvEventDispatch(option.onBefore, that, ajaxParam)
+      if (allow === false) {
+        // 不允许请求
+        return;
+      }
+      ajaxPromise = YvanUI.dbs[option.db].query(ajaxParam)
+
+    } else if (option.type === 'Server') {
+      const [serverUrl, method] = _.split(option.method, '@');
+      const ajaxParam = {
+        params: queryParams,
+        limit: params.endRow - params.startRow,
+        limitOffset: params.startRow,
+        needCount,
+        sortModel: params.sortModel,
+        filterModel: params.filterModel,
+      }
+      const allow = YvEventDispatch(option.onBefore, that, ajaxParam)
+      if (allow === false) {
+        // 不允许请求
+        return;
+      }
+      ajaxPromise = <Promise<Db.Response>>brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, ajaxParam)
 
     } else if (option.type === 'Ajax') {
       const ajax: Ajax.Function = _.get(window, 'YvanUI.ajax');
-      ajaxPromise = <Promise<Db.Response>>ajax({
+      const ajaxParam: Ajax.Option = {
         url: option.url,
         method: 'POST-JSON',
         data: {
@@ -80,7 +90,13 @@ export class YvanDataSourceGrid {
           sortModel: params.sortModel,
           filterModel: params.filterModel,
         }
-      });
+      }
+      const allow = YvEventDispatch(option.onBefore, that, ajaxParam)
+      if (allow === false) {
+        // 不允许请求
+        return;
+      }
+      ajaxPromise = <Promise<Db.Response>>ajax(ajaxParam);
 
     } else {
       console.error('unSupport dataSource mode:', option);
@@ -88,6 +104,8 @@ export class YvanDataSourceGrid {
       return;
     }
 
+    //异步请求数据内容
+    that.ctl.loading = true
     ajaxPromise.then(res => {
       const { data: resultData, pagination, params: resParams } = res
       if (needCount) {
@@ -108,6 +126,7 @@ export class YvanDataSourceGrid {
       if (that.ctl.entityName) {
         _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow())
       }
+      YvEventDispatch(option.onAfter, that, res)
 
     }).catch(r => {
       params.failCallback()

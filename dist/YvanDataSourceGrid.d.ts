@@ -1,4 +1,6 @@
 import { CtlGrid } from './CtlGrid';
+import { YvEvent } from './YvanEvent';
+import { YvanDataSourceGrid } from './YvanDataSourceGridImp';
 export interface CtlGridColumn {
     hidden: boolean;
     field: string;
@@ -50,11 +52,11 @@ export interface GridDataSourceServer {
     /**
      * 执行前, 检查是否需要请求服务器
      */
-    preFunction?: string;
+    onBefore: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 执行后, 更改服务器返回的数据结构
      */
-    afterFunction?: string;
+    onAfter: YvEvent<YvanDataSourceGrid, any>;
 }
 export interface GridDataSourceAjax {
     type: 'Ajax';
@@ -84,11 +86,11 @@ export interface GridDataSourceAjax {
     /**
      * 执行前, 检查是否需要请求服务器
      */
-    preFunction?: string;
+    onBefore: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 执行后, 更改服务器返回的数据结构
      */
-    afterFunction?: string;
+    onAfter: YvEvent<YvanDataSourceGrid, any>;
 }
 export interface GridDataSourceSql {
     type: 'SQL';
@@ -122,11 +124,11 @@ export interface GridDataSourceSql {
     /**
      * 执行前, 检查是否需要请求服务器
      */
-    preFunction?: string;
+    onBefore: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 执行后, 更改服务器返回的数据结构
      */
-    afterFunction?: string;
+    onAfter: YvEvent<YvanDataSourceGrid, any>;
 }
 export interface GridDataSourceStatic {
     type: 'function';
@@ -150,13 +152,13 @@ export interface GridDataSourceStatic {
      */
     bind: string | GridDataSourceStaticFunction;
     /**
-     * 执行前, 检查是否需要请求服务器
+     * 执行前, 检查是否需要请求服务器, 如果返回 false 代表取消请求
      */
-    preFunction?: string;
+    onBefore: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 执行后, 更改服务器返回的数据结构
      */
-    afterFunction?: string;
+    onAfter: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 保存方法
      */

@@ -3803,6 +3803,7 @@
       };
       return CtlSearch;
   }(CtlInput));
+  //# sourceMappingURL=CtlSearch.js.map
 
   var CtlCarousel = /** @class */ (function (_super) {
       __extends(CtlCarousel, _super);
@@ -4439,8 +4440,6 @@
           this.isFirstAutoLoad = true; //是否为第一次自动读取
           this.serverQuery = _.debounce(function (option, paramFunction, params) {
               var that = _this;
-              //异步请求数据内容
-              that.ctl.loading = true;
               var needCount = false;
               if (typeof that.rowCount === 'undefined') {
                   //从来没有统计过 rowCount(记录数)
@@ -4460,8 +4459,7 @@
               var queryParams = __assign({}, (typeof paramFunction === 'function' ? paramFunction() : undefined));
               var ajaxPromise;
               if (option.type === 'SQL') {
-                  ajaxPromise = dbs[option.db]
-                      .query({
+                  var ajaxParam = {
                       params: queryParams,
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
@@ -4469,22 +4467,34 @@
                       sortModel: params.sortModel,
                       filterModel: params.filterModel,
                       sqlId: option.sqlId
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = dbs[option.db].query(ajaxParam);
               }
               else if (option.type === 'Server') {
                   var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
-                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, {
+                  var ajaxParam = {
                       params: queryParams,
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
                       needCount: needCount,
                       sortModel: params.sortModel,
                       filterModel: params.filterModel,
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, ajaxParam);
               }
               else if (option.type === 'Ajax') {
                   var ajax = _.get(window, 'YvanUI.ajax');
-                  ajaxPromise = ajax({
+                  var ajaxParam = {
                       url: option.url,
                       method: 'POST-JSON',
                       data: {
@@ -4495,13 +4505,21 @@
                           sortModel: params.sortModel,
                           filterModel: params.filterModel,
                       }
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = ajax(ajaxParam);
               }
               else {
                   console.error('unSupport dataSource mode:', option);
                   params.failCallback();
                   return;
               }
+              //异步请求数据内容
+              that.ctl.loading = true;
               ajaxPromise.then(function (res) {
                   var resultData = res.data, pagination = res.pagination, resParams = res.params;
                   if (needCount) {
@@ -4522,6 +4540,7 @@
                   if (that.ctl.entityName) {
                       _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow());
                   }
+                  YvEventDispatch(option.onAfter, that, res);
               }).catch(function (r) {
                   params.failCallback();
               }).finally(function () {
@@ -4765,7 +4784,6 @@
       };
       return YvanDataSourceGrid;
   }());
-  //# sourceMappingURL=YvanDataSourceGridImp.js.map
 
   var CtlGridCellButton = /** @class */ (function () {
       function CtlGridCellButton() {
@@ -6641,7 +6659,6 @@
       };
       return CtlGrid;
   }(CtlBase));
-  //# sourceMappingURL=CtlGrid.js.map
 
   var CtlSwitch = /** @class */ (function (_super) {
       __extends(CtlSwitch, _super);
@@ -8386,6 +8403,7 @@
       wrapperWebixConfig(module, vjson);
       webix.ui(vjson, webix.$$(module.instanceId + '$' + spaceId));
   }
+  //# sourceMappingURL=YvanRender.js.map
 
   function downLoad(downLoadUrl, filename, data, header) {
       var YvanUI = _.get(window, 'YvanUI');
