@@ -53,7 +53,7 @@ export class YvanDataSourceGrid {
         filterModel: params.filterModel,
         sqlId: option.sqlId
       };
-      const allow = YvEventDispatch(option.onBefore, that, ajaxParam)
+      const allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam)
       if (allow === false) {
         // 不允许请求
         return;
@@ -70,7 +70,7 @@ export class YvanDataSourceGrid {
         sortModel: params.sortModel,
         filterModel: params.filterModel,
       }
-      const allow = YvEventDispatch(option.onBefore, that, ajaxParam)
+      const allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam)
       if (allow === false) {
         // 不允许请求
         return;
@@ -91,7 +91,7 @@ export class YvanDataSourceGrid {
           filterModel: params.filterModel,
         }
       }
-      const allow = YvEventDispatch(option.onBefore, that, ajaxParam)
+      const allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam)
       if (allow === false) {
         // 不允许请求
         return;
@@ -107,6 +107,8 @@ export class YvanDataSourceGrid {
     //异步请求数据内容
     that.ctl.loading = true
     ajaxPromise.then(res => {
+      YvEventDispatch(option.onAfter, that.ctl, res)
+      
       const { data: resultData, pagination, params: resParams } = res
       if (needCount) {
         if (_.has(res, 'totalCount')) {
@@ -126,7 +128,6 @@ export class YvanDataSourceGrid {
       if (that.ctl.entityName) {
         _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow())
       }
-      YvEventDispatch(option.onAfter, that, res)
 
     }).catch(r => {
       params.failCallback()

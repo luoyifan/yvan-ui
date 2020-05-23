@@ -50,13 +50,13 @@ export interface GridDataSourceServer {
         [name: string]: string | number | WatchParam | GetParam;
     };
     /**
-     * 执行前, 检查是否需要请求服务器
+     * 执行前, 检查是否需要请求服务器, 如果返回 false 代表取消请求
      */
-    onBefore: YvEvent<YvanDataSourceGrid, any>;
+    onBefore?: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 执行后, 更改服务器返回的数据结构
      */
-    onAfter: YvEvent<YvanDataSourceGrid, any>;
+    onAfter?: YvEvent<YvanDataSourceGrid, any>;
 }
 export interface GridDataSourceAjax {
     type: 'Ajax';
@@ -84,13 +84,13 @@ export interface GridDataSourceAjax {
         [name: string]: string | number | WatchParam | GetParam;
     };
     /**
-     * 执行前, 检查是否需要请求服务器
+     * 执行前, 检查是否需要请求服务器, 如果返回 false 代表取消请求
      */
-    onBefore: YvEvent<YvanDataSourceGrid, any>;
+    onBefore?: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 执行后, 更改服务器返回的数据结构
      */
-    onAfter: YvEvent<YvanDataSourceGrid, any>;
+    onAfter?: YvEvent<YvanDataSourceGrid, any>;
 }
 export interface GridDataSourceSql {
     type: 'SQL';
@@ -122,13 +122,13 @@ export interface GridDataSourceSql {
         [name: string]: string | number | WatchParam | GetParam;
     };
     /**
-     * 执行前, 检查是否需要请求服务器
+     * 执行前, 检查是否需要请求服务器, 如果返回 false 代表取消请求
      */
-    onBefore: YvEvent<YvanDataSourceGrid, any>;
+    onBefore?: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 执行后, 更改服务器返回的数据结构
      */
-    onAfter: YvEvent<YvanDataSourceGrid, any>;
+    onAfter?: YvEvent<YvanDataSourceGrid, any>;
 }
 export interface GridDataSourceStatic {
     type: 'function';
@@ -154,11 +154,11 @@ export interface GridDataSourceStatic {
     /**
      * 执行前, 检查是否需要请求服务器, 如果返回 false 代表取消请求
      */
-    onBefore: YvEvent<YvanDataSourceGrid, any>;
+    onBefore?: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 执行后, 更改服务器返回的数据结构
      */
-    onAfter: YvEvent<YvanDataSourceGrid, any>;
+    onAfter?: YvEvent<YvanDataSourceGrid, any>;
     /**
      * 保存方法
      */
