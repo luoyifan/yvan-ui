@@ -74,3 +74,6 @@
 .webix_window .dialogBottom .webix_el_button {
   margin-right:7px;
 }
+.webix_resize_handle{
+  opacity: 0;
+}

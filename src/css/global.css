@@ -121,11 +121,8 @@ body,
 }
 .mainLeft .webix_tree .webix_selected{
   background: #e6f7ff;
-  border-right:3px solid #1890ff;
+  border-left:3px solid #1890ff;
   color:#1890ff
-}
-.mainLeft .webix_tree .webix_tree_branch_2 .webix_tree_item{
-  /* padding-left:16px */
 }
 .webix_tree_leaves .webix_tree_leaves{
   margin:0px!important;

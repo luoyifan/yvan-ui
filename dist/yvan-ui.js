@@ -408,22 +408,32 @@
           });
           this.sqlModeDebounce = _.debounce(function (option) {
               var that = _this;
-              //异步请求数据内容
-              that.ctl.loading = true;
               var ajaxPromise;
               if (option.type === 'SQL') {
-                  ajaxPromise = dbs[option.db].query({
+                  var ajaxParam = {
                       params: option.params,
                       needCount: false,
                       sqlId: option.sqlId
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = dbs[option.db].query(ajaxParam);
               }
               else if (option.type === 'Server') {
                   var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
-                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, {
+                  var ajaxParam = {
                       params: option.params,
                       needCount: false,
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, ajaxParam);
               }
               else {
                   console.error('unSupport dataSource mode:', option);
@@ -431,7 +441,10 @@
                   that.ctl.loading = false;
                   return;
               }
+              //异步请求数据内容
+              that.ctl.loading = true;
               ajaxPromise.then(function (res) {
+                  YvEventDispatch(option.onAfter, that.ctl, res);
                   var resultData = res.data, resParams = res.params;
                   if (_this.dataSourceProcess) {
                       //自定义的数据处理过程
@@ -3677,11 +3690,14 @@
               return;
           }
           this.supportChangeValue = true;
-          YvEventDispatch(this.widget.onClear, this, undefined);
-          //清空
-          _.forOwn(this.widget.bind, function (value, key) {
-              _.set(_this._module, key, '');
-          });
+          // 发出 onClear 事件，如果事件返回 true，代表不用再清空
+          var hasHandle = YvEventDispatch(this.widget.onClear, this, undefined);
+          if (!hasHandle) {
+              //清空
+              _.forOwn(this.widget.bind, function (value, key) {
+                  _.set(_this._module, key, '');
+              });
+          }
       };
       Object.defineProperty(CtlSearch.prototype, "value", {
           get: function () {
@@ -4404,8 +4420,6 @@
           this.isFirstAutoLoad = true; //是否为第一次自动读取
           this.serverQuery = _.debounce(function (option, paramFunction, params) {
               var that = _this;
-              //异步请求数据内容
-              that.ctl.loading = true;
               var needCount = false;
               if (typeof that.rowCount === 'undefined') {
                   //从来没有统计过 rowCount(记录数)
@@ -4425,8 +4439,7 @@
               var queryParams = __assign({}, (typeof paramFunction === 'function' ? paramFunction() : undefined));
               var ajaxPromise;
               if (option.type === 'SQL') {
-                  ajaxPromise = dbs[option.db]
-                      .query({
+                  var ajaxParam = {
                       params: queryParams,
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
@@ -4434,22 +4447,34 @@
                       sortModel: params.sortModel,
                       filterModel: params.filterModel,
                       sqlId: option.sqlId
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = dbs[option.db].query(ajaxParam);
               }
               else if (option.type === 'Server') {
                   var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
-                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, {
+                  var ajaxParam = {
                       params: queryParams,
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
                       needCount: needCount,
                       sortModel: params.sortModel,
                       filterModel: params.filterModel,
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, ajaxParam);
               }
               else if (option.type === 'Ajax') {
                   var ajax = _.get(window, 'YvanUI.ajax');
-                  ajaxPromise = ajax({
+                  var ajaxParam = {
                       url: option.url,
                       method: 'POST-JSON',
                       data: {
@@ -4460,14 +4485,23 @@
                           sortModel: params.sortModel,
                           filterModel: params.filterModel,
                       }
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = ajax(ajaxParam);
               }
               else {
                   console.error('unSupport dataSource mode:', option);
                   params.failCallback();
                   return;
               }
+              //异步请求数据内容
+              that.ctl.loading = true;
               ajaxPromise.then(function (res) {
+                  YvEventDispatch(option.onAfter, that.ctl, res);
                   var resultData = res.data, pagination = res.pagination, resParams = res.params;
                   if (needCount) {
                       if (_.has(res, 'totalCount')) {

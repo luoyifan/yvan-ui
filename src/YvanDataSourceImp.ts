@@ -28,6 +28,7 @@ export class YvDataSource<T> {
 
         that.ctl.loading = false
         YvEventDispatch(that.ctl.onDataComplete, that.ctl, undefined)
+
       },
       failCallback() {
         that.ctl.dataReal = []
@@ -37,26 +38,35 @@ export class YvDataSource<T> {
     })
   });
 
-  sqlModeDebounce = _.debounce((option: DataSourceDb | DataSourceServer) => {
+  sqlModeDebounce = _.debounce((option: DataSourceDb<T> | DataSourceServer<T>) => {
     const that = this
-
-    //异步请求数据内容
-    that.ctl.loading = true
 
     let ajaxPromise: Promise<Db.Response>;
     if (option.type === 'SQL') {
-      ajaxPromise = YvanUI.dbs[option.db].query({
+      const ajaxParam = {
         params: option.params,
         needCount: false,
         sqlId: option.sqlId
-      })
+      }
+      const allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam)
+      if (allow === false) {
+        // 不允许请求
+        return;
+      }
+      ajaxPromise = YvanUI.dbs[option.db].query(ajaxParam)
 
     } else if (option.type === 'Server') {
       const [serverUrl, method] = _.split(option.method, '@');
-      ajaxPromise = <Promise<Db.Response>>brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, {
+      const ajaxParam = {
         params: option.params,
         needCount: false,
-      })
+      }
+      const allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam)
+      if (allow === false) {
+        // 不允许请求
+        return;
+      }
+      ajaxPromise = <Promise<Db.Response>>brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, ajaxParam)
 
     } else {
       console.error('unSupport dataSource mode:', option);
@@ -65,7 +75,10 @@ export class YvDataSource<T> {
       return;
     }
 
+    //异步请求数据内容
+    that.ctl.loading = true
     ajaxPromise.then(res => {
+      YvEventDispatch(option.onAfter, that.ctl, res)
       const { data: resultData, params: resParams } = res
 
       if (this.dataSourceProcess) {
@@ -99,7 +112,7 @@ export class YvDataSource<T> {
   /**
    * SQL取值
    */
-  setSqlMode(option: DataSourceDb | DataSourceServer) {
+  setSqlMode(option: DataSourceDb<T> | DataSourceServer<T>) {
     const that = this
     this.reload = () => {
       that.sqlModeDebounce(option)
