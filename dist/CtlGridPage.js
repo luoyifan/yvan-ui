@@ -1,3 +1,4 @@
+import { GridRefreshMode } from './CtlGrid';
 var CtlGridPage = /** @class */ (function () {
     function CtlGridPage(grid) {
         this._currentPage = 1;
@@ -90,6 +91,7 @@ var CtlGridPage = /** @class */ (function () {
                 if (cp <= 0) {
                     cp = 1;
                 }
+                me.grid.refreshMode = GridRefreshMode.refreshWithFilter;
                 me.getPageData(cp, me.pageSize);
             }
             else {
@@ -102,6 +104,7 @@ var CtlGridPage = /** @class */ (function () {
             me.pageSize = v.srcElement.value;
             me.grid.paginationSetPageSize(me.pageSize);
             if (typeof me.getPageData === 'function') {
+                me.grid.refreshMode = GridRefreshMode.refreshWithFilter;
                 me.getPageData(1, me.pageSize);
             }
         };
@@ -141,6 +144,7 @@ var CtlGridPage = /** @class */ (function () {
                     }
                 }
                 if (typeof me.getPageData === 'function') {
+                    me.grid.refreshMode = GridRefreshMode.refreshWithFilter;
                     me.getPageData(cp, me.pageSize);
                 }
             };

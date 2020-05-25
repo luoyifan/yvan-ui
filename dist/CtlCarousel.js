@@ -1,4 +1,4 @@
-import { __extends } from "tslib";
+import { __assign, __extends } from "tslib";
 import { CtlBase } from './CtlBase';
 import { parseYvanPropChangeVJson } from './CtlUtils';
 import { YvEventDispatch } from './YvanEvent';
@@ -7,8 +7,9 @@ var CtlCarousel = /** @class */ (function (_super) {
     function CtlCarousel() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlCarousel.create = function (vjson) {
+    CtlCarousel.create = function (module, vjson) {
         var that = new CtlCarousel(vjson);
+        that._module = module;
         var yvanProp = parseYvanPropChangeVJson(vjson, ['onShow']);
         // 将 vjson 存至 _webix (此时 _webix 还只是 vjson 代理对象)
         that._webixConfig = vjson;
@@ -17,7 +18,7 @@ var CtlCarousel = /** @class */ (function (_super) {
         _.merge(vjson, that._webixConfig, {
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                 },
                 onDestruct: function () {
                     that.removeHandle();

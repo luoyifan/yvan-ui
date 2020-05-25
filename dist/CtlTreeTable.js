@@ -1,4 +1,4 @@
-import { __extends } from "tslib";
+import { __assign, __extends } from "tslib";
 import { CtlBase } from './CtlBase';
 import { parseYvanPropChangeVJson } from './CtlUtils';
 import { YvDataSource } from './YvanDataSourceImp';
@@ -21,8 +21,9 @@ var CtlTreeTable = /** @class */ (function (_super) {
         _this.showIcon = true;
         return _this;
     }
-    CtlTreeTable.create = function (vjson) {
+    CtlTreeTable.create = function (module, vjson) {
         var that = new CtlTreeTable(vjson);
+        that._module = module;
         if (vjson.hasOwnProperty('debugger')) {
             debugger;
         }
@@ -43,7 +44,7 @@ var CtlTreeTable = /** @class */ (function (_super) {
         _.merge(vjson, that._webixConfig, {
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                 },
                 onAfterDelete: function () {
                     that.removeHandle();
@@ -133,7 +134,11 @@ var CtlTreeTable = /** @class */ (function (_super) {
          */
         set: function (nv) {
             this._dataSource = nv;
-            this._rebindDataSource();
+            if (this._module.loadFinished) {
+                // onLoad 之后会触发 view.onInited -> attachHandle -> refreshState -> _rebindDataSource
+                // onLoad 之前都不需要主动触发 _rebindDataSource
+                this._rebindDataSource();
+            }
         },
         enumerable: true,
         configurable: true
@@ -217,16 +222,79 @@ var CtlTreeTable = /** @class */ (function (_super) {
     CtlTreeTable.prototype.collapseAll = function () {
         this._webix.closeAll();
     };
+    /**
+     * 过滤, 如果不设置 condition 代表不过滤，否则带入过滤函数
+     */
+    CtlTreeTable.prototype.filter = function (condition) {
+        this._webix.filter(condition);
+    };
     //重新绑定数据源
     CtlTreeTable.prototype._rebindDataSource = function () {
-        if (this.dataSourceBind) {
-            this.dataSourceBind.destory();
-            this.dataSourceBind = undefined;
+        var _this = this;
+        var innerMethod = function () {
+            if (_this.dataSourceBind) {
+                _this.dataSourceBind.destory();
+                _this.dataSourceBind = undefined;
+            }
+            if (_this._webix && _this._module) {
+                _this.dataSourceBind = new YvDataSource(_this, _this.dataSource, _this._dataSourceProcess.bind(_this));
+                _this.dataSourceBind.init();
+            }
+        };
+        if (!this._module.loadFinished) {
+            // onload 函数还没有执行（模块还没加载完）, 延迟调用 rebind
+            _.defer(innerMethod);
         }
-        if (this._webix && this.getModule()) {
-            this.dataSourceBind = new YvDataSource(this, this.dataSource);
-            this.dataSourceBind.init();
+        else {
+            // 否则实时调用 rebind
+            innerMethod();
         }
+    };
+    CtlTreeTable.prototype._dataSourceProcess = function (data) {
+        if (!this.dataSource || _.isArray(this.dataSource) || _.isFunction(this.dataSource)) {
+            return data;
+        }
+        if (this.dataSource.type !== 'SQL' && this.dataSource.type !== 'function') {
+            return data;
+        }
+        if (!this.dataSource.parentField || !this.dataSource.valueField) {
+            return data;
+        }
+        var idField = this.dataSource.valueField;
+        var parentField = this.dataSource.parentField;
+        data = _.cloneDeep(data);
+        // 第一遍扫描, 建立映射关系
+        var nodeMap = {};
+        var rootNode = [];
+        for (var i = 0; i < data.length; i++) {
+            var row = data[i];
+            nodeMap[row[idField]] = row;
+        }
+        // 第二遍扫描，建立父子关系
+        for (var i = 0; i < data.length; i++) {
+            var row = data[i];
+            var parent_1 = row[parentField];
+            var id = row[idField];
+            if (!parent_1 || parent_1 === '0') {
+                // 没有父亲，作为根节点
+                rootNode.push(nodeMap[id]);
+            }
+            else if (nodeMap.hasOwnProperty(parent_1)) {
+                //找到父亲
+                var parentNode = nodeMap[parent_1];
+                if (parentNode.hasOwnProperty('data')) {
+                    parentNode.data.push(nodeMap[id]);
+                }
+                else {
+                    parentNode.data = [nodeMap[id]];
+                }
+            }
+            else {
+                // 没有找到父亲，作为根节点
+                rootNode.push(nodeMap[id]);
+            }
+        }
+        return rootNode;
     };
     //刷新状态时，自动重绑数据源
     CtlTreeTable.prototype.refreshState = function () {

@@ -11,8 +11,9 @@ var CtlDateRangePicker = /** @class */ (function (_super) {
         _this.entityNameEnd = '';
         return _this;
     }
-    CtlDateRangePicker.create = function (vjson) {
+    CtlDateRangePicker.create = function (module, vjson) {
         var that = new CtlDateRangePicker(vjson);
+        that._module = module;
         var baseConfig = {};
         if (vjson.view === 'datetimerange') {
             // 日期+时间输入
@@ -101,7 +102,7 @@ var CtlDateRangePicker = /** @class */ (function (_super) {
         if (_.isPlainObject(value)) {
             var start = value.start, end = value.end;
             if (!moment(start).isValid() || !moment(end).isValid()) {
-                return false;
+                return true;
             }
         }
         return true;

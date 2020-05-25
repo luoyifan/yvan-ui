@@ -2,18 +2,6 @@ import { __extends } from "tslib";
 import Vue from 'vue';
 import { componentFactory } from './YvanRender';
 import webix from 'webix';
-/**
- * 扩展 grid 组件
- */
-webix.protoUI({
-    name: 'grid'
-}, webix.ui.template);
-/**
- * 扩展 echarts 组件
- */
-webix.protoUI({
-    name: 'echarts'
-}, webix.ui.template);
 var BaseModule = /** @class */ (function (_super) {
     __extends(BaseModule, _super);
     function BaseModule() {
@@ -33,6 +21,60 @@ var BaseModule = /** @class */ (function (_super) {
     BaseModule.prototype.getPlace = function (placeId) {
         return webix.$$(_.get(this, 'instanceId') + '$' + placeId);
     };
+    BaseModule.prototype.validate = function (entityName) {
+        var _this = this;
+        return new Promise(function (resolver, reject) {
+            var ctlMappings = _.get(_this, '_entityCtlMapping.' + entityName);
+            var result = {};
+            if (_.has(ctlMappings, '_validate')) {
+                var validateResult = ctlMappings._validate(ctlMappings.value);
+                if (validateResult) {
+                    _.set(result, ctlMappings.vjson.label, validateResult);
+                }
+            }
+            else {
+                _.forEach(ctlMappings, function (ctl, key) {
+                    if (_.has(ctl, '_validate')) {
+                        var validateResult = ctl._validate(ctl.value);
+                        if (validateResult) {
+                            ctl._showTootip(validateResult);
+                            ctl._showValidateError();
+                            _.set(result, key, validateResult);
+                        }
+                    }
+                });
+            }
+            if (_.size(result) > 0) {
+                reject(result);
+            }
+            else {
+                resolver(_.get(_this, entityName));
+            }
+        });
+    };
+    Object.defineProperty(BaseModule.prototype, "title", {
+        get: function () {
+            if (this._webixId) {
+                // webix 对象已经出现
+                return this._webixId.config.title;
+            }
+            return '无法获取';
+        },
+        /**
+         * 获取或设置 window 标题
+         */
+        set: function (v) {
+            if (this._webixId) {
+                // webix 对象已经出现
+                this._webixId.define('title', v);
+                $(this._webixId.$view).find('.webix_win_head .webix_win_title .webix_el_box').html(v);
+                return;
+            }
+            console.error('无法设置 title');
+        },
+        enumerable: true,
+        configurable: true
+    });
     return BaseModule;
 }(Vue));
 export { BaseModule };

@@ -1,4 +1,4 @@
-import { __extends } from "tslib";
+import { __assign, __extends } from "tslib";
 import { CtlBase } from './CtlBase';
 import { parseYvanPropChangeVJson } from './CtlUtils';
 import { YvDataSource } from './YvanDataSourceImp';
@@ -9,8 +9,9 @@ var CtlDataview = /** @class */ (function (_super) {
     function CtlDataview() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlDataview.create = function (vjson) {
+    CtlDataview.create = function (module, vjson) {
         var that = new CtlDataview(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlDataviewDefault);
         var yvanProp = parseYvanPropChangeVJson(vjson, [
             // 'data',
@@ -29,7 +30,7 @@ var CtlDataview = /** @class */ (function (_super) {
             select: true,
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                 },
                 onAfterDelete: function () {
                     that.removeHandle();
@@ -98,7 +99,11 @@ var CtlDataview = /** @class */ (function (_super) {
          */
         set: function (nv) {
             this._dataSource = nv;
-            this._rebindDataSource();
+            if (this._module.loadFinished) {
+                // onLoad 之后会触发 view.onInited -> attachHandle -> refreshState -> _rebindDataSource
+                // onLoad 之前都不需要主动触发 _rebindDataSource
+                this._rebindDataSource();
+            }
         },
         enumerable: true,
         configurable: true
@@ -111,15 +116,29 @@ var CtlDataview = /** @class */ (function (_super) {
             this.dataSourceBind.reload();
         }
     };
+    CtlDataview.prototype.filter = function (func) {
+        this._webix.filter(func);
+    };
     //重新绑定数据源
     CtlDataview.prototype._rebindDataSource = function () {
-        if (this.dataSourceBind) {
-            this.dataSourceBind.destory();
-            this.dataSourceBind = undefined;
+        var _this = this;
+        var innerMethod = function () {
+            if (_this.dataSourceBind) {
+                _this.dataSourceBind.destory();
+                _this.dataSourceBind = undefined;
+            }
+            if (_this._webix && _this._module) {
+                _this.dataSourceBind = new YvDataSource(_this, _this.dataSource, _this._dataSourceProcess.bind(_this));
+                _this.dataSourceBind.init();
+            }
+        };
+        if (!this._module.loadFinished) {
+            // onload 函数还没有执行（模块还没加载完）, 延迟调用 rebind
+            _.defer(innerMethod);
         }
-        if (this._webix && this.getModule()) {
-            this.dataSourceBind = new YvDataSource(this, this.dataSource, this._dataSourceProcess.bind(this));
-            this.dataSourceBind.init();
+        else {
+            // 否则实时调用 rebind
+            innerMethod();
         }
     };
     CtlDataview.prototype._dataSourceProcess = function (data) {

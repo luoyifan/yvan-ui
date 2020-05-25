@@ -8,8 +8,9 @@ var CtlMultiCombo = /** @class */ (function (_super) {
     function CtlMultiCombo() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlMultiCombo.create = function (vjson) {
+    CtlMultiCombo.create = function (module, vjson) {
         var that = new CtlMultiCombo(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlMultiComboDefault);
         // 基础属性先执行
         that._create(vjson, that);

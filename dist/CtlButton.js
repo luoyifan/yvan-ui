@@ -1,4 +1,4 @@
-import { __extends } from "tslib";
+import { __assign, __extends } from "tslib";
 import { CtlBase } from './CtlBase';
 import { parseYvanPropChangeVJson } from './CtlUtils';
 import { YvEventDispatch } from './YvanEvent';
@@ -17,8 +17,9 @@ var CtlButton = /** @class */ (function (_super) {
         _this._icon = '';
         return _this;
     }
-    CtlButton.create = function (vjson) {
+    CtlButton.create = function (module, vjson) {
         var that = new CtlButton(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlButtonDefault);
         var yvanProp = parseYvanPropChangeVJson(vjson, [
             'onClick',
@@ -37,7 +38,7 @@ var CtlButton = /** @class */ (function (_super) {
             type: 'text',
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                 },
                 onDestruct: function () {
                     that.removeHandle();
@@ -157,6 +158,23 @@ var CtlButton = /** @class */ (function (_super) {
         set: function (nv) {
             this._text = nv;
             this._refreshText();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CtlButton.prototype, "enable", {
+        /**
+         * 是否允许
+         */
+        get: function () {
+            return this._webixConfig.disabled;
+        },
+        set: function (nv) {
+            if (!this._webix) {
+                this._webixConfig.disabled = !nv;
+                return;
+            }
+            this._webix.define('disabled', !nv);
         },
         enumerable: true,
         configurable: true

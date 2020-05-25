@@ -550,9 +550,9 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
           vjson.body = {
             template: 'dialog 没有 body'
           }
-        }else{
-          if(!_.has(vjson.body, 'padding')){
-            vjson.body.padding=10
+        } else {
+          if (!_.has(vjson.body, 'padding')) {
+            vjson.body.padding = 10
           }
         }
         // 与 yvan 组件进行交换，使 vjson 能被 webix 使用
@@ -567,7 +567,14 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
           resize: vjson.resize === undefined ? true : vjson.resize,
           head: {
             view: "toolbar", margin: -4, cols: [
-              { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
+              {
+                view: "label", label: vjson.title, css: 'webix_header webix_win_title',
+                on: {
+                  onAfterRender() {
+                    module._titleLabel = this;
+                  }
+                }
+              },
               {
                 view: "icon", icon: "fa fa-expand", click: function (this: any) {
                   dialog.config.fullscreen = !dialog.config.fullscreen;

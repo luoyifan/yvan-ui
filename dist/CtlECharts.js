@@ -1,14 +1,22 @@
-import { __extends } from "tslib";
+import { __assign, __extends } from "tslib";
 import { CtlBase } from './CtlBase';
 import { YvEventDispatch } from './YvanEvent';
 import { parseYvanPropChangeVJson } from './CtlUtils';
+import webix from 'webix';
+/**
+ * 扩展 echarts 组件
+ */
+webix.protoUI({
+    name: 'echarts'
+}, webix.ui.template);
 var CtlECharts = /** @class */ (function (_super) {
     __extends(CtlECharts, _super);
     function CtlECharts() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlECharts.create = function (vjson) {
+    CtlECharts.create = function (module, vjson) {
         var that = new CtlECharts(_.cloneDeep(vjson));
+        that._module = module;
         if (vjson.hasOwnProperty('debugger')) {
             debugger;
         }
@@ -21,11 +29,11 @@ var CtlECharts = /** @class */ (function (_super) {
             delete vjson[key];
         });
         _.merge(vjson, {
-            view: 'grid',
+            view: 'echarts',
             template: "<div role=\"echarts\"></div>",
             on: {
                 onAfterRender: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                     that._resetECharts();
                 },
                 onDestruct: function () {

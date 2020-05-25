@@ -21,7 +21,7 @@ export namespace Db {
         limitOffset?: number
         needCount?: boolean
         filterModel?: any
-        orderByModel?: any
+        sortModel?: any
     }
 
     export interface Response extends Ajax.Response<any> {
@@ -111,7 +111,7 @@ export namespace Db {
                     data: {
                         db: this.defaultDb,
                         filterModel: option.filterModel,
-                        orderByModel: option.orderByModel,
+                        sortModel: option.sortModel,
                         limit: option.limit,
                         limitOffset: option.limitOffset,
                         needCount: option.needCount,

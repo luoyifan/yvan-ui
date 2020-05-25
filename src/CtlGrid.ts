@@ -21,6 +21,13 @@ import CtlGridEditorText from './CtlGridEditorText'
 import CtlGridEditorCombo from './CtlGridEditorCombo'
 import webix from 'webix'
 
+/** 在CtlGridPage.ts 里面有关于点击分页按钮时候设置 GridRefreshMode **/
+export enum GridRefreshMode {
+  refreshRows,
+  refreshWithFilter,
+  refreshAndClearFilter
+}
+
 /**
  * 表格中的行按钮被点击后触发的事件参数
  */
@@ -106,7 +113,8 @@ export class CtlGrid extends CtlBase<CtlGrid> {
   /*============================ 公共属性部分 ============================*/
   gridApi: any
   columnApi: any
-
+  refreshMode: GridRefreshMode = GridRefreshMode.refreshRows;
+  private paginationDefaultSelectRow: number | undefined;
   get webix() {
     return this._webix
   }
@@ -321,34 +329,48 @@ export class CtlGrid extends CtlBase<CtlGrid> {
    * 无感知刷新
    */
   _transactionUpdate(targetDataList: any[]) {
-    // if (targetDataList.length <= 0) {
-    //   //无数据，不用做更新
-    //   this.gridApi.setRowData([])
-    //   return
-    // }
-    // 不能用更新，这里会出 bug
 
-    const transaction: any = {
-      add: [],
-      remove: [],
-      update: []
-    }
-    let i = 0
-    this.gridApi.forEachNode((node: any) => {
-      if (i === targetDataList.length) {
-        //已经越位
-        transaction.remove.push(node.data)
-      } else {
-        const newData = targetDataList[i++]
-        node.setData(newData)
-        transaction.update.push(node.data)
+    if (this.refreshMode === GridRefreshMode.refreshWithFilter || this.refreshMode === GridRefreshMode.refreshAndClearFilter) {
+
+      /** 更改当前的刷新模式， 避免重复刷新 **/
+      this.refreshMode = GridRefreshMode.refreshRows
+      this.setData(targetDataList);
+      if (this.dataSourceBind) {
+        this.gridApi.setFilterModel(this.dataSourceBind.lastFilterModel)
       }
-    })
-    for (; i < targetDataList.length; i++) {
-      transaction.add.push(targetDataList[i])
+    } else {
+      /** 更改当前的刷新模式， 避免重复刷新 **/
+      this.refreshMode = GridRefreshMode.refreshRows
+      const transaction: any = {
+        add: [],
+        remove: [],
+        update: []
+      }
+      let i = 0
+      this.gridApi.forEachNode((node: any) => {
+        if (i === targetDataList.length) {
+          //已经越位
+          transaction.remove.push(node.data)
+        } else {
+          const newData = targetDataList[i++]
+          node.setData(newData)
+          transaction.update.push(node.data)
+        }
+      })
+      for (; i < targetDataList.length; i++) {
+        transaction.add.push(targetDataList[i])
+      }
+      this.gridApi.updateRowData(transaction)
     }
-
-    this.gridApi.updateRowData(transaction)
+    if (this.paginationDefaultSelectRow != undefined && targetDataList && targetDataList.length > 0) {
+      if (this.paginationDefaultSelectRow >=0) {
+        if (targetDataList.length <= this.paginationDefaultSelectRow) {
+          this.selectRow(node => node.rowIndex === targetDataList.length-1);
+        } else {
+          this.selectRow(node => node.rowIndex === this.paginationDefaultSelectRow);
+        }
+      }
+    }
   }
 
   /**
@@ -378,9 +400,52 @@ export class CtlGrid extends CtlBase<CtlGrid> {
    * option:
    *   clearFilter=true 是否清空筛选
    */
-  reload(option?: any) {
-    this.loading = true
+  // reload(option?: any) {
+  //   this.loading = true
+  //
+  //   //无感刷新之前，清空所有状态
+  //   this._clearCache()
+  //
+  //   //需要重新请求 rowCount(总数据行)
+  //   if (this.dataSourceBind) {
+  //     this.dataSourceBind.clearRowCount()
+  //   }
+  //
+  //   if (this.entityName) {
+  //     _.set(this.getModule(), this.entityName + '.selectedRow', undefined)
+  //   }
+  //
+  //   /** 有clearFilter 参数的时候 一定刷新数据 **/
+  //   if (option && option.clearFilter === true) {
+  //     this.pageAbleDataRefreshMode = "refreshAndReset"
+  //     this.gridApi.setFilterModel(null)
+  //     if (this.dataSourceBind) {
+  //       /** 表头筛选数据没有变化也要重新加载数据 **/
+  //       if (_.isEqual(this.gridApi.getFilterModel(), this.dataSourceBind.lastFilterModel)) {
+  //         this._filterChanged();
+  //       }
+  //     }
+  //   } else {
+  //     if (this.pagination) {
+  //       this.pageAbleDataRefreshMode = "refreshWithFilter"
+  //       this.gridPage.refreshGrid()
+  //     } else {
+  //       this.pageAbleDataRefreshMode = "refreshRows"
+  //       this.gridApi.refreshInfiniteCache()
+  //     }
+  //   }
+  // }
 
+  /**
+   * 无感刷新
+   * 清空缓存，从后台重新拉取数据，表格上临时修改的内容都会被清空
+   *
+   * option:
+   *   clearFilter=true 是否清空筛选
+   */
+  reload(refreshMode: GridRefreshMode = GridRefreshMode.refreshRows) {
+    this.loading = true
+    this.refreshMode = refreshMode
     //无感刷新之前，清空所有状态
     this._clearCache()
 
@@ -393,8 +458,15 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       _.set(this.getModule(), this.entityName + '.selectedRow', undefined)
     }
 
-    if (option && option.clearFilter === true) {
+    /** 有clearFilter 参数的时候 一定刷新数据 **/
+    if (refreshMode === GridRefreshMode.refreshAndClearFilter) {
       this.gridApi.setFilterModel(null)
+      if (this.dataSourceBind) {
+        /** 表头筛选数据没有变化也要重新加载数据 **/
+        if (_.isEqual(this.gridApi.getFilterModel(), this.dataSourceBind.lastFilterModel)) {
+          this._filterChanged();
+        }
+      }
     } else {
       if (this.pagination) {
         this.gridPage.refreshGrid()
@@ -617,8 +689,10 @@ export class CtlGrid extends CtlBase<CtlGrid> {
       onCellFocused: this._cellFocused.bind(this),
       onCellClicked: this._cellClicked.bind(this),
       onFilterChanged: this._filterChanged.bind(this),
+      onSortChanged: this._sortChanged.bind(this),
       enterMovesDown: false,
       enterMovesDownAfterEdit: false,
+      accentedSort: true,
 
       components: {
         CtlGridCellButton: CtlGridCellButton,
@@ -653,10 +727,26 @@ export class CtlGrid extends CtlBase<CtlGrid> {
   }
 
   private _filterChanged() {
-    console.log('_filterChanged', this.gridApi.getFilterModel());
-    const reload = _.get(this.dataSourceBind, 'reload')
-    if (typeof reload === 'function') {
-      reload.call(this.dataSourceBind);
+    if (this.dataSourceBind) {
+      if ((!_.isEqual(this.gridApi.getFilterModel(), this.dataSourceBind.lastFilterModel)) || this.refreshMode == GridRefreshMode.refreshAndClearFilter) {
+        const reload = _.get(this.dataSourceBind, 'reload')
+        if (typeof reload === 'function') {
+          reload.call(this.dataSourceBind);
+        }
+      }
+      // console.log('_filterChanged', this.gridApi.getFilterModel());
+    }
+  }
+
+  private _sortChanged() {
+    if (this.dataSourceBind) {
+      if ((!_.isEqual(this.gridApi.getSortModel(), this.dataSourceBind.lastSortModel)) || this.refreshMode == GridRefreshMode.refreshAndClearFilter) {
+        const reload = _.get(this.dataSourceBind, 'reload')
+        if (typeof reload === 'function') {
+          reload.call(this.dataSourceBind);
+        }
+      }
+      // console.log('_sortChanged', this.gridApi.getSortModel());
     }
   }
 
@@ -1144,6 +1234,13 @@ export class CtlGrid extends CtlBase<CtlGrid> {
         sortable: easyuiCol.sortable,
         //unSortIcon: true,
         hide: easyuiCol.hidden
+      }
+
+      if (easyuiCol.sortable) {
+        // 走服务端排序，客户端排序可以让其无效
+        col.comparator = () => {
+          return 0;
+        }
       }
 
       if (typeof easyuiCol.width !== 'undefined') col.width = easyuiCol.width

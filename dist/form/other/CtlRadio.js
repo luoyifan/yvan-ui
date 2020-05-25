@@ -7,8 +7,9 @@ var CtlRadio = /** @class */ (function (_super) {
     function CtlRadio() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CtlRadio.create = function (vjson) {
+    CtlRadio.create = function (module, vjson) {
         var that = new CtlRadio(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlRadioDefault);
         // 基础属性先执行
         that._create(vjson, that);

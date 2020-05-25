@@ -90,14 +90,6 @@ export declare abstract class BaseDialog<M, Refs, INP> extends BaseModule<M, Ref
      */
     dialogParent: any;
     /**
-     * 对话框标题
-     */
-    get title(): string;
-    /**
-     * 设置对话框标题
-     */
-    set title(nv: string);
-    /**
      * 显示进行中的状态
      */
     showLoading(): void;

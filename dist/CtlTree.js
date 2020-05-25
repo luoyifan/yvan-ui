@@ -1,4 +1,4 @@
-import { __extends } from "tslib";
+import { __assign, __extends } from "tslib";
 import { CtlBase } from './CtlBase';
 import { parseYvanPropChangeVJson } from './CtlUtils';
 import { YvDataSource } from './YvanDataSourceImp';
@@ -23,8 +23,9 @@ var CtlTree = /** @class */ (function (_super) {
         _this.showIcon = true;
         return _this;
     }
-    CtlTree.create = function (vjson) {
+    CtlTree.create = function (module, vjson) {
         var that = new CtlTree(vjson);
+        that._module = module;
         _.defaultsDeep(vjson, CtlTreeDefault);
         var yvanProp = parseYvanPropChangeVJson(vjson, [
             // 'data',
@@ -48,7 +49,7 @@ var CtlTree = /** @class */ (function (_super) {
             },
             on: {
                 onInited: function () {
-                    that.attachHandle(this);
+                    that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
                 },
                 onAfterDelete: function () {
                     that.removeHandle();
@@ -107,7 +108,7 @@ var CtlTree = /** @class */ (function (_super) {
         this._webix.filter(function (node) {
             var value = node.value;
             var nodePy = getFirstPinyin(value).toLowerCase();
-            return nodePy.indexOf(nv.toLowerCase()) >= 0 || value.indexOf(nv) >= 0;
+            return nodePy.indexOf(nv.toLowerCase()) >= 0 || value.toLowerCase().indexOf(nv) >= 0;
         });
     };
     Object.defineProperty(CtlTree.prototype, "value", {
@@ -158,7 +159,11 @@ var CtlTree = /** @class */ (function (_super) {
          */
         set: function (nv) {
             this._dataSource = nv;
-            this._rebindDataSource();
+            if (this._module.loadFinished) {
+                // onLoad 之后会触发 view.onInited -> attachHandle -> refreshState -> _rebindDataSource
+                // onLoad 之前都不需要主动触发 _rebindDataSource
+                this._rebindDataSource();
+            }
         },
         enumerable: true,
         configurable: true
@@ -302,15 +307,32 @@ var CtlTree = /** @class */ (function (_super) {
     CtlTree.prototype.collapseAll = function () {
         this._webix.closeAll();
     };
+    /**
+     * 递归查找每个节点, 直到寻找到想要的节点
+     */
+    CtlTree.prototype.find = function (condition) {
+        return this._webix.find(condition);
+    };
     //重新绑定数据源
     CtlTree.prototype._rebindDataSource = function () {
-        if (this.dataSourceBind) {
-            this.dataSourceBind.destory();
-            this.dataSourceBind = undefined;
+        var _this = this;
+        var innerMethod = function () {
+            if (_this.dataSourceBind) {
+                _this.dataSourceBind.destory();
+                _this.dataSourceBind = undefined;
+            }
+            if (_this._webix && _this._module) {
+                _this.dataSourceBind = new YvDataSource(_this, _this.dataSource, _this._dataSourceProcess.bind(_this));
+                _this.dataSourceBind.init();
+            }
+        };
+        if (!this._module.loadFinished) {
+            // onload 函数还没有执行（模块还没加载完）, 延迟调用 rebind
+            _.defer(innerMethod);
         }
-        if (this._webix && this.getModule()) {
-            this.dataSourceBind = new YvDataSource(this, this.dataSource, this._dataSourceProcess.bind(this));
-            this.dataSourceBind.init();
+        else {
+            // 否则实时调用 rebind
+            innerMethod();
         }
     };
     CtlTree.prototype._dataSourceProcess = function (data) {
@@ -337,6 +359,7 @@ var CtlTree = /** @class */ (function (_super) {
         for (var i = 0; i < data.length; i++) {
             var row = data[i];
             nodeMap[row[idField]] = {
+                icon: row['icon'],
                 value: row[textField],
                 id: row[idField],
                 row: row
