@@ -8,6 +8,7 @@ export declare class YvanDataSourceGrid {
     private reload;
     private rowCount;
     lastFilterModel: any;
+    lastSortModel: any;
     serverQuery: ((option: GridDataSourceServer | GridDataSourceAjax | GridDataSourceSql, paramFunction: (() => any) | undefined, params: any) => void) & import("lodash").Cancelable;
     /**
      * SQL取值

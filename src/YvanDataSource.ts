@@ -1,4 +1,5 @@
 import { GetParam, WatchParam } from './YvanDataSourceGrid'
+import { YvEvent } from './YvanEvent'
 
 export interface DataSourceParam {
   /**
@@ -23,8 +24,8 @@ export type DataSourceProcessFunction = (data: any[]) => any
 export type DataSource<T> =
   | undefined
   | any[]
-  | DataSourceDb
-  | DataSourceServer
+  | DataSourceDb<T>
+  | DataSourceServer<T>
   | DataSourceStaticFunction<T>
   | DataSourceFunctionBind<T>
 
@@ -44,14 +45,14 @@ export interface DataSourceFunctionBind<T> {
   watch?: string[]
 
   /**
-   * 执行前, 检查是否需要请求服务器
+   * 执行前, 检查是否需要请求服务器, 如果返回 false 代表取消请求
    */
-  preFunction?: string
+  onBefore?: YvEvent<T, any>
 
   /**
    * 执行后, 更改服务器返回的数据结构
    */
-  afterFunction?: string
+  onAfter?: YvEvent<T, any>
 
   displayField: string
   valueField: string
@@ -59,7 +60,7 @@ export interface DataSourceFunctionBind<T> {
   idField: string
 }
 
-export interface DataSourceServer {
+export interface DataSourceServer<T> {
   type: 'Server',
 
   /**
@@ -95,17 +96,17 @@ export interface DataSourceServer {
   idField: string
 
   /**
-   * 执行前, 检查是否需要请求服务器
+   * 执行前, 检查是否需要请求服务器, 如果返回 false 代表取消请求
    */
-  preFunction?: string
+  onBefore?: YvEvent<T, any>
 
   /**
    * 执行后, 更改服务器返回的数据结构
    */
-  afterFunction?: string
+  onAfter?: YvEvent<T, any>
 }
 
-export interface DataSourceDb {
+export interface DataSourceDb<T> {
   type: 'SQL'
 
   /**
@@ -149,12 +150,12 @@ export interface DataSourceDb {
   idField: string
 
   /**
-   * 执行前, 检查是否需要请求服务器
+   * 执行前, 检查是否需要请求服务器, 如果返回 false 代表取消请求
    */
-  preFunction?: string
+  onBefore?: YvEvent<T, any>
 
   /**
    * 执行后, 更改服务器返回的数据结构
    */
-  afterFunction?: string
+  onAfter?: YvEvent<T, any>
 }

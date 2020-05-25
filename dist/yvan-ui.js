@@ -408,22 +408,32 @@
           });
           this.sqlModeDebounce = _.debounce(function (option) {
               var that = _this;
-              //异步请求数据内容
-              that.ctl.loading = true;
               var ajaxPromise;
               if (option.type === 'SQL') {
-                  ajaxPromise = dbs[option.db].query({
+                  var ajaxParam = {
                       params: option.params,
                       needCount: false,
                       sqlId: option.sqlId
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = dbs[option.db].query(ajaxParam);
               }
               else if (option.type === 'Server') {
                   var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
-                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, {
+                  var ajaxParam = {
                       params: option.params,
                       needCount: false,
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, ajaxParam);
               }
               else {
                   console.error('unSupport dataSource mode:', option);
@@ -431,7 +441,10 @@
                   that.ctl.loading = false;
                   return;
               }
+              //异步请求数据内容
+              that.ctl.loading = true;
               ajaxPromise.then(function (res) {
+                  YvEventDispatch(option.onAfter, that.ctl, res);
                   var resultData = res.data, resParams = res.params;
                   if (_this.dataSourceProcess) {
                       //自定义的数据处理过程
@@ -2068,7 +2081,7 @@
           msg = '请稍后';
       }
       var $body = $('body');
-      $body.append("<div class=\"load-view\" style=\"z-index: 19850224;\"><div class=\"load-an-view\"><div class=\"fading-circle\">\n  <div class=\"sk-circle1 sk-circle\"></div>\n  <div class=\"sk-circle2 sk-circle\"></div>\n  <div class=\"sk-circle3 sk-circle\"></div>\n  <div class=\"sk-circle4 sk-circle\"></div>\n  <div class=\"sk-circle5 sk-circle\"></div>\n  <div class=\"sk-circle6 sk-circle\"></div>\n  <div class=\"sk-circle7 sk-circle\"></div> \n  <div class=\"sk-circle8 sk-circle\"></div>\n  <div class=\"sk-circle9 sk-circle\"></div>\n  <div class=\"sk-circle10 sk-circle\"></div>\n  <div class=\"sk-circle11 sk-circle\"></div>\n  <div class=\"sk-circle12 sk-circle\"></div>\n</div></div><div class=\"load-tip\">" + msg + "</div></div>");
+      $body.append("<div class=\"load-view\" style=\"z-index: 119850224;\"><div class=\"load-an-view\"><div class=\"fading-circle\">\n  <div class=\"sk-circle1 sk-circle\"></div>\n  <div class=\"sk-circle2 sk-circle\"></div>\n  <div class=\"sk-circle3 sk-circle\"></div>\n  <div class=\"sk-circle4 sk-circle\"></div>\n  <div class=\"sk-circle5 sk-circle\"></div>\n  <div class=\"sk-circle6 sk-circle\"></div>\n  <div class=\"sk-circle7 sk-circle\"></div> \n  <div class=\"sk-circle8 sk-circle\"></div>\n  <div class=\"sk-circle9 sk-circle\"></div>\n  <div class=\"sk-circle10 sk-circle\"></div>\n  <div class=\"sk-circle11 sk-circle\"></div>\n  <div class=\"sk-circle12 sk-circle\"></div>\n</div></div><div class=\"load-tip\">" + msg + "</div></div>");
       $body.append($("<div class=\"webix_modal load-view-masker\" style=\"z-index: 19850223;\"></div>"));
   }
   /**
@@ -2251,6 +2264,12 @@
           webix.message({ type: 'error', text: content, expire: -1 });
       }
       else {
+          toastr.options = {
+              "closeButton": true,
+              "positionClass": "toast-bottom-left",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut"
+          };
           toastr.error(content, '错误');
       }
   }
@@ -2264,6 +2283,13 @@
           webix.message({ type: 'success', text: content, expire: 2000 });
       }
       else {
+          toastr.options = {
+              "closeButton": true,
+              "positionClass": "toast-bottom-left",
+              "hideDuration": "3000",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut"
+          };
           toastr.success(content, '成功');
       }
   }
@@ -2277,6 +2303,13 @@
           webix.message({ type: 'info', text: content, expire: 2000 });
       }
       else {
+          toastr.options = {
+              "closeButton": true,
+              "positionClass": "toast-bottom-left",
+              "hideDuration": "3000",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut"
+          };
           toastr.info(content);
       }
       // https://docs.webix.com/desktop__message_boxes.html
@@ -3657,11 +3690,14 @@
               return;
           }
           this.supportChangeValue = true;
-          YvEventDispatch(this.widget.onClear, this, undefined);
-          //清空
-          _.forOwn(this.widget.bind, function (value, key) {
-              _.set(_this._module, key, '');
-          });
+          // 发出 onClear 事件，如果事件返回 true，代表不用再清空
+          var hasHandle = YvEventDispatch(this.widget.onClear, this, undefined);
+          if (!hasHandle) {
+              //清空
+              _.forOwn(this.widget.bind, function (value, key) {
+                  _.set(_this._module, key, '');
+              });
+          }
       };
       Object.defineProperty(CtlSearch.prototype, "value", {
           get: function () {
@@ -4384,50 +4420,61 @@
           this.isFirstAutoLoad = true; //是否为第一次自动读取
           this.serverQuery = _.debounce(function (option, paramFunction, params) {
               var that = _this;
-              //异步请求数据内容
-              that.ctl.loading = true;
               var needCount = false;
               if (typeof that.rowCount === 'undefined') {
                   //从来没有统计过 rowCount(记录数)
                   needCount = true;
                   that.lastFilterModel = _.cloneDeep(params.filterModel);
+                  that.lastSortModel = _.cloneDeep(params.sortModel);
               }
               else {
                   if (!_.isEqual(that.lastFilterModel, params.filterModel)) {
                       //深度对比，如果 filter 模型更改了，需要重新统计 rowCount(记录数)
                       needCount = true;
                       that.lastFilterModel = _.cloneDeep(params.filterModel);
+                      that.lastSortModel = _.cloneDeep(params.sortModel);
                   }
               }
               // 获取所有参数
               var queryParams = __assign({}, (typeof paramFunction === 'function' ? paramFunction() : undefined));
               var ajaxPromise;
               if (option.type === 'SQL') {
-                  ajaxPromise = dbs[option.db]
-                      .query({
+                  var ajaxParam = {
                       params: queryParams,
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
                       needCount: needCount,
-                      orderByModel: params.sortModel,
+                      sortModel: params.sortModel,
                       filterModel: params.filterModel,
                       sqlId: option.sqlId
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = dbs[option.db].query(ajaxParam);
               }
               else if (option.type === 'Server') {
                   var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
-                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, {
+                  var ajaxParam = {
                       params: queryParams,
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
                       needCount: needCount,
-                      orderByModel: params.sortModel,
+                      sortModel: params.sortModel,
                       filterModel: params.filterModel,
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, ajaxParam);
               }
               else if (option.type === 'Ajax') {
                   var ajax = _.get(window, 'YvanUI.ajax');
-                  ajaxPromise = ajax({
+                  var ajaxParam = {
                       url: option.url,
                       method: 'POST-JSON',
                       data: {
@@ -4435,17 +4482,26 @@
                           limit: params.endRow - params.startRow,
                           limitOffset: params.startRow,
                           needCount: needCount,
-                          orderByModel: params.sortModel,
+                          sortModel: params.sortModel,
                           filterModel: params.filterModel,
                       }
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = ajax(ajaxParam);
               }
               else {
                   console.error('unSupport dataSource mode:', option);
                   params.failCallback();
                   return;
               }
+              //异步请求数据内容
+              that.ctl.loading = true;
               ajaxPromise.then(function (res) {
+                  YvEventDispatch(option.onAfter, that.ctl, res);
                   var resultData = res.data, pagination = res.pagination, resParams = res.params;
                   if (needCount) {
                       if (_.has(res, 'totalCount')) {
@@ -4577,6 +4633,7 @@
                       params.startRow = (currentPage - 1) * pageSize;
                       params.endRow = currentPage * pageSize;
                       params.filterModel = that.ctl.gridApi.getFilterModel();
+                      params.sortModel = that.ctl.gridApi.getSortModel();
                       if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
                           that.rowCount = 0;
                           params.successCallback([], that.rowCount);
@@ -5478,8 +5535,15 @@
               }
               this.gridApi.updateRowData(transaction_1);
           }
-          if (this.paginationDefaultSelectRow && this.paginationDefaultSelectRow >= 0 && targetDataList && targetDataList.length > 0) {
-              this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+          if (this.paginationDefaultSelectRow != undefined && targetDataList && targetDataList.length > 0) {
+              if (this.paginationDefaultSelectRow >= 0) {
+                  if (targetDataList.length <= this.paginationDefaultSelectRow) {
+                      this.selectRow(function (node) { return node.rowIndex === targetDataList.length - 1; });
+                  }
+                  else {
+                      this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+                  }
+              }
           }
       };
       /**
@@ -5778,8 +5842,10 @@
               onCellFocused: this._cellFocused.bind(this),
               onCellClicked: this._cellClicked.bind(this),
               onFilterChanged: this._filterChanged.bind(this),
+              onSortChanged: this._sortChanged.bind(this),
               enterMovesDown: false,
               enterMovesDownAfterEdit: false,
+              accentedSort: true,
               components: {
                   CtlGridCellButton: CtlGridCellButton,
                   CtlGridCellCheckbox: CtlGridCellCheckbox,
@@ -5816,7 +5882,18 @@
                       reload.call(this.dataSourceBind);
                   }
               }
-              console.log('_filterChanged', this.gridApi.getFilterModel());
+              // console.log('_filterChanged', this.gridApi.getFilterModel());
+          }
+      };
+      CtlGrid.prototype._sortChanged = function () {
+          if (this.dataSourceBind) {
+              if ((!_.isEqual(this.gridApi.getSortModel(), this.dataSourceBind.lastSortModel)) || this.refreshMode == exports.GridRefreshMode.refreshAndClearFilter) {
+                  var reload = _.get(this.dataSourceBind, 'reload');
+                  if (typeof reload === 'function') {
+                      reload.call(this.dataSourceBind);
+                  }
+              }
+              // console.log('_sortChanged', this.gridApi.getSortModel());
           }
       };
       CtlGrid.prototype._gridReady = function () {
@@ -6248,6 +6325,12 @@
                   //unSortIcon: true,
                   hide: easyuiCol.hidden
               };
+              if (easyuiCol.sortable) {
+                  // 走服务端排序，客户端排序可以让其无效
+                  col.comparator = function () {
+                      return 0;
+                  };
+              }
               if (typeof easyuiCol.width !== 'undefined')
                   col.width = easyuiCol.width;
               if (typeof easyuiCol.minwidth !== 'undefined')
@@ -8188,7 +8271,14 @@
                       resize: vjson.resize === undefined ? true : vjson.resize,
                       head: {
                           view: "toolbar", margin: -4, cols: [
-                              { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
+                              {
+                                  view: "label", label: vjson.title, css: 'webix_header webix_win_title',
+                                  on: {
+                                      onAfterRender: function () {
+                                          module._titleLabel = this;
+                                      }
+                                  }
+                              },
                               {
                                   view: "icon", icon: "fa fa-expand", click: function () {
                                       dialog.config.fullscreen = !dialog.config.fullscreen;
@@ -8435,7 +8525,7 @@
                       data: {
                           db: _this.defaultDb,
                           filterModel: option.filterModel,
-                          orderByModel: option.orderByModel,
+                          sortModel: option.sortModel,
                           limit: option.limit,
                           limitOffset: option.limitOffset,
                           needCount: option.needCount,
@@ -8633,10 +8723,12 @@
            * 获取或设置 window 标题
            */
           set: function (v) {
-              if (this._webixId) {
+              if (this._webixId && _.has(this, '_titleLabel')) {
                   // webix 对象已经出现
                   this._webixId.define('title', v);
-                  $(this._webixId.$view).find('.webix_win_head .webix_win_title .webix_el_box').html(v);
+                  var _titleLabel = _.get(this, '_titleLabel');
+                  _titleLabel.define('label', v);
+                  _titleLabel.refresh();
                   return;
               }
               console.error('无法设置 title');
@@ -8667,26 +8759,6 @@
        * 关闭后触发
        */
       BaseDialog.prototype.onClose = function () { };
-      Object.defineProperty(BaseDialog.prototype, "title", {
-          /**
-           * 对话框标题
-           */
-          get: function () {
-              return $(this.layero)
-                  .find('.layui-layer-title')
-                  .html();
-          },
-          /**
-           * 设置对话框标题
-           */
-          set: function (nv) {
-              $(this.layero)
-                  .find('.layui-layer-title')
-                  .html(nv);
-          },
-          enumerable: true,
-          configurable: true
-      });
       /**
        * 显示进行中的状态
        */

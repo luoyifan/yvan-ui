@@ -59,7 +59,7 @@ export function loading(msg?: string) {
     msg = '请稍后'
   }
   const $body = $('body')
-  $body.append(`<div class="load-view" style="z-index: 19850224;"><div class="load-an-view"><div class="fading-circle">
+  $body.append(`<div class="load-view" style="z-index: 119850224;"><div class="load-an-view"><div class="fading-circle">
   <div class="sk-circle1 sk-circle"></div>
   <div class="sk-circle2 sk-circle"></div>
   <div class="sk-circle3 sk-circle"></div>
@@ -281,6 +281,12 @@ export function msgError(content: string): void {
   if (!toastr) {
     webix.message({ type: 'error', text: content, expire: -1 })
   } else {
+    toastr.options = {
+      "closeButton": true,
+      "positionClass": "toast-bottom-left",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
     toastr.error(content, '错误')
   }
 }
@@ -294,6 +300,13 @@ export function msgSuccess(content: string): void {
   if (!toastr) {
     webix.message({ type: 'success', text: content, expire: 2000 })
   } else {
+    toastr.options = {
+      "closeButton": true,
+      "positionClass": "toast-bottom-left",
+      "hideDuration": "3000",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
     toastr.success(content, '成功')
   }
 }
@@ -307,6 +320,13 @@ export function msgInfo(content: string): void {
   if (!toastr) {
     webix.message({ type: 'info', text: content, expire: 2000 })
   } else {
+    toastr.options = {
+      "closeButton": true,
+      "positionClass": "toast-bottom-left",
+      "hideDuration": "3000",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
     toastr.info(content)
   }
   // https://docs.webix.com/desktop__message_boxes.html
