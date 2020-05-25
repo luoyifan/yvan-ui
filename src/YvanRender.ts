@@ -576,18 +576,18 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
                 }
               },
               {
-                view: "icon", icon: "fa fa-expand", click: function (this: any) {
+                view: "icon", icon: "fa fa-window-maximize", click: function (this: any) {
                   dialog.config.fullscreen = !dialog.config.fullscreen;
                   if (dialog.config.fullscreen) {
                     dialog.config.oldtop = dialog.config.top;
                     dialog.config.oldleft = dialog.config.left;
                     dialog.config.left = 0;
                     dialog.config.top = 0;
-                    this.define({ icon: 'fa fa-compress' });
+                    this.define({ icon: 'fa fa-window-restore' });
                   } else {
                     dialog.config.top = dialog.config.oldtop;
                     dialog.config.left = dialog.config.oldleft;
-                    this.define({ icon: 'fa fa-expand' });
+                    this.define({ icon: 'fa fa-window-maximize' });
                   }
                   dialog.resize();
                   this.refresh();
