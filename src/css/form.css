@@ -10,7 +10,6 @@
   height: 28px;
   border-radius: 2px;
   transition: all .3s ease;
-  box-shadow: 0px 1px 5px rgba(0,0,0,.08) inset
 }
 .webix_inp_label,
 .webix_inp_top_label,
@@ -32,6 +31,15 @@ legend.webix_forminput_label,
 .yvan-validate-error.webix_el_datepicker input,
 .yvan-validate-error.webix_el_colorpicker input {
   border:1px solid #ff8400
+}
+.yvan-validate-error input:focus, 
+.yvan-validate-error input:focus, 
+.yvan-validate-error input:focus, 
+.yvan-validate-error input:focus, 
+.yvan-validate-error input:focus{
+  outline: 0;
+  box-shadow: 0 0 0 2px rgba(255,132,0,.2);
+  border-color:#ff8400
 }
 .yvan-validate-error{
   overflow: visible!important;
@@ -78,7 +86,7 @@ legend.webix_forminput_label,
   left: -8px;
 }
 .webix_inp_label, .webix_inp_top_label, legend.webix_forminput_label, .webix_el_label .webix_el_box{
-  line-height: 28px;
+  line-height: 28px!important;
   font-size: 13px
 }
 .webix_list_item{
@@ -87,8 +95,8 @@ legend.webix_forminput_label,
   font-size: 13px!important
 }
 .webix_list_item.webix_selected{
-  box-shadow:none;
   background: #e6f7ff;
+  box-shadow: inset 2px 0 #1890ff;
 }
 input::-webkit-input-placeholder{
   color:#e4e4e4;
@@ -107,4 +115,17 @@ input:-ms-input-placeholder{
 }
 .webix_el_radio .webix_custom_radio:before{
   font-size: 18px;
+}
+.webix_el_combo span.webix_input_icon, .webix_el_richselect span.webix_input_icon, .webix_el_datepicker span.webix_input_icon, .webix_el_dbldatepicker span.webix_input_icon, .webix_el_colorpicker span.webix_input_icon, .webix_el_search span.webix_input_icon{
+  height: 23px!important;
+  padding-top: 4px!important;
+}
+.webix_cal_body .webix_cal_select .webix_cal_day_inner, .webix_cal_body .webix_cal_today.webix_cal_select .webix_cal_day_inner{
+  background-color: #1890ff;
+}
+.webix_cal_body .webix_cal_event{
+  color: #1890ff;
+}
+.webix_cal_body .webix_cal_today .webix_cal_day_inner{
+  box-shadow: inset 0 0 0 1px #1CA1C1;
 }
