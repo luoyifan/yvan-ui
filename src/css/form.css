@@ -129,3 +129,25 @@ input:-ms-input-placeholder{
 .webix_cal_body .webix_cal_today .webix_cal_day_inner{
   box-shadow: inset 0 0 0 1px #1890ff;
 }
+.webix_custom_checkbox{
+  font-size: 18px;
+  border-radius: 4px;
+}
+.webix_custom_checkbox:focus,.webix_checkbox_1 .webix_custom_checkbox{
+  color: #1890ff;
+}
+.webix_switch_handle{
+  width: 14px;
+  height: 14px;
+}
+.webix_switch_box.webix_switch_on,.webix_switch_box{
+  width: 40px!important;
+  background-color: #1890ff;
+}
+.webix_switch_box{
+  height: 17px;
+  margin-top: -11px;
+}
+.webix_switch_handle{
+  left: 24px!important;
+}

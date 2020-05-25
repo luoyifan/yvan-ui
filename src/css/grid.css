@@ -462,3 +462,6 @@ input[type='number']::-webkit-outer-spin-button {
   height: 100%;
   background: rgba(255, 255, 255, .5);
 }
+.yv-grid-button{
+  background-color:#1890ff
+}
