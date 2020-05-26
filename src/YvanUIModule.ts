@@ -73,7 +73,7 @@ export abstract class BaseModule<M, Refs, INP> extends Vue implements Module<M, 
       const ctlMappings: any = _.get(this, '_entityCtlMapping.' + entityName);
 
       const result = {};
-      if (_.get(ctlMappings, '_required') === true || _.has(ctlMappings, '_validate')) {
+      if (_.get(ctlMappings, '_required') === true || _.has(ctlMappings, 'onValidate')) {
         const validateResult = ctlMappings._resultToShowOrHide();
         if (validateResult) {
           ctlMappings._showTootip(validateResult)
@@ -85,7 +85,7 @@ export abstract class BaseModule<M, Refs, INP> extends Vue implements Module<M, 
       else {
         let isShow = false;
         _.forEach(ctlMappings, (ctl, key) => {
-          if (_.get(ctl, '_required') === true || _.has(ctl, '_validate')) {
+          if (_.get(ctl, '_required') === true || _.has(ctl, 'onValidate')) {
             const validateResult = ctl._resultToShowOrHide();
             if (validateResult) {
               ctl._showValidateError()

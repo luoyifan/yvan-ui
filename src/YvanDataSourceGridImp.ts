@@ -108,7 +108,7 @@ export class YvanDataSourceGrid {
     that.ctl.loading = true
     ajaxPromise.then(res => {
       YvEventDispatch(option.onAfter, that.ctl, res)
-      
+
       const { data: resultData, pagination, params: resParams } = res
       if (needCount) {
         if (_.has(res, 'totalCount')) {
@@ -245,6 +245,7 @@ export class YvanDataSourceGrid {
               params.successCallback(data, dataLength)
 
               that.ctl.loading = false
+              that.ctl.gridPage.itemCount = dataLength
               that.ctl._bindingComplete()
               if (that.ctl.entityName) {
                 _.set(

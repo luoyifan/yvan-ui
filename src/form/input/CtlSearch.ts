@@ -98,8 +98,8 @@ export class CtlSearch extends CtlInput<CtlSearch> {
           YvEventDispatch(that.onFocus, that, undefined)
         },
         onBlur(this: any) {
-          if (that._validate) {
-            const result = that._validate(that.value);
+          if (that.onValidate || that._required) {
+            const result = that._resultToShowOrHide();
             if (result) {
               that._showValidateError()
             }
