@@ -42,6 +42,9 @@ body,
 .mainHeader  .webix_template{
   color: rgba(0,0,0,.85)
 }
+.mainHeader  .webix_scroll_cont .webix_view{
+  margin-top: 0!important;
+}
 .headerMenu{
   height:63px!important
 }
@@ -123,6 +126,9 @@ body,
   background: #e6f7ff;
   border-left:3px solid #1890ff;
   color:#1890ff
+}
+.mainLeft .webix_tree .webix_selected span{
+  padding-left:2px!important
 }
 .webix_tree_leaves .webix_tree_leaves{
   margin:0px!important;
