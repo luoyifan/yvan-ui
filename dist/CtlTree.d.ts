@@ -72,6 +72,10 @@ export declare class CtlTree extends CtlBase<CtlTree> {
      */
     clear(): void;
     /**
+     * 选择所有节点
+     */
+    checkAll(): void;
+    /**
      * 取消选择所有节点
      */
     uncheckAll(): void;

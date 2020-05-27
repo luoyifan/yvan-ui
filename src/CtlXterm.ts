@@ -1,8 +1,7 @@
 import { CtlBase } from './CtlBase'
 import { CtlXtermDefault } from './CtlDefaultValue'
 import { parseYvanPropChangeVJson } from './CtlUtils'
-import { YvEvent } from './YvanEvent'
-import * as YvanUI from './YvanUIExtend'
+import { YvEvent, YvEventDispatch } from './YvanEvent'
 import webix from 'webix'
 
 webix.protoUI(
@@ -45,7 +44,11 @@ webix.protoUI(
                         this.isXtermLoad = true
                         //@ts-ignore
                         require(['xterm', 'xterm-addon-fit'], (xterm: any, addon: any) => {
-                            const term = new xterm.Terminal();
+                            const term = new xterm.Terminal(this.config.termConfig);
+                            term.onData((data: any) => {
+                                //键盘输入时的回调函数
+                                YvEventDispatch(this.wrapper.onData, this.wrapper, data)
+                            });
                             const fitAddon = new addon.FitAddon();
                             term.loadAddon(fitAddon);
                             term.open(this.$view.firstChild);
@@ -69,7 +72,10 @@ export class CtlXterm extends CtlBase<CtlXterm> {
 
         _.defaultsDeep(vjson, CtlXtermDefault)
 
-        const yvanProp = parseYvanPropChangeVJson(vjson, ['value'])
+        const yvanProp = parseYvanPropChangeVJson(vjson, [
+            'value',
+            'onData'
+        ])
 
         // 将 vjson 存至 _webixConfig
         that._webixConfig = vjson
@@ -97,6 +103,8 @@ export class CtlXterm extends CtlBase<CtlXterm> {
      * size 改变时触发
      */
     onSizeChange?: YvEvent<CtlXterm, any>
+
+    onData?: YvEvent<CtlXterm, any>
 
     /**
      * 获取终端
