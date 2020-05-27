@@ -1,9 +1,9 @@
 import { CtlBase } from './CtlBase'
 import { CtlXtermDefault } from './CtlDefaultValue'
 import { parseYvanPropChangeVJson } from './CtlUtils'
+import { YvEvent } from './YvanEvent'
+import * as YvanUI from './YvanUIExtend'
 import webix from 'webix'
-import { Terminal } from 'xterm'
-import { FitAddon } from 'xterm-addon-fit';
 
 webix.protoUI(
     {
@@ -19,16 +19,7 @@ webix.protoUI(
             }
         },
         _ready: function (this: any) {
-            const term = new Terminal();
-            const fitAddon = new FitAddon();
-
-            _.defer(() => {
-                term.loadAddon(fitAddon);
-                term.open(this.$view.firstChild);
-                fitAddon.fit();
-                this._term = term;
-                this._fitAddon = fitAddon;
-            })
+            this.isXtermLoad = false;
         },
         _set_inner_size: function () {
             if (!this._term || !this.$width) return
@@ -50,6 +41,19 @@ webix.protoUI(
         $setSize: function (x: any, y: any) {
             if (webix.ui.view.prototype.$setSize.call(this, x, y)) {
                 _.defer(() => {
+                    if (this.isXtermLoad == false) {
+                        this.isXtermLoad = true
+                        //@ts-ignore
+                        require(['xterm', 'xterm-addon-fit'], (xterm: any, addon: any) => {
+                            const term = new xterm.Terminal();
+                            const fitAddon = new addon.FitAddon();
+                            term.loadAddon(fitAddon);
+                            term.open(this.$view.firstChild);
+                            fitAddon.fit();
+                            this._term = term;
+                            this._fitAddon = fitAddon;
+                        })
+                    }
                     this._set_inner_size()
                 })
             }
@@ -78,6 +82,7 @@ export class CtlXterm extends CtlBase<CtlXterm> {
             on: {
                 onInited(this: any) {
                     that.attachHandle(this, { ...vjson, ...yvanProp })
+                    this.wrapper = that
                 },
                 onAfterDelete() {
                     that.removeHandle()
@@ -89,16 +94,21 @@ export class CtlXterm extends CtlBase<CtlXterm> {
     }
 
     /**
+     * size 改变时触发
+     */
+    onSizeChange?: YvEvent<CtlXterm, any>
+
+    /**
      * 获取终端
      */
-    get term(): Terminal {
+    get term(): any {
         return this._webix._term
     }
 
     /**
      * 获取填充插件
      */
-    get fitAddon(): FitAddon {
+    get fitAddon(): any {
         return this._webix._fitAddon
     }
 
