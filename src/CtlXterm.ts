@@ -35,11 +35,21 @@ webix.protoUI(
 
             if (this._fitAddon) {
                 this._fitAddon.fit();
+                this._updateXtermInfo()
+            }
+        },
+        _updateXtermInfo: function () {
+            this.wrapper.xtermInfo = {
+                "cols": this._term.cols,
+                "rows": this._term.rows,
+                "width": this.$width,
+                "height": this.$height
             }
         },
         $setSize: function (x: any, y: any) {
             if (webix.ui.view.prototype.$setSize.call(this, x, y)) {
                 _.defer(() => {
+                    this._set_inner_size()
                     if (this.isXtermLoad == false) {
                         this.isXtermLoad = true
                         //@ts-ignore
@@ -55,9 +65,12 @@ webix.protoUI(
                             fitAddon.fit();
                             this._term = term;
                             this._fitAddon = fitAddon;
+                            this._updateXtermInfo()
                         })
                     }
-                    this._set_inner_size()
+                    else {
+                        YvEventDispatch(this.wrapper.onSizeChange, this.wrapper, this.wrapper.xtermInfo)
+                    }
                 })
             }
         }
@@ -74,7 +87,8 @@ export class CtlXterm extends CtlBase<CtlXterm> {
 
         const yvanProp = parseYvanPropChangeVJson(vjson, [
             'value',
-            'onData'
+            'onData',
+            'onSizeChange'
         ])
 
         // 将 vjson 存至 _webixConfig
@@ -100,6 +114,15 @@ export class CtlXterm extends CtlBase<CtlXterm> {
     }
 
     /**
+     * xterm 信息
+     * cols          
+     * rows
+     * width
+     * height
+     */
+    xtermInfo?: any
+
+    /**
      * size 改变时触发
      */
     onSizeChange?: YvEvent<CtlXterm, any>
@@ -118,13 +141,5 @@ export class CtlXterm extends CtlBase<CtlXterm> {
      */
     get fitAddon(): any {
         return this._webix._fitAddon
-    }
-
-    get xtermWidth(): number {
-        return this._webix.$width
-    }
-
-    get xtermHeight(): number {
-        return this._webix.$height
     }
 }

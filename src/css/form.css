@@ -148,3 +148,21 @@ input:-ms-input-placeholder{
   height: 17px;
   margin-top: -10px;
 }
+.webix_fieldset > fieldset{
+  border: 1px solid #f0f0f0;
+}
+.webix_cal_body .webix_cal_range_start .webix_cal_day_inner, .webix_cal_body .webix_cal_range_end .webix_cal_day_inner, .webix_cal_body .webix_cal_today.webix_cal_range_start .webix_cal_day_inner, .webix_cal_body .webix_cal_today.webix_cal_range_end .webix_cal_day_inner{
+  background-color: #1890ff;
+}
+.webix_cal_body .webix_cal_range {
+  background-color: #ebf5ff;
+}
+.webix_range_footer .webix_el_button .webix_el_box{
+  height: 30px!important;
+}
+.webix_cal_footer .webix_template{
+  padding:4px 12px
+}
+.webix_cal_icon:hover, .webix_cal_time:hover, .webix_cal_month_name:hover, .webix_cal_icon:focus, .webix_cal_time:focus, .webix_cal_month_name:focus{
+  color: #1890ff;
+}

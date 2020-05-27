@@ -9,10 +9,6 @@
   float: left;
   color: #606060;
 }
-.ctl-grid-page span.ui-icon:hover {
-  background-color: #e5e8ff;
-  border: 1px solid #7a839f;
-}
 
 .ctl-grid-page .ui-icon-disable {
   text-align: center;
@@ -366,28 +362,35 @@ input[type='number']::-webkit-outer-spin-button {
 .ctl-grid-page span.ui-icon:hover{
   background: #fff;
   color:#1890ff;
-  border:1px solid #fff
 }
 .ui-pg-table input,.ui-pg-table select{
   border: 1px solid #d9d9d9!important;
   color:#666;
-  border-radius: 4px
+  border-radius: 2px
 }
 .ui-pg-table input{
-  padding:2px 7px
+  padding:0px 5px
+}
+.ui-pg-table,.ui-pg-table table{
+  border-spacing: 0px;
+}
+.ui-pg-table table{
+  margin-top:1px
 }
 .ag-theme-blue .ag-paging-panel{
   color:#666!important;
   border-top:1px solid #f0f0f0!important;
+  height: 25px;
 }
 .ag-theme-blue .ag-paging-panel>*{
+  height: 25px;
   margin:0!important
 }
 .ctl-grid-page{
   border:none
 }
 .ctl-grid-page span.ui-icon{
-  border:1px solid #fff
+  border:none
 }
 .ag-theme-blue .ag-row{
   border-bottom:1px solid #f0f0f0!important
