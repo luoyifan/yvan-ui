@@ -7290,12 +7290,22 @@
           box.style.width = (this.$width || 0) + 'px';
           if (this._fitAddon) {
               this._fitAddon.fit();
+              this._updateXtermInfo();
           }
+      },
+      _updateXtermInfo: function () {
+          this.wrapper.xtermInfo = {
+              "cols": this._term.cols,
+              "rows": this._term.rows,
+              "width": this.$width,
+              "height": this.$height
+          };
       },
       $setSize: function (x, y) {
           var _this = this;
           if (webix.ui.view.prototype.$setSize.call(this, x, y)) {
               _.defer(function () {
+                  _this._set_inner_size();
                   if (_this.isXtermLoad == false) {
                       _this.isXtermLoad = true;
                       //@ts-ignore
@@ -7311,9 +7321,12 @@
                           fitAddon.fit();
                           _this._term = term;
                           _this._fitAddon = fitAddon;
+                          _this._updateXtermInfo();
                       });
                   }
-                  _this._set_inner_size();
+                  else {
+                      YvEventDispatch(_this.wrapper.onSizeChange, _this.wrapper, _this.wrapper.xtermInfo);
+                  }
               });
           }
       }
@@ -7329,7 +7342,8 @@
           _.defaultsDeep(vjson, CtlXtermDefault);
           var yvanProp = parseYvanPropChangeVJson(vjson, [
               'value',
-              'onData'
+              'onData',
+              'onSizeChange'
           ]);
           // 将 vjson 存至 _webixConfig
           that._webixConfig = vjson;
@@ -7365,20 +7379,6 @@
            */
           get: function () {
               return this._webix._fitAddon;
-          },
-          enumerable: true,
-          configurable: true
-      });
-      Object.defineProperty(CtlXterm.prototype, "xtermWidth", {
-          get: function () {
-              return this._webix.$width;
-          },
-          enumerable: true,
-          configurable: true
-      });
-      Object.defineProperty(CtlXterm.prototype, "xtermHeight", {
-          get: function () {
-              return this._webix.$height;
           },
           enumerable: true,
           configurable: true

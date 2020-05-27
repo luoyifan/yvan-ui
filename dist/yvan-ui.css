@@ -138,20 +138,6 @@ body,
 .webix_tree_leaves .webix_tree_leaves{
   margin:0px!important;
 }
-.mainLeft .webix_tree::-webkit-scrollbar {
-  width: 5px;
-  height: 10px;
-  overflow: auto
-}
-.mainLeft .webix_tree::-webkit-scrollbar-thumb {
-  background-color: #d9d9d9;
-  min-height: 25px;
-  min-width: 25px;
-  border: 1px solid #f0f0f0
-}
-.mainLeft .webix_tree::-webkit-scrollbar-track {
-  background-color: #f7f7f7
-}
 .mainLeft div[aria-level='1']{
   padding:8px
 }
@@ -320,21 +306,26 @@ body,
 .webix_layout_line{
   padding:.5px 0!important
 }
-/* =================================== */
-::-webkit-scrollbar {
-  width: 5px;
-  border-radius: 2.5px;
-  height: 5px;
-  overflow: auto
+/* ================滚动条样式=================== */
+*::-webkit-scrollbar{
+  width:6px;
+  height:6px;
 }
-::-webkit-scrollbar-thumb {
-  background-color: #d9d9d9;
-  min-height: 25px;
-  min-width: 25px;
-  border: 1px solid #f0f0f0
+*::-webkit-scrollbar-button{
+  width:0px; 
+  height:0px;
 }
-::-webkit-scrollbar-track {
-  background-color: #f7f7f7
+*::-webkit-scrollbar-track{
+  background:#f7f7f7;
+}
+*::-webkit-scrollbar-thumb{
+  background:#d9d9d9;
+}
+*::-webkit-scrollbar-track,*::-webkit-scrollbar-thumb{
+  border-radius:3px;
+}
+*::-webkit-scrollbar-corner,*::-webkit-scrollbar-resizer,*::-webkit-scrollbar-button{
+  background:#fff;
 }
 /*======================== tree =======================*/
 .webix_tree_item {
@@ -639,6 +630,9 @@ body,
 .webix_resize_handle{
   opacity: 0;
 }
+.webix_win_head .webix_win_title .webix_el_box{
+  line-height: 38px!important;
+}
 /* ====================== grid.foot =========================*/
 .ctl-grid-page span.ui-icon {
   text-align: center;
@@ -649,10 +643,6 @@ body,
   margin: 1px;
   float: left;
   color: #606060;
-}
-.ctl-grid-page span.ui-icon:hover {
-  background-color: #e5e8ff;
-  border: 1px solid #7a839f;
 }
 
 .ctl-grid-page .ui-icon-disable {
@@ -1017,28 +1007,35 @@ input[type='number']::-webkit-outer-spin-button {
 .ctl-grid-page span.ui-icon:hover{
   background: #fff;
   color:#1890ff;
-  border:1px solid #fff
 }
 .ui-pg-table input,.ui-pg-table select{
   border: 1px solid #d9d9d9!important;
   color:#666;
-  border-radius: 4px
+  border-radius: 2px
 }
 .ui-pg-table input{
-  padding:2px 7px
+  padding:0px 5px
+}
+.ui-pg-table,.ui-pg-table table{
+  border-spacing: 0px;
+}
+.ui-pg-table table{
+  margin-top:1px
 }
 .ag-theme-blue .ag-paging-panel{
   color:#666!important;
   border-top:1px solid #f0f0f0!important;
+  height: 25px;
 }
 .ag-theme-blue .ag-paging-panel>*{
+  height: 25px;
   margin:0!important
 }
 .ctl-grid-page{
   border:none
 }
 .ctl-grid-page span.ui-icon{
-  border:1px solid #fff
+  border:none
 }
 .ag-theme-blue .ag-row{
   border-bottom:1px solid #f0f0f0!important
@@ -1118,6 +1115,7 @@ input[type='number']::-webkit-outer-spin-button {
 .yv-grid-button{
   background-color:#1890ff
 }
+
 /* ====================== checkbox =========================*/
 .yvan-checkbox {
   display: inline-block;
@@ -1744,7 +1742,7 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 .webix_template {
-  padding: 0 !important;
+  padding: 0;
 }
 
 .input_validate_false {
@@ -1910,6 +1908,24 @@ input:-ms-input-placeholder{
 .webix_switch_box{
   height: 17px;
   margin-top: -10px;
+}
+.webix_fieldset > fieldset{
+  border: 1px solid #f0f0f0;
+}
+.webix_cal_body .webix_cal_range_start .webix_cal_day_inner, .webix_cal_body .webix_cal_range_end .webix_cal_day_inner, .webix_cal_body .webix_cal_today.webix_cal_range_start .webix_cal_day_inner, .webix_cal_body .webix_cal_today.webix_cal_range_end .webix_cal_day_inner{
+  background-color: #1890ff;
+}
+.webix_cal_body .webix_cal_range {
+  background-color: #ebf5ff;
+}
+.webix_range_footer .webix_el_button .webix_el_box{
+  height: 30px!important;
+}
+.webix_cal_footer .webix_template{
+  padding:4px 12px
+}
+.webix_cal_icon:hover, .webix_cal_time:hover, .webix_cal_month_name:hover, .webix_cal_icon:focus, .webix_cal_time:focus, .webix_cal_month_name:focus{
+  color: #1890ff;
 }
 .vc-log {
   /* padding-bottom: 100px; */
