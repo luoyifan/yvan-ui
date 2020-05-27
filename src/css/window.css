@@ -77,3 +77,6 @@
 .webix_resize_handle{
   opacity: 0;
 }
+.webix_win_head .webix_win_title .webix_el_box{
+  line-height: 38px!important;
+}
