@@ -141,13 +141,10 @@ input:-ms-input-placeholder{
   height: 14px;
 }
 .webix_switch_box.webix_switch_on,.webix_switch_box{
-  width: 40px!important;
+  width: 44px!important;
   background-color: #1890ff;
 }
 .webix_switch_box{
   height: 17px;
-  margin-top: -11px;
-}
-.webix_switch_handle{
-  left: 24px!important;
+  margin-top: -10px;
 }
