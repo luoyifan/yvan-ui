@@ -1,9 +1,8 @@
 import { CtlBase } from './CtlBase'
 import { CtlXtermDefault } from './CtlDefaultValue'
 import { parseYvanPropChangeVJson } from './CtlUtils'
+import { YvEvent, YvEventDispatch } from './YvanEvent'
 import webix from 'webix'
-import { Terminal } from 'xterm'
-import { FitAddon } from 'xterm-addon-fit';
 
 webix.protoUI(
     {
@@ -19,16 +18,7 @@ webix.protoUI(
             }
         },
         _ready: function (this: any) {
-            const term = new Terminal();
-            const fitAddon = new FitAddon();
-
-            _.defer(() => {
-                term.loadAddon(fitAddon);
-                term.open(this.$view.firstChild);
-                fitAddon.fit();
-                this._term = term;
-                this._fitAddon = fitAddon;
-            })
+            this.isXtermLoad = false;
         },
         _set_inner_size: function () {
             if (!this._term || !this.$width) return
@@ -45,12 +35,38 @@ webix.protoUI(
 
             if (this._fitAddon) {
                 this._fitAddon.fit();
+                this._updateXtermInfo()
+            }
+        },
+        _updateXtermInfo: function () {
+            this.wrapper.xtermInfo = {
+                "cols": this._term.cols,
+                "rows": this._term.rows,
+                "width": this.$width,
+                "height": this.$height
             }
         },
         $setSize: function (x: any, y: any) {
             if (webix.ui.view.prototype.$setSize.call(this, x, y)) {
                 _.defer(() => {
                     this._set_inner_size()
+                    if (this.isXtermLoad == false) {
+                        this.isXtermLoad = true
+                        //@ts-ignore
+                        require(['xterm', 'xterm-addon-fit'], (xterm: any, addon: any) => {
+                            const term = new xterm.Terminal();
+                            const fitAddon = new addon.FitAddon();
+                            term.loadAddon(fitAddon);
+                            term.open(this.$view.firstChild);
+                            fitAddon.fit();
+                            this._term = term;
+                            this._fitAddon = fitAddon;
+                            this._updateXtermInfo()
+                        })
+                    }
+                    else {
+                        YvEventDispatch(this.wrapper.onSizeChange, this.wrapper, this.wrapper.xtermInfo)
+                    }
                 })
             }
         }
@@ -65,7 +81,7 @@ export class CtlXterm extends CtlBase<CtlXterm> {
 
         _.defaultsDeep(vjson, CtlXtermDefault)
 
-        const yvanProp = parseYvanPropChangeVJson(vjson, ['value'])
+        const yvanProp = parseYvanPropChangeVJson(vjson, ['value', 'onSizeChange'])
 
         // 将 vjson 存至 _webixConfig
         that._webixConfig = vjson
@@ -78,6 +94,7 @@ export class CtlXterm extends CtlBase<CtlXterm> {
             on: {
                 onInited(this: any) {
                     that.attachHandle(this, { ...vjson, ...yvanProp })
+                    this.wrapper = that
                 },
                 onAfterDelete() {
                     that.removeHandle()
@@ -89,24 +106,30 @@ export class CtlXterm extends CtlBase<CtlXterm> {
     }
 
     /**
+     * xterm 信息
+     * cols          
+     * rows
+     * width
+     * height
+     */
+    xtermInfo?: any
+
+    /**
+     * size 改变时触发
+     */
+    onSizeChange?: YvEvent<CtlXterm, any>
+
+    /**
      * 获取终端
      */
-    get term(): Terminal {
+    get term(): any {
         return this._webix._term
     }
 
     /**
      * 获取填充插件
      */
-    get fitAddon(): FitAddon {
+    get fitAddon(): any {
         return this._webix._fitAddon
-    }
-
-    get xtermWidth(): number {
-        return this._webix.$width
-    }
-
-    get xtermHeight(): number {
-        return this._webix.$height
     }
 }

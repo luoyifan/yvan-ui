@@ -5,7 +5,7 @@ import { CtlTree } from './CtlTree'
 import { CtlTreeTable } from './CtlTreeTable'
 import { CtlTab } from './CtlTab'
 import { CtlDataview } from './CtlDataview'
-import { CtlECharts } from './CtlECharts'
+// import { CtlECharts } from './CtlECharts'
 import { CtlButton } from './CtlButton'
 import { CtlText } from './form/input/CtlText'
 import { CtlCheckBox } from './form/other/CtlCheckBox'
@@ -365,9 +365,9 @@ export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP
           CtlConsoleLog.create(module, obj);
           break
 
-        case 'echarts':
-          CtlECharts.create(module, obj);
-          break
+        // case 'echarts':
+        //   CtlECharts.create(module, obj);
+        //   break
 
         case 'sidebar':
           CtlSidebar.create(module, obj);
