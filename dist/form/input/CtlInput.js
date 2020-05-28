@@ -24,16 +24,14 @@ var CtlInput = /** @class */ (function (_super) {
         /**================ 私有属性 ===================**/
         _this._validateResult = true;
         _this.anonymous_showTootip = function () {
-            if (_this._validate) {
-                var result = _this._validate(_this.value);
-                if (result) {
-                    _this._showTootip(result);
-                    _this._showValidateError();
-                }
-                else {
-                    _this._hideTootip();
-                    _this._hideValidateError();
-                }
+            var result = _this._resultToShowOrHide();
+            if (result) {
+                _this._showTootip(result);
+                _this._showValidateError();
+            }
+            else {
+                _this._hideTootip();
+                _this._hideValidateError();
             }
         };
         _this.anonymous_hideTootip = function () {
@@ -91,15 +89,15 @@ var CtlInput = /** @class */ (function (_super) {
                     var $input = $(this.$view).find('input');
                     $input.on('input', that.onInputEvent.bind(that));
                     $input.on('keydown', onKeydown);
-                    if (that._validate) {
-                        var result = that._validate(null);
-                        if (result) {
-                            that._showValidateError();
-                        }
-                        else {
-                            that._hideValidateError();
-                        }
+                    if (that._validate || that._required) {
                         that._addEnvent($input);
+                    }
+                    var result = that._resultToShowOrHide();
+                    if (result) {
+                        that._showValidateError();
+                    }
+                    else {
+                        that._hideValidateError();
                     }
                     if (that.constructor.name !== 'CtlSelect' && that._webixConfig.required) {
                         if (that.constructor.name === 'CtlDateRangePicker') {
@@ -133,8 +131,8 @@ var CtlInput = /** @class */ (function (_super) {
                     YvEventDispatch(that.onEnter, that, undefined);
                 },
                 onFocus: function () {
-                    if (that._validate) {
-                        var result = that._validate(that.value);
+                    if (that._validate || that._required) {
+                        var result = that._resultToShowOrHide();
                         if (result) {
                             that._showTootip(result);
                             that._showValidateError();
@@ -167,8 +165,8 @@ var CtlInput = /** @class */ (function (_super) {
                     YvEventDispatch(that.onChange, that, newValue);
                 },
                 onBlur: function () {
-                    if (that._validate) {
-                        var result = that._validate(that.value);
+                    if (that._validate || that._required) {
+                        var result = that._resultToShowOrHide();
                         if (result) {
                             that._showValidateError();
                         }
@@ -324,6 +322,7 @@ var CtlInput = /** @class */ (function (_super) {
          * 必填
          */
         set: function (nv) {
+            this._required = nv;
             if (!this._webix) {
                 this._webixConfig.required = nv;
                 return;
@@ -449,9 +448,6 @@ var CtlInput = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
-    CtlInput.prototype.getValidate = function () {
-        return this._validate;
-    };
     CtlInput.prototype._addEnvent = function (input) {
         input.context.addEventListener('mouseenter', this.anonymous_showTootip);
         input.context.addEventListener('mouseleave', this.anonymous_hideTootip);
@@ -471,6 +467,23 @@ var CtlInput = /** @class */ (function (_super) {
     };
     CtlInput.prototype._hideTootip = function () {
         YvanMessage.hideTooltip(this);
+    };
+    CtlInput.prototype._resultToShowOrHide = function () {
+        if (!this.value) {
+            if (this._required) {
+                return "该项为必填项";
+            }
+        }
+        else {
+            if (this._validate) {
+                // 只有校验值
+                var result = this._validate(this.value);
+                if (result) {
+                    return result;
+                }
+            }
+        }
+        return null;
     };
     CtlInput.prototype._showValidate = function (msg, type) {
         var $input;

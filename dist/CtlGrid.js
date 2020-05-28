@@ -1100,8 +1100,7 @@ var CtlGrid = /** @class */ (function (_super) {
                         }
                     });
                 }
-                else if (easyuiCol.editMode === 'text' ||
-                    easyuiCol.editMode === 'number') {
+                else if (easyuiCol.editMode === 'text' || easyuiCol.editMode === 'number') {
                     //普通文本框编辑
                     formatable = true;
                     _.assign(col, {
@@ -1128,8 +1127,7 @@ var CtlGrid = /** @class */ (function (_super) {
                         }
                     });
                 }
-                else if (easyuiCol.editMode === 'date' ||
-                    easyuiCol.editMode === 'datetime') {
+                else if (easyuiCol.editMode === 'date' || easyuiCol.editMode === 'datetime') {
                     formatable = true;
                     // _.assign(col, {
                     //     editable: true,
@@ -1220,12 +1218,13 @@ var CtlGrid = /** @class */ (function (_super) {
                             suppressAndOrCondition: true,
                             filterOptions: [
                                 // 服务器已经设置条件，浏览器不进行实际比对
-                                { displayKey: '=', displayName: '等于', test: function () { return true; } },
-                                { displayKey: '<>', displayName: '不等于', test: function () { return true; } },
-                                { displayKey: '<', displayName: '小于', test: function () { return true; } },
-                                { displayKey: '>', displayName: '大于', test: function () { return true; } },
-                                { displayKey: '<=', displayName: '小于等于', test: function () { return true; } },
-                                { displayKey: '>=', displayName: '大于等于', test: function () { return true; } },
+                                { displayKey: 'equals', displayName: '等于', test: function () { return true; } },
+                                { displayKey: 'notEqual', displayName: '不等于', test: function () { return true; } },
+                                { displayKey: 'lessThan', displayName: '小于', test: function () { return true; } },
+                                { displayKey: 'greaterThan', displayName: '大于', test: function () { return true; } },
+                                { displayKey: 'lessThanOrEqual', displayName: '小于等于', test: function () { return true; } },
+                                { displayKey: 'greaterThanOrEqual', displayName: '大于等于', test: function () { return true; } },
+                                { displayKey: 'inRange', displayName: '范围', test: function () { return true; } },
                             ]
                         }
                     });
