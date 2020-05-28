@@ -42,6 +42,9 @@ body,
 .mainHeader  .webix_template{
   color: rgba(0,0,0,.85)
 }
+.mainHeader  .webix_scroll_cont .webix_view{
+  margin-top: 0!important;
+}
 .headerMenu{
   height:63px!important
 }
@@ -121,28 +124,14 @@ body,
 }
 .mainLeft .webix_tree .webix_selected{
   background: #e6f7ff;
-  border-right:3px solid #1890ff;
+  border-left:3px solid #1890ff;
   color:#1890ff
 }
-.mainLeft .webix_tree .webix_tree_branch_2 .webix_tree_item{
-  /* padding-left:16px */
+.mainLeft .webix_tree .webix_selected span{
+  padding-left:2px!important
 }
 .webix_tree_leaves .webix_tree_leaves{
   margin:0px!important;
-}
-.mainLeft .webix_tree::-webkit-scrollbar {
-  width: 5px;
-  height: 10px;
-  overflow: auto
-}
-.mainLeft .webix_tree::-webkit-scrollbar-thumb {
-  background-color: #d9d9d9;
-  min-height: 25px;
-  min-width: 25px;
-  border: 1px solid #f0f0f0
-}
-.mainLeft .webix_tree::-webkit-scrollbar-track {
-  background-color: #f7f7f7
 }
 .mainLeft div[aria-level='1']{
   padding:8px
@@ -309,19 +298,24 @@ body,
 .webix_layout_line{
   padding:.5px 0!important
 }
-/* =================================== */
-::-webkit-scrollbar {
-  width: 5px;
-  border-radius: 2.5px;
-  height: 5px;
-  overflow: auto
+/* ================滚动条样式=================== */
+*::-webkit-scrollbar{
+  width:6px;
+  height:6px;
 }
-::-webkit-scrollbar-thumb {
-  background-color: #d9d9d9;
-  min-height: 25px;
-  min-width: 25px;
-  border: 1px solid #f0f0f0
+*::-webkit-scrollbar-button{
+  width:0px; 
+  height:0px;
 }
-::-webkit-scrollbar-track {
-  background-color: #f7f7f7
+*::-webkit-scrollbar-track{
+  background:#f7f7f7;
+}
+*::-webkit-scrollbar-thumb{
+  background:#d9d9d9;
+}
+*::-webkit-scrollbar-track,*::-webkit-scrollbar-thumb{
+  border-radius:3px;
+}
+*::-webkit-scrollbar-corner,*::-webkit-scrollbar-resizer,*::-webkit-scrollbar-button{
+  background:#fff;
 }

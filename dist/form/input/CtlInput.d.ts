@@ -32,6 +32,10 @@ export declare class CtlInput<M> extends CtlBase<M> {
      */
     onBlur?: YvEvent<M, void>;
     /**
+     * 校验事件
+     */
+    onValidate?: YvEvent<M, string>;
+    /**
      * 按下任何键之后触发事件
      */
     onKeydown?: YvEvent<M, Event>;
@@ -94,15 +98,8 @@ export declare class CtlInput<M> extends CtlBase<M> {
     set width(nv: CtlInputWidth);
     onValueChange(newV: any, oldV: any): void;
     onInputValue(value: any): void;
-    /**
-     * 验证
-     * @param nv  div.webix_inp_static
-     */
-    set validate(nv: any);
-    get validate(): any;
     /**================ 私有属性 ===================**/
     _validateResult: boolean;
-    _validate: any;
     _required: boolean | undefined;
     _id: any;
     _maxlength: any;

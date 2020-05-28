@@ -189,10 +189,50 @@ export class CtlTreeTable extends CtlBase<CtlTreeTable> {
   }
 
   /**
+   * 获取某 id 下树节点所有的子节点
+   */
+  public getChildItems(id: any): any[] {
+    const ret = []
+    let c = this._webix.getFirstChildId(id)
+    while (c) {
+      ret.push(this._webix.getItem(c))
+      c = this._webix.getNextSiblingId(c)
+    }
+    return ret
+  }
+
+  /**
+   * 获取某 id 下树节点所有的子节点的编号
+   */
+  public getChildIds(id: any): any[] {
+    const ret = []
+    let c = this._webix.getFirstChildId(id)
+    while (c) {
+      ret.push(c)
+      c = this._webix.getNextSiblingId(c)
+    }
+    return ret
+  }
+
+  /**
    * 勾选选中一行
    */
   public checkItem(id: any) {
     this._webix.checkItem(id)
+  }
+
+  /**
+   * 获取被选中的一行编号
+   */
+  public getSelectedId(): any {
+    return this._webix.getSelectedId()
+  }
+
+  /**
+   * 获取被选中的一行
+   */
+  public getSelectedItem(): any {
+    return this._webix.getSelectedItem()
   }
 
   /**

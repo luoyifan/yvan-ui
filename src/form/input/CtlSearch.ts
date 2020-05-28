@@ -98,8 +98,8 @@ export class CtlSearch extends CtlInput<CtlSearch> {
           YvEventDispatch(that.onFocus, that, undefined)
         },
         onBlur(this: any) {
-          if (that._validate) {
-            const result = that._validate(that.value);
+          if (that.onValidate || that._required) {
+            const result = that._resultToShowOrHide();
             if (result) {
               that._showValidateError()
             }
@@ -153,12 +153,14 @@ export class CtlSearch extends CtlInput<CtlSearch> {
 
     this.supportChangeValue = true
 
-    YvEventDispatch(this.widget.onClear, this, undefined)
-
-    //清空
-    _.forOwn(this.widget.bind, (value, key) => {
-      _.set(this._module, key, '')
-    })
+    // 发出 onClear 事件，如果事件返回 true，代表不用再清空
+    const hasHandle = YvEventDispatch(this.widget.onClear, this, undefined)
+    if (!hasHandle) {
+      //清空
+      _.forOwn(this.widget.bind, (value, key) => {
+        _.set(this._module, key, '')
+      })
+    }
   }
 
   get value(): string | undefined {

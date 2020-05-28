@@ -4,7 +4,8 @@ import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSource
 import { isDesignMode } from './DesignHelper'
 import { brokerInvoke } from './Service'
 import { Db } from './YvanUIDb'
-import {GridRefreshMode} from "./CtlGrid";
+import { GridRefreshMode } from "./CtlGrid";
+import { YvEventDispatch } from './YvanEvent'
 
 export class YvanDataSourceGrid {
   private option: GridDataSource
@@ -16,22 +17,23 @@ export class YvanDataSourceGrid {
   private reload: undefined | (() => void)
   private rowCount: number | undefined
   public lastFilterModel: any
+  public lastSortModel: any
 
   serverQuery = _.debounce((option: GridDataSourceSql | GridDataSourceServer | GridDataSourceAjax, paramFunction: undefined | (() => any), params: any) => {
     const that = this
 
-    //异步请求数据内容
-    that.ctl.loading = true
     let needCount = false
     if (typeof that.rowCount === 'undefined') {
       //从来没有统计过 rowCount(记录数)
       needCount = true
       that.lastFilterModel = _.cloneDeep(params.filterModel)
+      that.lastSortModel = _.cloneDeep(params.sortModel)
     } else {
       if (!_.isEqual(that.lastFilterModel, params.filterModel)) {
         //深度对比，如果 filter 模型更改了，需要重新统计 rowCount(记录数)
         needCount = true
         that.lastFilterModel = _.cloneDeep(params.filterModel)
+        that.lastSortModel = _.cloneDeep(params.sortModel)
       }
     }
 
@@ -42,31 +44,42 @@ export class YvanDataSourceGrid {
 
     let ajaxPromise: Promise<Db.Response>;
     if (option.type === 'SQL') {
-      ajaxPromise = YvanUI.dbs[option.db]
-        .query({
-          params: queryParams,
-          limit: params.endRow - params.startRow,
-          limitOffset: params.startRow,
-          needCount,
-          orderByModel: params.sortModel,
-          filterModel: params.filterModel,
-          sqlId: option.sqlId
-        })
-
-    } else if (option.type === 'Server') {
-      const [serverUrl, method] = _.split(option.method, '@');
-      ajaxPromise = <Promise<Db.Response>>brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, {
+      const ajaxParam = {
         params: queryParams,
         limit: params.endRow - params.startRow,
         limitOffset: params.startRow,
         needCount,
-        orderByModel: params.sortModel,
+        sortModel: params.sortModel,
         filterModel: params.filterModel,
-      })
+        sqlId: option.sqlId
+      };
+      const allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam)
+      if (allow === false) {
+        // 不允许请求
+        return;
+      }
+      ajaxPromise = YvanUI.dbs[option.db].query(ajaxParam)
+
+    } else if (option.type === 'Server') {
+      const [serverUrl, method] = _.split(option.method, '@');
+      const ajaxParam = {
+        params: queryParams,
+        limit: params.endRow - params.startRow,
+        limitOffset: params.startRow,
+        needCount,
+        sortModel: params.sortModel,
+        filterModel: params.filterModel,
+      }
+      const allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam)
+      if (allow === false) {
+        // 不允许请求
+        return;
+      }
+      ajaxPromise = <Promise<Db.Response>>brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, ajaxParam)
 
     } else if (option.type === 'Ajax') {
       const ajax: Ajax.Function = _.get(window, 'YvanUI.ajax');
-      ajaxPromise = <Promise<Db.Response>>ajax({
+      const ajaxParam: Ajax.Option = {
         url: option.url,
         method: 'POST-JSON',
         data: {
@@ -74,10 +87,16 @@ export class YvanDataSourceGrid {
           limit: params.endRow - params.startRow,
           limitOffset: params.startRow,
           needCount,
-          orderByModel: params.sortModel,
+          sortModel: params.sortModel,
           filterModel: params.filterModel,
         }
-      });
+      }
+      const allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam)
+      if (allow === false) {
+        // 不允许请求
+        return;
+      }
+      ajaxPromise = <Promise<Db.Response>>ajax(ajaxParam);
 
     } else {
       console.error('unSupport dataSource mode:', option);
@@ -85,7 +104,11 @@ export class YvanDataSourceGrid {
       return;
     }
 
+    //异步请求数据内容
+    that.ctl.loading = true
     ajaxPromise.then(res => {
+      YvEventDispatch(option.onAfter, that.ctl, res)
+
       const { data: resultData, pagination, params: resParams } = res
       if (needCount) {
         if (_.has(res, 'totalCount')) {
@@ -137,9 +160,9 @@ export class YvanDataSourceGrid {
             //   that.ctl.setData(data)
 
             // } else {
-              // 不能直接用 setData, 会造成 filter 被置空
-              // 使用 _transactionUpdate 也有 bug ，如果查询条件被改变，也不会分页回顶端
-              that.ctl._transactionUpdate(data)
+            // 不能直接用 setData, 会造成 filter 被置空
+            // 使用 _transactionUpdate 也有 bug ，如果查询条件被改变，也不会分页回顶端
+            that.ctl._transactionUpdate(data)
             // }
             // that.ctl.setData(data)
             that.ctl.gridPage.itemCount = rowCount
@@ -151,6 +174,7 @@ export class YvanDataSourceGrid {
           params.startRow = (currentPage - 1) * pageSize
           params.endRow = currentPage * pageSize
           params.filterModel = that.ctl.gridApi.getFilterModel()
+          params.sortModel = that.ctl.gridApi.getSortModel()
 
           if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
             that.rowCount = 0
@@ -221,6 +245,7 @@ export class YvanDataSourceGrid {
               params.successCallback(data, dataLength)
 
               that.ctl.loading = false
+              that.ctl.gridPage.itemCount = dataLength
               that.ctl._bindingComplete()
               if (that.ctl.entityName) {
                 _.set(
@@ -252,10 +277,7 @@ export class YvanDataSourceGrid {
       if (that.ctl.pagination) {
         /** 分页模式 **/
 
-        that.ctl.gridPage.getPageData = (
-          currentPage: number,
-          pageSize: number
-        ) => {
+        that.ctl.gridPage.getPageData = (currentPage: number, pageSize: number) => {
           let d = []
           const startRow = (currentPage - 1) * pageSize
           let endRow = currentPage * pageSize

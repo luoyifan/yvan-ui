@@ -26,28 +26,20 @@ var BaseModule = /** @class */ (function (_super) {
         return new Promise(function (resolver, reject) {
             var ctlMappings = _.get(_this, '_entityCtlMapping.' + entityName);
             var result = {};
-            if (_.get(ctlMappings, '_required') === true || _.has(ctlMappings, '_validate')) {
-                var validateResult = ctlMappings._resultToShowOrHide();
+            if (_.has(ctlMappings, '_validate')) {
+                var validateResult = ctlMappings._validate(ctlMappings.value);
                 if (validateResult) {
-                    ctlMappings._showTootip(validateResult);
-                    ctlMappings._showValidateError();
-                    ctlMappings.focus();
-                    _.set(result, ctlMappings.entityName, validateResult);
+                    _.set(result, ctlMappings.vjson.label, validateResult);
                 }
             }
             else {
-                var isShow_1 = false;
                 _.forEach(ctlMappings, function (ctl, key) {
-                    if (_.get(ctl, '_required') === true || _.has(ctl, '_validate')) {
-                        var validateResult = ctl._resultToShowOrHide();
+                    if (_.has(ctl, '_validate')) {
+                        var validateResult = ctl._validate(ctl.value);
                         if (validateResult) {
+                            ctl._showTootip(validateResult);
                             ctl._showValidateError();
                             _.set(result, key, validateResult);
-                            if (!isShow_1) {
-                                isShow_1 = true;
-                                ctl._showTootip(validateResult);
-                                ctl.focus();
-                            }
                         }
                     }
                 });

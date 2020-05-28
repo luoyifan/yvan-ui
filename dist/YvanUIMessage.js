@@ -99,8 +99,6 @@ export function showTooltip(obj, message) {
     var $body = $('body');
     var tooptipId = obj.id + '_tooltip';
     if ($body.find("#" + tooptipId).length > 0) {
-        var ddiv = $body.find("#" + tooptipId)[0].children[1];
-        _.set(ddiv, 'innerText', message);
         return;
     }
     var $w = $('<div xtype="tooltip" class="yvan-tooltip">' +

@@ -17,7 +17,7 @@
   display: block;
 }
 .webix_item_tab{
-  width: 100px!important;
+  /* width: 100px!important; */
   color:#475466!important;
   transition: color .3s ease;
   height: 40px!important;
@@ -33,4 +33,10 @@
 .webix_all_tabs .webix_item_tab.webix_selected:focus{
   box-shadow: inset 0 -2px #1890ff;
   color:#1890ff
+}
+.webix_all_tabs .webix_selected{
+  background: none!important;
+}
+.webix_all_tabs .webix_item_tab .webix_icon.webix_tab_close{
+  font-size: 14px;
 }

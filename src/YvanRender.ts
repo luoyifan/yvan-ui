@@ -5,7 +5,7 @@ import { CtlTree } from './CtlTree'
 import { CtlTreeTable } from './CtlTreeTable'
 import { CtlTab } from './CtlTab'
 import { CtlDataview } from './CtlDataview'
-import { CtlECharts } from './CtlECharts'
+// import { CtlECharts } from './CtlECharts'
 import { CtlButton } from './CtlButton'
 import { CtlText } from './form/input/CtlText'
 import { CtlCheckBox } from './form/other/CtlCheckBox'
@@ -365,9 +365,9 @@ export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP
           CtlConsoleLog.create(module, obj);
           break
 
-        case 'echarts':
-          CtlECharts.create(module, obj);
-          break
+        // case 'echarts':
+        //   CtlECharts.create(module, obj);
+        //   break
 
         case 'sidebar':
           CtlSidebar.create(module, obj);
@@ -550,9 +550,9 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
           vjson.body = {
             template: 'dialog 没有 body'
           }
-        }else{
-          if(!_.has(vjson.body, 'padding')){
-            vjson.body.padding=10
+        } else {
+          if (!_.has(vjson.body, 'padding')) {
+            vjson.body.padding = 10
           }
         }
         // 与 yvan 组件进行交换，使 vjson 能被 webix 使用
@@ -567,20 +567,27 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
           resize: vjson.resize === undefined ? true : vjson.resize,
           head: {
             view: "toolbar", margin: -4, cols: [
-              { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
               {
-                view: "icon", icon: "fa fa-expand", click: function (this: any) {
+                view: "label", label: vjson.title, css: 'webix_header webix_win_title',
+                on: {
+                  onAfterRender() {
+                    module._titleLabel = this;
+                  }
+                }
+              },
+              {
+                view: "icon", icon: "fa fa-window-maximize", click: function (this: any) {
                   dialog.config.fullscreen = !dialog.config.fullscreen;
                   if (dialog.config.fullscreen) {
                     dialog.config.oldtop = dialog.config.top;
                     dialog.config.oldleft = dialog.config.left;
                     dialog.config.left = 0;
                     dialog.config.top = 0;
-                    this.define({ icon: 'fa fa-compress' });
+                    this.define({ icon: 'fa fa-window-restore' });
                   } else {
                     dialog.config.top = dialog.config.oldtop;
                     dialog.config.left = dialog.config.oldleft;
-                    this.define({ icon: 'fa fa-expand' });
+                    this.define({ icon: 'fa fa-window-maximize' });
                   }
                   dialog.resize();
                   this.refresh();

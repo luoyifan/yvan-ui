@@ -221,6 +221,13 @@ export class CtlTree extends CtlBase<CtlTree> {
   }
 
   /**
+   * 选择所有节点
+   */
+  public checkAll() {
+    this._webix.checkAll()
+  }
+
+  /**
    * 取消选择所有节点
    */
   public uncheckAll() {
@@ -422,6 +429,7 @@ export class CtlTree extends CtlBase<CtlTree> {
         icon: row['icon'],
         value: row[textField],
         id: row[idField],
+        disabled: _.get(row, 'disabled'),
         row: row
       }
     }

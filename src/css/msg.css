@@ -294,7 +294,7 @@
 }
 
 .webix_template {
-  padding: 0 !important;
+  padding: 0;
 }
 
 .input_validate_false {

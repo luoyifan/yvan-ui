@@ -64,9 +64,25 @@ export declare class CtlTreeTable extends CtlBase<CtlTreeTable> {
      */
     getItem(id: any): any;
     /**
+     * 获取某 id 下树节点所有的子节点
+     */
+    getChildItems(id: any): any[];
+    /**
+     * 获取某 id 下树节点所有的子节点的编号
+     */
+    getChildIds(id: any): any[];
+    /**
      * 勾选选中一行
      */
     checkItem(id: any): void;
+    /**
+     * 获取被选中的一行编号
+     */
+    getSelectedId(): any;
+    /**
+     * 获取被选中的一行
+     */
+    getSelectedItem(): any;
     /**
      * 选中一行
      * @param id

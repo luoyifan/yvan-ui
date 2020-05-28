@@ -1,14 +1,14 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('webix'), require('reflect-metadata'), require('ag-grid'), require('xterm'), require('xterm-addon-fit'), require('axios'), require('qs'), require('typescript')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'webix', 'reflect-metadata', 'ag-grid', 'xterm', 'xterm-addon-fit', 'axios', 'qs', 'typescript'], factory) :
-  (global = global || self, factory(global['yvan-ui'] = {}, global.Vue, global.webix, null, global.agGrid, global.xterm, global.xtermAddonFit, global.axios, global.Qs, global.ts));
-}(this, (function (exports, Vue, webix, reflectMetadata, agGrid, xterm, xtermAddonFit, axios, Qs, ts) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('webix'), require('reflect-metadata'), require('ag-grid'), require('qs'), require('axios'), require('typescript')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'webix', 'reflect-metadata', 'ag-grid', 'qs', 'axios', 'typescript'], factory) :
+  (global = global || self, factory(global['yvan-ui'] = {}, global.Vue, global.webix, null, global.agGrid, global.qs, global.axios, global.ts));
+}(this, (function (exports, Vue, webix, reflectMetadata, agGrid, qs, axios, ts) { 'use strict';
 
   Vue = Vue && Object.prototype.hasOwnProperty.call(Vue, 'default') ? Vue['default'] : Vue;
   webix = webix && Object.prototype.hasOwnProperty.call(webix, 'default') ? webix['default'] : webix;
   agGrid = agGrid && Object.prototype.hasOwnProperty.call(agGrid, 'default') ? agGrid['default'] : agGrid;
+  qs = qs && Object.prototype.hasOwnProperty.call(qs, 'default') ? qs['default'] : qs;
   axios = axios && Object.prototype.hasOwnProperty.call(axios, 'default') ? axios['default'] : axios;
-  Qs = Qs && Object.prototype.hasOwnProperty.call(Qs, 'default') ? Qs['default'] : Qs;
   ts = ts && Object.prototype.hasOwnProperty.call(ts, 'default') ? ts['default'] : ts;
 
   /*! *****************************************************************************
@@ -266,6 +266,7 @@
       });
       return CtlBase;
   }());
+  //# sourceMappingURL=CtlBase.js.map
 
   /**
    * 内部函数
@@ -348,6 +349,7 @@
           exports.componentRenderFilter = option.componentRenderFilter;
       }
   }
+  //# sourceMappingURL=YvanUIExtend.js.map
 
   /**
    * 服务调用
@@ -412,22 +414,32 @@
           });
           this.sqlModeDebounce = _.debounce(function (option) {
               var that = _this;
-              //异步请求数据内容
-              that.ctl.loading = true;
               var ajaxPromise;
               if (option.type === 'SQL') {
-                  ajaxPromise = dbs[option.db].query({
+                  var ajaxParam = {
                       params: option.params,
                       needCount: false,
                       sqlId: option.sqlId
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = dbs[option.db].query(ajaxParam);
               }
               else if (option.type === 'Server') {
                   var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
-                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, {
+                  var ajaxParam = {
                       params: option.params,
                       needCount: false,
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, ajaxParam);
               }
               else {
                   console.error('unSupport dataSource mode:', option);
@@ -435,7 +447,10 @@
                   that.ctl.loading = false;
                   return;
               }
+              //异步请求数据内容
+              that.ctl.loading = true;
               ajaxPromise.then(function (res) {
+                  YvEventDispatch(option.onAfter, that.ctl, res);
                   var resultData = res.data, resParams = res.params;
                   if (_this.dataSourceProcess) {
                       //自定义的数据处理过程
@@ -540,6 +555,7 @@
       };
       return YvDataSource;
   }());
+  //# sourceMappingURL=YvanDataSourceImp.js.map
 
   var CtlButtonDefault = {
       text: '',
@@ -806,6 +822,12 @@
           this._webix.clearAll();
       };
       /**
+       * 选择所有节点
+       */
+      CtlTree.prototype.checkAll = function () {
+          this._webix.checkAll();
+      };
+      /**
        * 取消选择所有节点
        */
       CtlTree.prototype.uncheckAll = function () {
@@ -973,6 +995,7 @@
                   icon: row['icon'],
                   value: row[textField],
                   id: row[idField],
+                  disabled: _.get(row, 'disabled'),
                   row: row
               };
           }
@@ -1009,6 +1032,7 @@
       };
       return CtlTree;
   }(CtlBase));
+  //# sourceMappingURL=CtlTree.js.map
 
   var CtlTreeTable = /** @class */ (function (_super) {
       __extends(CtlTreeTable, _super);
@@ -1177,10 +1201,46 @@
           return this._webix.getItem(id);
       };
       /**
+       * 获取某 id 下树节点所有的子节点
+       */
+      CtlTreeTable.prototype.getChildItems = function (id) {
+          var ret = [];
+          var c = this._webix.getFirstChildId(id);
+          while (c) {
+              ret.push(this._webix.getItem(c));
+              c = this._webix.getNextSiblingId(c);
+          }
+          return ret;
+      };
+      /**
+       * 获取某 id 下树节点所有的子节点的编号
+       */
+      CtlTreeTable.prototype.getChildIds = function (id) {
+          var ret = [];
+          var c = this._webix.getFirstChildId(id);
+          while (c) {
+              ret.push(c);
+              c = this._webix.getNextSiblingId(c);
+          }
+          return ret;
+      };
+      /**
        * 勾选选中一行
        */
       CtlTreeTable.prototype.checkItem = function (id) {
           this._webix.checkItem(id);
+      };
+      /**
+       * 获取被选中的一行编号
+       */
+      CtlTreeTable.prototype.getSelectedId = function () {
+          return this._webix.getSelectedId();
+      };
+      /**
+       * 获取被选中的一行
+       */
+      CtlTreeTable.prototype.getSelectedItem = function () {
+          return this._webix.getSelectedItem();
       };
       /**
        * 选中一行
@@ -1310,6 +1370,7 @@
       };
       return CtlTreeTable;
   }(CtlBase));
+  //# sourceMappingURL=CtlTreeTable.js.map
 
   /**
    * 创建快捷菜单
@@ -1622,6 +1683,7 @@
       };
       return CtlTab;
   }(CtlBase));
+  //# sourceMappingURL=CtlTab.js.map
 
   var CtlDataview = /** @class */ (function (_super) {
       __extends(CtlDataview, _super);
@@ -1787,99 +1849,7 @@
       };
       return CtlDataview;
   }(CtlBase));
-
-  /**
-   * 扩展 echarts 组件
-   */
-  webix.protoUI({
-      name: 'echarts'
-  }, webix.ui.template);
-  var CtlECharts = /** @class */ (function (_super) {
-      __extends(CtlECharts, _super);
-      function CtlECharts() {
-          return _super !== null && _super.apply(this, arguments) || this;
-      }
-      CtlECharts.create = function (module, vjson) {
-          var that = new CtlECharts(_.cloneDeep(vjson));
-          that._module = module;
-          if (vjson.hasOwnProperty('debugger')) {
-              debugger;
-          }
-          // 提取基础属性 onRender / ctlName / entityName 等等
-          var yvanProp = parseYvanPropChangeVJson(vjson, []);
-          // 将 yvanProp 合并至当前 CtlBase 对象
-          _.assign(that, yvanProp);
-          // 删除 vjson 所有数据, 替换为 template 语法
-          _.forOwn(vjson, function (value, key) {
-              delete vjson[key];
-          });
-          _.merge(vjson, {
-              view: 'echarts',
-              template: "<div role=\"echarts\"></div>",
-              on: {
-                  onAfterRender: function () {
-                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
-                      that._resetECharts();
-                  },
-                  onDestruct: function () {
-                      if (that._echartsHandler) {
-                          that._echartsHandler.dispose();
-                          delete that._echartsHandler;
-                      }
-                      that.removeHandle();
-                  }
-              }
-          });
-          if (that.vjson.id) {
-              vjson.id = that.vjson.id;
-          }
-          return that;
-      };
-      CtlECharts.prototype.setOption = function (option, opts) {
-          var _this = this;
-          this._echartsHandler.setOption(option, opts);
-          _.defer(function () {
-              _this._echartsHandler.resize();
-          });
-      };
-      Object.defineProperty(CtlECharts.prototype, "handle", {
-          get: function () {
-              return this._echartsHandler;
-          },
-          enumerable: true,
-          configurable: true
-      });
-      // setOption(option: echarts.EChartOption, opts?: echarts.EChartsOptionConfig): void {
-      //     this._echartsHandler.setOption(option, opts);
-      //     _.defer(() => {
-      //         this._echartsHandler.resize();
-      //     });
-      // }
-      //
-      // setOption2(option: echarts.EChartOption | echarts.EChartsResponsiveOption, notMerge?: boolean, lazyUpdate?: boolean): void {
-      //     this._echartsHandler.setOption(option, notMerge, lazyUpdate);
-      //     _.defer(() => {
-      //         this._echartsHandler.resize();
-      //     });
-      // }
-      CtlECharts.prototype.resize = function () {
-          this._echartsHandler.resize();
-      };
-      CtlECharts.prototype.clear = function () {
-          this._echartsHandler.clear();
-      };
-      CtlECharts.prototype._resetECharts = function () {
-          var _this = this;
-          var $el = $(this._webix._viewobj).find('[role="echarts"]')[0];
-          var el = $el;
-          this._echartsHandler = echarts.init(el);
-          this._echartsHandler.on('click', function (params) {
-              YvEventDispatch(_this.onClick, _this, params);
-          });
-      };
-      return CtlECharts;
-  }(CtlBase));
-  //# sourceMappingURL=CtlECharts.js.map
+  //# sourceMappingURL=CtlDataview.js.map
 
   /**
    * 按钮组件
@@ -2077,7 +2047,7 @@
           msg = '请稍后';
       }
       var $body = $('body');
-      $body.append("<div class=\"load-view\" style=\"z-index: 19850224;\"><div class=\"load-an-view\"><div class=\"fading-circle\">\n  <div class=\"sk-circle1 sk-circle\"></div>\n  <div class=\"sk-circle2 sk-circle\"></div>\n  <div class=\"sk-circle3 sk-circle\"></div>\n  <div class=\"sk-circle4 sk-circle\"></div>\n  <div class=\"sk-circle5 sk-circle\"></div>\n  <div class=\"sk-circle6 sk-circle\"></div>\n  <div class=\"sk-circle7 sk-circle\"></div> \n  <div class=\"sk-circle8 sk-circle\"></div>\n  <div class=\"sk-circle9 sk-circle\"></div>\n  <div class=\"sk-circle10 sk-circle\"></div>\n  <div class=\"sk-circle11 sk-circle\"></div>\n  <div class=\"sk-circle12 sk-circle\"></div>\n</div></div><div class=\"load-tip\">" + msg + "</div></div>");
+      $body.append("<div class=\"load-view\" style=\"z-index: 119850224;\"><div class=\"load-an-view\"><div class=\"fading-circle\">\n  <div class=\"sk-circle1 sk-circle\"></div>\n  <div class=\"sk-circle2 sk-circle\"></div>\n  <div class=\"sk-circle3 sk-circle\"></div>\n  <div class=\"sk-circle4 sk-circle\"></div>\n  <div class=\"sk-circle5 sk-circle\"></div>\n  <div class=\"sk-circle6 sk-circle\"></div>\n  <div class=\"sk-circle7 sk-circle\"></div> \n  <div class=\"sk-circle8 sk-circle\"></div>\n  <div class=\"sk-circle9 sk-circle\"></div>\n  <div class=\"sk-circle10 sk-circle\"></div>\n  <div class=\"sk-circle11 sk-circle\"></div>\n  <div class=\"sk-circle12 sk-circle\"></div>\n</div></div><div class=\"load-tip\">" + msg + "</div></div>");
       $body.append($("<div class=\"webix_modal load-view-masker\" style=\"z-index: 19850223;\"></div>"));
   }
   /**
@@ -2260,6 +2230,12 @@
           webix.message({ type: 'error', text: content, expire: -1 });
       }
       else {
+          toastr.options = {
+              "closeButton": true,
+              "positionClass": "toast-bottom-left",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut"
+          };
           toastr.error(content, '错误');
       }
   }
@@ -2273,6 +2249,13 @@
           webix.message({ type: 'success', text: content, expire: 2000 });
       }
       else {
+          toastr.options = {
+              "closeButton": true,
+              "positionClass": "toast-bottom-left",
+              "hideDuration": "3000",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut"
+          };
           toastr.success(content, '成功');
       }
   }
@@ -2286,10 +2269,18 @@
           webix.message({ type: 'info', text: content, expire: 2000 });
       }
       else {
+          toastr.options = {
+              "closeButton": true,
+              "positionClass": "toast-bottom-left",
+              "hideDuration": "3000",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut"
+          };
           toastr.info(content);
       }
       // https://docs.webix.com/desktop__message_boxes.html
   }
+  //# sourceMappingURL=YvanUIMessage.js.map
 
   var CtlInput = /** @class */ (function (_super) {
       __extends(CtlInput, _super);
@@ -2353,6 +2344,7 @@
               'readonly',
               'disabled',
               'required',
+              'onValidate',
               'value',
               'prompt'
           ]);
@@ -2376,7 +2368,7 @@
                       var $input = $(this.$view).find('input');
                       $input.on('input', that.onInputEvent.bind(that));
                       $input.on('keydown', onKeydown);
-                      if (that._validate || that._required) {
+                      if (that.onValidate || that._required) {
                           that._addEnvent($input);
                       }
                       var result = that._resultToShowOrHide();
@@ -2418,7 +2410,7 @@
                       YvEventDispatch(that.onEnter, that, undefined);
                   },
                   onFocus: function () {
-                      if (that._validate || that._required) {
+                      if (that.onValidate || that._required) {
                           var result = that._resultToShowOrHide();
                           if (result) {
                               that._showTootip(result);
@@ -2452,7 +2444,7 @@
                       YvEventDispatch(that.onChange, that, newValue);
                   },
                   onBlur: function () {
-                      if (that._validate || that._required) {
+                      if (that.onValidate || that._required) {
                           var result = that._resultToShowOrHide();
                           if (result) {
                               that._showValidateError();
@@ -2706,34 +2698,10 @@
           //validType[this.validType](newV);
       };
       CtlInput.prototype.onInputValue = function (value) {
-          if (this.validate && typeof this.validate === 'function') {
-              this._validateResult = this.validate(value);
+          if (this.onValidate && typeof this.onValidate === 'function') {
+              this._validateResult = YvEventDispatch(this.onValidate, this, value);
           }
       };
-      Object.defineProperty(CtlInput.prototype, "validate", {
-          get: function () {
-              return this._validate;
-          },
-          /**
-           * 验证
-           * @param nv  div.webix_inp_static
-           */
-          set: function (nv) {
-              var that = this;
-              if (typeof nv === 'function') {
-                  this._validate = nv;
-              }
-              else if (typeof nv === 'string') {
-                  var vl = function (value, data) {
-                      var msg = complexValid['fun'](nv, value);
-                      return that._showValidate(msg, 'inputValidate');
-                  };
-                  this._validate = vl;
-              }
-          },
-          enumerable: true,
-          configurable: true
-      });
       CtlInput.prototype._addEnvent = function (input) {
           input.context.addEventListener('mouseenter', this.anonymous_showTootip);
           input.context.addEventListener('mouseleave', this.anonymous_hideTootip);
@@ -2761,12 +2729,11 @@
               }
           }
           else {
-              if (this._validate) {
-                  // 只有校验值
-                  var result = this._validate(this.value);
-                  if (result) {
-                      return result;
-                  }
+              // 只有校验值
+              var that = this;
+              var result = YvEventDispatch(this.onValidate, that, this.value);
+              if (result) {
+                  return result;
               }
           }
           return null;
@@ -2862,6 +2829,7 @@
       };
       return CtlInput;
   }(CtlBase));
+  //# sourceMappingURL=CtlInput.js.map
 
   var CtlText = /** @class */ (function (_super) {
       __extends(CtlText, _super);
@@ -2880,47 +2848,9 @@
           _.merge(vjson, that._webixConfig);
           return that;
       };
-      Object.defineProperty(CtlText.prototype, "validate", {
-          /*============================ 公共属性部分 ============================*/
-          set: function (nv) {
-              var that = this;
-              if (typeof nv === 'function') {
-                  this._validate = nv;
-              }
-              else if (typeof nv === 'string') {
-                  var vl = function (value, data) {
-                      var msg = complexValid['fun'](nv, value);
-                      var $input = $(that._webix.$view).find('input');
-                      if (msg) {
-                          $input.each(function (index, item) {
-                              $(item).css({
-                                  'background-color': '#ffdedb',
-                                  'border-color': '#ff8d82'
-                              });
-                          });
-                          $("#" + that.id + "_validate").remove();
-                          $(that._webix.$view).append("<div id=\"" + that.id + "_validate\" style=\"position:relative; border: 1px #ff8d82; float:right; top:-38px; color: #FF5C4C;\">" + msg + "</div>");
-                          return false;
-                      }
-                      else {
-                          $input.each(function (index, item) {
-                              $(item).css({
-                                  'background-color': '',
-                                  'border-color': ''
-                              });
-                          });
-                          $("#" + that.id + "_validate").remove();
-                          return true;
-                      }
-                  };
-                  this._validate = vl;
-              }
-          },
-          enumerable: true,
-          configurable: true
-      });
       return CtlText;
   }(CtlInput));
+  //# sourceMappingURL=CtlText.js.map
 
   var CtlCheckBox = /** @class */ (function (_super) {
       __extends(CtlCheckBox, _super);
@@ -3035,6 +2965,7 @@
       });
       return CtlCheckBox;
   }(CtlInput));
+  //# sourceMappingURL=CtlCheckBox.js.map
 
   /**
    * 下拉框组件
@@ -3186,6 +3117,7 @@
       };
       return CtlCombo;
   }(CtlInput));
+  //# sourceMappingURL=CtlCombo.js.map
 
   var CtlDatePicker = /** @class */ (function (_super) {
       __extends(CtlDatePicker, _super);
@@ -3266,6 +3198,7 @@
       };
       return CtlDatePicker;
   }(CtlInput));
+  //# sourceMappingURL=CtlDatePicker.js.map
 
   var CtlDateRangePicker = /** @class */ (function (_super) {
       __extends(CtlDateRangePicker, _super);
@@ -3403,6 +3336,7 @@
       };
       return CtlDateRangePicker;
   }(CtlInput));
+  //# sourceMappingURL=CtlDateRangePicker.js.map
 
   var CtlForm = /** @class */ (function (_super) {
       __extends(CtlForm, _super);
@@ -3561,6 +3495,7 @@
       });
       return CtlMultiCombo;
   }(CtlInput));
+  //# sourceMappingURL=CtlMultiCombo.js.map
 
   var CtlSearch = /** @class */ (function (_super) {
       __extends(CtlSearch, _super);
@@ -3622,8 +3557,8 @@
                       YvEventDispatch(that.onFocus, that, undefined);
                   },
                   onBlur: function () {
-                      if (that._validate) {
-                          var result = that._validate(that.value);
+                      if (that.onValidate || that._required) {
+                          var result = that._resultToShowOrHide();
                           if (result) {
                               that._showValidateError();
                           }
@@ -3667,11 +3602,14 @@
               return;
           }
           this.supportChangeValue = true;
-          YvEventDispatch(this.widget.onClear, this, undefined);
-          //清空
-          _.forOwn(this.widget.bind, function (value, key) {
-              _.set(_this._module, key, '');
-          });
+          // 发出 onClear 事件，如果事件返回 true，代表不用再清空
+          var hasHandle = YvEventDispatch(this.widget.onClear, this, undefined);
+          if (!hasHandle) {
+              //清空
+              _.forOwn(this.widget.bind, function (value, key) {
+                  _.set(_this._module, key, '');
+              });
+          }
       };
       Object.defineProperty(CtlSearch.prototype, "value", {
           get: function () {
@@ -3765,6 +3703,7 @@
       };
       return CtlSearch;
   }(CtlInput));
+  //# sourceMappingURL=CtlSearch.js.map
 
   var CtlCarousel = /** @class */ (function (_super) {
       __extends(CtlCarousel, _super);
@@ -4133,6 +4072,7 @@
       };
       return CtlGridPage;
   }());
+  //# sourceMappingURL=CtlGridPage.js.map
 
   function CtlGridIdRender (params, grid) {
       if (params.node.cstate) {
@@ -4400,50 +4340,61 @@
           this.isFirstAutoLoad = true; //是否为第一次自动读取
           this.serverQuery = _.debounce(function (option, paramFunction, params) {
               var that = _this;
-              //异步请求数据内容
-              that.ctl.loading = true;
               var needCount = false;
               if (typeof that.rowCount === 'undefined') {
                   //从来没有统计过 rowCount(记录数)
                   needCount = true;
                   that.lastFilterModel = _.cloneDeep(params.filterModel);
+                  that.lastSortModel = _.cloneDeep(params.sortModel);
               }
               else {
                   if (!_.isEqual(that.lastFilterModel, params.filterModel)) {
                       //深度对比，如果 filter 模型更改了，需要重新统计 rowCount(记录数)
                       needCount = true;
                       that.lastFilterModel = _.cloneDeep(params.filterModel);
+                      that.lastSortModel = _.cloneDeep(params.sortModel);
                   }
               }
               // 获取所有参数
               var queryParams = __assign({}, (typeof paramFunction === 'function' ? paramFunction() : undefined));
               var ajaxPromise;
               if (option.type === 'SQL') {
-                  ajaxPromise = dbs[option.db]
-                      .query({
+                  var ajaxParam = {
                       params: queryParams,
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
                       needCount: needCount,
-                      orderByModel: params.sortModel,
+                      sortModel: params.sortModel,
                       filterModel: params.filterModel,
                       sqlId: option.sqlId
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = dbs[option.db].query(ajaxParam);
               }
               else if (option.type === 'Server') {
                   var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
-                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, {
+                  var ajaxParam = {
                       params: queryParams,
                       limit: params.endRow - params.startRow,
                       limitOffset: params.startRow,
                       needCount: needCount,
-                      orderByModel: params.sortModel,
+                      sortModel: params.sortModel,
                       filterModel: params.filterModel,
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, ajaxParam);
               }
               else if (option.type === 'Ajax') {
                   var ajax = _.get(window, 'YvanUI.ajax');
-                  ajaxPromise = ajax({
+                  var ajaxParam = {
                       url: option.url,
                       method: 'POST-JSON',
                       data: {
@@ -4451,17 +4402,26 @@
                           limit: params.endRow - params.startRow,
                           limitOffset: params.startRow,
                           needCount: needCount,
-                          orderByModel: params.sortModel,
+                          sortModel: params.sortModel,
                           filterModel: params.filterModel,
                       }
-                  });
+                  };
+                  var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                  if (allow === false) {
+                      // 不允许请求
+                      return;
+                  }
+                  ajaxPromise = ajax(ajaxParam);
               }
               else {
                   console.error('unSupport dataSource mode:', option);
                   params.failCallback();
                   return;
               }
+              //异步请求数据内容
+              that.ctl.loading = true;
               ajaxPromise.then(function (res) {
+                  YvEventDispatch(option.onAfter, that.ctl, res);
                   var resultData = res.data, pagination = res.pagination, resParams = res.params;
                   if (needCount) {
                       if (_.has(res, 'totalCount')) {
@@ -4593,6 +4553,7 @@
                       params.startRow = (currentPage - 1) * pageSize;
                       params.endRow = currentPage * pageSize;
                       params.filterModel = that.ctl.gridApi.getFilterModel();
+                      params.sortModel = that.ctl.gridApi.getSortModel();
                       if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
                           that.rowCount = 0;
                           params.successCallback([], that.rowCount);
@@ -4653,6 +4614,7 @@
                           successCallback: function (data, dataLength) {
                               params.successCallback(data, dataLength);
                               that.ctl.loading = false;
+                              that.ctl.gridPage.itemCount = dataLength;
                               that.ctl._bindingComplete();
                               if (that.ctl.entityName) {
                                   _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow());
@@ -4723,6 +4685,7 @@
       };
       return YvanDataSourceGrid;
   }());
+  //# sourceMappingURL=YvanDataSourceGridImp.js.map
 
   var CtlGridCellButton = /** @class */ (function () {
       function CtlGridCellButton() {
@@ -5806,8 +5769,10 @@
               onCellFocused: this._cellFocused.bind(this),
               onCellClicked: this._cellClicked.bind(this),
               onFilterChanged: this._filterChanged.bind(this),
+              onSortChanged: this._sortChanged.bind(this),
               enterMovesDown: false,
               enterMovesDownAfterEdit: false,
+              accentedSort: true,
               components: {
                   CtlGridCellButton: CtlGridCellButton,
                   CtlGridCellCheckbox: CtlGridCellCheckbox,
@@ -5844,7 +5809,18 @@
                       reload.call(this.dataSourceBind);
                   }
               }
-              console.log('_filterChanged', this.gridApi.getFilterModel());
+              // console.log('_filterChanged', this.gridApi.getFilterModel());
+          }
+      };
+      CtlGrid.prototype._sortChanged = function () {
+          if (this.dataSourceBind) {
+              if ((!_.isEqual(this.gridApi.getSortModel(), this.dataSourceBind.lastSortModel)) || this.refreshMode == exports.GridRefreshMode.refreshAndClearFilter) {
+                  var reload = _.get(this.dataSourceBind, 'reload');
+                  if (typeof reload === 'function') {
+                      reload.call(this.dataSourceBind);
+                  }
+              }
+              // console.log('_sortChanged', this.gridApi.getSortModel());
           }
       };
       CtlGrid.prototype._gridReady = function () {
@@ -6276,6 +6252,12 @@
                   //unSortIcon: true,
                   hide: easyuiCol.hidden
               };
+              if (easyuiCol.sortable) {
+                  // 走服务端排序，客户端排序可以让其无效
+                  col.comparator = function () {
+                      return 0;
+                  };
+              }
               if (typeof easyuiCol.width !== 'undefined')
                   col.width = easyuiCol.width;
               if (typeof easyuiCol.minwidth !== 'undefined')
@@ -6579,6 +6561,7 @@
       };
       return CtlGrid;
   }(CtlBase));
+  //# sourceMappingURL=CtlGrid.js.map
 
   var CtlSwitch = /** @class */ (function (_super) {
       __extends(CtlSwitch, _super);
@@ -6633,6 +6616,7 @@
       });
       return CtlSwitch;
   }(CtlInput));
+  //# sourceMappingURL=CtlSwitch.js.map
 
   var CtlNumber = /** @class */ (function (_super) {
       __extends(CtlNumber, _super);
@@ -6728,6 +6712,7 @@
       });
       return CtlNumber;
   }(CtlInput));
+  //# sourceMappingURL=CtlNumber.js.map
 
   var CtlRadio = /** @class */ (function (_super) {
       __extends(CtlRadio, _super);
@@ -6772,6 +6757,7 @@
       });
       return CtlRadio;
   }(CtlInput));
+  //# sourceMappingURL=CtlRadio.js.map
 
   webix.protoUI({
       name: 'codemirror-editor',
@@ -7274,6 +7260,7 @@
       };
       return CtlSidebar;
   }(CtlBase));
+  //# sourceMappingURL=CtlSidebar.js.map
 
   webix.protoUI({
       name: 'xterm',
@@ -7288,22 +7275,22 @@
           }
       },
       _ready: function () {
-          var _this = this;
-          var term = new xterm.Terminal();
-          var fitAddon = new xtermAddonFit.FitAddon();
-          _.defer(function () {
-              term.loadAddon(fitAddon);
-              term.open(_this.$view.firstChild);
-              fitAddon.fit();
-              _this._term = term;
-              _this._fitAddon = fitAddon;
-          });
+          this.isXtermLoad = false;
       },
       _set_inner_size: function () {
           if (!this._term || !this.$width)
               return;
           this._updateScrollSize();
           // this._editor.scrollTo(0, 0) //force repaint, mandatory for IE
+      },
+      destructor: function () {
+          if (this.$destructed) {
+              return;
+          }
+          this.$destructed = true;
+          if (this.config.on && typeof this.config.on.onDestruct === 'function') {
+              this.config.on.onDestruct.call(this);
+          }
       },
       _updateScrollSize: function () {
           var box = this._term.element;
@@ -7312,6 +7299,19 @@
           box.style.width = (this.$width || 0) + 'px';
           if (this._fitAddon) {
               this._fitAddon.fit();
+              this._updateXtermInfo();
+          }
+      },
+      _updateXtermInfo: function () {
+          var info = {
+              "xtermCols": this._term.cols,
+              "xtermRows": this._term.rows,
+              "xtermWp": this.$width,
+              "xtermHp": this.$height
+          };
+          this.wrapper.xtermInfo = info;
+          if (this.wrapper._connection) {
+              this.wrapper._resizeClientData(info);
           }
       },
       $setSize: function (x, y) {
@@ -7319,6 +7319,25 @@
           if (webix.ui.view.prototype.$setSize.call(this, x, y)) {
               _.defer(function () {
                   _this._set_inner_size();
+                  if (_this.isXtermLoad == false) {
+                      _this.isXtermLoad = true;
+                      //@ts-ignore
+                      require(['xterm', 'xterm-addon-fit'], function (xterm, addon) {
+                          var term = new xterm.Terminal(_this.config.termConfig);
+                          if (_this.wrapper.allowInput) {
+                              term.onData(function (data) {
+                                  _this.wrapper._sendClientData(data);
+                              });
+                          }
+                          var fitAddon = new addon.FitAddon();
+                          term.loadAddon(fitAddon);
+                          term.open(_this.$view.firstChild);
+                          fitAddon.fit();
+                          _this._term = term;
+                          _this._fitAddon = fitAddon;
+                          _this._updateXtermInfo();
+                      });
+                  }
               });
           }
       }
@@ -7332,7 +7351,12 @@
           var that = new CtlXterm(vjson);
           that._module = module;
           _.defaultsDeep(vjson, CtlXtermDefault);
-          var yvanProp = parseYvanPropChangeVJson(vjson, ['value']);
+          var yvanProp = parseYvanPropChangeVJson(vjson, [
+              'value',
+              'allowInput',
+              'onOpen',
+              'onClose',
+          ]);
           // 将 vjson 存至 _webixConfig
           that._webixConfig = vjson;
           // 将 yvanProp 合并至当前 Ctl 对象, 期间会操作 _webixConfig
@@ -7342,8 +7366,10 @@
               on: {
                   onInited: function () {
                       that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
+                      this.wrapper = that;
                   },
-                  onAfterDelete: function () {
+                  onDestruct: function () {
+                      that.connectionClose();
                       that.removeHandle();
                   }
               }
@@ -7370,23 +7396,85 @@
           enumerable: true,
           configurable: true
       });
-      Object.defineProperty(CtlXterm.prototype, "xtermWidth", {
-          get: function () {
-              return this._webix.$width;
-          },
-          enumerable: true,
-          configurable: true
-      });
-      Object.defineProperty(CtlXterm.prototype, "xtermHeight", {
-          get: function () {
-              return this._webix.$height;
-          },
-          enumerable: true,
-          configurable: true
-      });
+      CtlXterm.prototype.connectHost = function (host) {
+          if (!this._connection) {
+              var hostUrl = host;
+              if (hostUrl.indexOf("?") === -1) {
+                  hostUrl = hostUrl + "?" + qs.stringify(this.xtermInfo);
+              }
+              else {
+                  var params = hostUrl.slice(hostUrl.indexOf("?") + 1);
+                  if (params.length > 0) {
+                      hostUrl = hostUrl + "&" + qs.stringify(this.xtermInfo);
+                  }
+                  hostUrl += qs.stringify(this.xtermInfo);
+              }
+              this._connection = new WebSocket(hostUrl);
+              this._connection.onopen = this._onSocketOpen.bind(this);
+              this._connection.onmessage = this._onSocketMessage.bind(this);
+              this._connection.onerror = this._onSocketError.bind(this);
+              this._connection.onclose = this._onSocketClose.bind(this);
+          }
+          else {
+              this.term.write('Error: WebSocket Not Supported\r\n');
+          }
+      };
+      CtlXterm.prototype.sendMessage = function (msg) {
+          this._sendClientData(msg);
+      };
+      CtlXterm.prototype.connectionClose = function () {
+          if (this._connection) {
+              console.log('WebSocket closed', this._connection);
+              this._connection.close();
+          }
+      };
+      CtlXterm.prototype._onSocketOpen = function () {
+          this.term.write('连接已建立，正在等待数据...\r\n');
+          if (this.onOpen) {
+              YvEventDispatch(this.onOpen, this, undefined);
+          }
+          this._sendInitData({ operate: 'connect' });
+      };
+      CtlXterm.prototype._onSocketMessage = function (msg) {
+          var data = msg.data.toString();
+          this.term.write(data);
+      };
+      CtlXterm.prototype._onSocketClose = function () {
+          this.term.write("\r\n连接已关闭\r\n");
+          this._connection = undefined;
+          if (this.onClose) {
+              YvEventDispatch(this.onClose, this, undefined);
+          }
+      };
+      CtlXterm.prototype._onSocketError = function () {
+          this.term.write("\r\n连接发生异常\r\n");
+      };
+      CtlXterm.prototype._sendInitData = function (options) {
+          if (!this._connection) {
+              console.error('_connection 没有初始化');
+              return;
+          }
+          //连接参数
+          this._connection.send(JSON.stringify(options));
+      };
+      CtlXterm.prototype._resizeClientData = function (data) {
+          if (!this._connection) {
+              console.error('_connection 没有初始化');
+              return;
+          }
+          //发送指令
+          this._connection.send(JSON.stringify(__assign({ "operate": "resize" }, data)));
+      };
+      CtlXterm.prototype._sendClientData = function (data) {
+          if (!this._connection) {
+              console.error('_connection 没有初始化');
+              return;
+          }
+          //发送指令
+          this._connection.send(JSON.stringify({ "operate": "command", "command": data }));
+      };
       return CtlXterm;
   }(CtlBase));
-  //# sourceMappingURL=CtlXterm.js.map
 
   webix.protoUI({
       name: 'xconsolelog',
@@ -8050,9 +8138,9 @@
                   case 'xconsolelog':
                       CtlConsoleLog.create(module, obj);
                       break;
-                  case 'echarts':
-                      CtlECharts.create(module, obj);
-                      break;
+                  // case 'echarts':
+                  //   CtlECharts.create(module, obj);
+                  //   break
                   case 'sidebar':
                       CtlSidebar.create(module, obj);
                       break;
@@ -8219,21 +8307,28 @@
                       resize: vjson.resize === undefined ? true : vjson.resize,
                       head: {
                           view: "toolbar", margin: -4, cols: [
-                              { view: "label", label: vjson.title, css: 'webix_header webix_win_title' },
                               {
-                                  view: "icon", icon: "fa fa-expand", click: function () {
+                                  view: "label", label: vjson.title, css: 'webix_header webix_win_title',
+                                  on: {
+                                      onAfterRender: function () {
+                                          module._titleLabel = this;
+                                      }
+                                  }
+                              },
+                              {
+                                  view: "icon", icon: "fa fa-window-maximize", click: function () {
                                       dialog.config.fullscreen = !dialog.config.fullscreen;
                                       if (dialog.config.fullscreen) {
                                           dialog.config.oldtop = dialog.config.top;
                                           dialog.config.oldleft = dialog.config.left;
                                           dialog.config.left = 0;
                                           dialog.config.top = 0;
-                                          this.define({ icon: 'fa fa-compress' });
+                                          this.define({ icon: 'fa fa-window-restore' });
                                       }
                                       else {
                                           dialog.config.top = dialog.config.oldtop;
                                           dialog.config.left = dialog.config.oldleft;
-                                          this.define({ icon: 'fa fa-expand' });
+                                          this.define({ icon: 'fa fa-window-maximize' });
                                       }
                                       dialog.resize();
                                       this.refresh();
@@ -8323,7 +8418,7 @@
       // _.forOwn(data, (v, k) => {
       //     formData.append(k, v);
       // });
-      var formData = data ? Qs.stringify(data) : '';
+      var formData = data ? qs.stringify(data) : '';
       var xhr = new XMLHttpRequest();
       xhr.open('POST', downLoadUrl);
       xhr.responseType = 'blob';
@@ -8398,7 +8493,7 @@
           else if (option.method === 'POST') {
               ax.method = 'POST';
               ax.headers = __assign({ 'Content-Type': 'application/x-www-form-urlencoded' }, option.headers);
-              ax.data = Qs.stringify(option.data);
+              ax.data = qs.stringify(option.data);
           }
           else if (option.method === 'GET') {
               ax.method = 'GET';
@@ -8467,7 +8562,7 @@
                       data: {
                           db: _this.defaultDb,
                           filterModel: option.filterModel,
-                          orderByModel: option.orderByModel,
+                          sortModel: option.sortModel,
                           limit: option.limit,
                           limitOffset: option.limitOffset,
                           needCount: option.needCount,
@@ -8501,6 +8596,7 @@
   function createDb(createOption) {
       return new exports.Db.Client(createOption);
   }
+  //# sourceMappingURL=YvanUIDb.js.map
 
   /**
    * 获取页面 URL 问号之后的参数
@@ -8620,7 +8716,7 @@
           return new Promise(function (resolver, reject) {
               var ctlMappings = _.get(_this, '_entityCtlMapping.' + entityName);
               var result = {};
-              if (_.get(ctlMappings, '_required') === true || _.has(ctlMappings, '_validate')) {
+              if (_.get(ctlMappings, '_required') === true || _.has(ctlMappings, 'onValidate')) {
                   var validateResult = ctlMappings._resultToShowOrHide();
                   if (validateResult) {
                       ctlMappings._showTootip(validateResult);
@@ -8632,7 +8728,7 @@
               else {
                   var isShow_1 = false;
                   _.forEach(ctlMappings, function (ctl, key) {
-                      if (_.get(ctl, '_required') === true || _.has(ctl, '_validate')) {
+                      if (_.get(ctl, '_required') === true || _.has(ctl, 'onValidate')) {
                           var validateResult = ctl._resultToShowOrHide();
                           if (validateResult) {
                               ctl._showValidateError();
@@ -8666,10 +8762,12 @@
            * 获取或设置 window 标题
            */
           set: function (v) {
-              if (this._webixId) {
+              if (this._webixId && _.has(this, '_titleLabel')) {
                   // webix 对象已经出现
                   this._webixId.define('title', v);
-                  $(this._webixId.$view).find('.webix_win_head .webix_win_title .webix_el_box').html(v);
+                  var _titleLabel = _.get(this, '_titleLabel');
+                  _titleLabel.define('label', v);
+                  _titleLabel.refresh();
                   return;
               }
               console.error('无法设置 title');
@@ -8700,26 +8798,6 @@
        * 关闭后触发
        */
       BaseDialog.prototype.onClose = function () { };
-      Object.defineProperty(BaseDialog.prototype, "title", {
-          /**
-           * 对话框标题
-           */
-          get: function () {
-              return $(this.layero)
-                  .find('.layui-layer-title')
-                  .html();
-          },
-          /**
-           * 设置对话框标题
-           */
-          set: function (nv) {
-              $(this.layero)
-                  .find('.layui-layer-title')
-                  .html(nv);
-          },
-          enumerable: true,
-          configurable: true
-      });
       /**
        * 显示进行中的状态
        */
@@ -8776,6 +8854,7 @@
           target.watches.push(watch);
       };
   }
+  //# sourceMappingURL=YvanUIModule.js.map
 
   // eslint-disable-next-line import/no-extraneous-dependencies
   /**
@@ -9189,6 +9268,99 @@
       ]
   }));
   //# sourceMappingURL=PropertyDescriptionTable.js.map
+
+  /**
+   * 扩展 echarts 组件
+   */
+  webix.protoUI({
+      name: 'echarts'
+  }, webix.ui.template);
+  var CtlECharts = /** @class */ (function (_super) {
+      __extends(CtlECharts, _super);
+      function CtlECharts() {
+          return _super !== null && _super.apply(this, arguments) || this;
+      }
+      CtlECharts.create = function (module, vjson) {
+          var that = new CtlECharts(_.cloneDeep(vjson));
+          that._module = module;
+          if (vjson.hasOwnProperty('debugger')) {
+              debugger;
+          }
+          // 提取基础属性 onRender / ctlName / entityName 等等
+          var yvanProp = parseYvanPropChangeVJson(vjson, []);
+          // 将 yvanProp 合并至当前 CtlBase 对象
+          _.assign(that, yvanProp);
+          // 删除 vjson 所有数据, 替换为 template 语法
+          _.forOwn(vjson, function (value, key) {
+              delete vjson[key];
+          });
+          _.merge(vjson, {
+              view: 'echarts',
+              template: "<div role=\"echarts\"></div>",
+              on: {
+                  onAfterRender: function () {
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
+                      that._resetECharts();
+                  },
+                  onDestruct: function () {
+                      if (that._echartsHandler) {
+                          that._echartsHandler.dispose();
+                          delete that._echartsHandler;
+                      }
+                      that.removeHandle();
+                  }
+              }
+          });
+          if (that.vjson.id) {
+              vjson.id = that.vjson.id;
+          }
+          return that;
+      };
+      CtlECharts.prototype.setOption = function (option, opts) {
+          var _this = this;
+          this._echartsHandler.setOption(option, opts);
+          _.defer(function () {
+              _this._echartsHandler.resize();
+          });
+      };
+      Object.defineProperty(CtlECharts.prototype, "handle", {
+          get: function () {
+              return this._echartsHandler;
+          },
+          enumerable: true,
+          configurable: true
+      });
+      // setOption(option: echarts.EChartOption, opts?: echarts.EChartsOptionConfig): void {
+      //     this._echartsHandler.setOption(option, opts);
+      //     _.defer(() => {
+      //         this._echartsHandler.resize();
+      //     });
+      // }
+      //
+      // setOption2(option: echarts.EChartOption | echarts.EChartsResponsiveOption, notMerge?: boolean, lazyUpdate?: boolean): void {
+      //     this._echartsHandler.setOption(option, notMerge, lazyUpdate);
+      //     _.defer(() => {
+      //         this._echartsHandler.resize();
+      //     });
+      // }
+      CtlECharts.prototype.resize = function () {
+          this._echartsHandler.resize();
+      };
+      CtlECharts.prototype.clear = function () {
+          this._echartsHandler.clear();
+      };
+      CtlECharts.prototype._resetECharts = function () {
+          var _this = this;
+          var $el = $(this._webix._viewobj).find('[role="echarts"]')[0];
+          var el = $el;
+          this._echartsHandler = echarts.init(el);
+          this._echartsHandler.on('click', function (params) {
+              YvEventDispatch(_this.onClick, _this, params);
+          });
+      };
+      return CtlECharts;
+  }(CtlBase));
+  //# sourceMappingURL=CtlECharts.js.map
 
   function userComponentFactory(Component, name) {
   }

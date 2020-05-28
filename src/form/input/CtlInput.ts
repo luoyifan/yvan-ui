@@ -32,6 +32,7 @@ export class CtlInput<M> extends CtlBase<M> {
       'readonly',
       'disabled',
       'required',
+      'onValidate',
       'value',
       'prompt'
     ])
@@ -59,7 +60,7 @@ export class CtlInput<M> extends CtlBase<M> {
           const $input = $(this.$view).find('input')
           $input.on('input', that.onInputEvent.bind(that))
           $input.on('keydown', onKeydown)
-          if (that._validate || that._required) {
+          if (that.onValidate || that._required) {
             that._addEnvent($input);
           }
           const result = that._resultToShowOrHide()
@@ -105,7 +106,7 @@ export class CtlInput<M> extends CtlBase<M> {
           YvEventDispatch(that.onEnter, that, undefined)
         },
         onFocus(this: any) {
-          if (that._validate || that._required) {
+          if (that.onValidate || that._required) {
             const result = that._resultToShowOrHide();
             if (result) {
               that._showTootip(result)
@@ -145,7 +146,7 @@ export class CtlInput<M> extends CtlBase<M> {
           YvEventDispatch(that.onChange, that, newValue)
         },
         onBlur(this: any) {
-          if (that._validate || that._required) {
+          if (that.onValidate || that._required) {
             const result = that._resultToShowOrHide();
             if (result) {
               that._showValidateError()
@@ -241,6 +242,11 @@ export class CtlInput<M> extends CtlBase<M> {
    * 离开焦点后触发
    */
   onBlur?: YvEvent<M, void>
+
+  /**
+   * 校验事件
+   */
+  onValidate?: YvEvent<M, string>
 
   /**
    * 按下任何键之后触发事件
@@ -449,37 +455,13 @@ export class CtlInput<M> extends CtlBase<M> {
   }
 
   onInputValue(value: any) {
-    if (this.validate && typeof this.validate === 'function') {
-      this._validateResult = this.validate(value)
+    if (this.onValidate && typeof this.onValidate === 'function') {
+      this._validateResult = YvEventDispatch(this.onValidate, <any>this, value);
     }
-  }
-
-  /**
-   * 验证
-   * @param nv  div.webix_inp_static
-   */
-  set validate(nv: any) {
-    const that = this
-    if (typeof nv === 'function') {
-      this._validate = nv
-    } else if (typeof nv === 'string') {
-      const vl = function (value: any, data: any) {
-        let msg = YvanUI.complexValid['fun'](nv, value)
-
-        return that._showValidate(msg, 'inputValidate')
-      }
-      this._validate = vl
-    }
-  }
-
-  get validate(): any {
-    return this._validate
   }
 
   /**================ 私有属性 ===================**/
   _validateResult: boolean = true
-
-  _validate: any
 
   _required: boolean | undefined
 
@@ -538,12 +520,11 @@ export class CtlInput<M> extends CtlBase<M> {
       }
     }
     else {
-      if (this._validate) {
-        // 只有校验值
-        const result = this._validate(this.value);
-        if (result) {
-          return result
-        }
+      // 只有校验值
+      const that: M = <any>this;
+      const result = YvEventDispatch(this.onValidate, that, this.value);
+      if (result) {
+        return result
       }
     }
     return null

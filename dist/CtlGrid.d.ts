@@ -233,6 +233,7 @@ export declare class CtlGrid extends CtlBase<CtlGrid> {
     private dataSourceBind?;
     private _gridOptions;
     private _filterChanged;
+    private _sortChanged;
     private _gridReady;
     private _resetGrid;
     _rowDoubleClicked(e: any): void;

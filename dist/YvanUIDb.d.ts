@@ -16,7 +16,7 @@ export declare namespace Db {
         limitOffset?: number;
         needCount?: boolean;
         filterModel?: any;
-        orderByModel?: any;
+        sortModel?: any;
     }
     interface Response extends Ajax.Response<any> {
         /**
