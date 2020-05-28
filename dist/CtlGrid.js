@@ -204,8 +204,15 @@ var CtlGrid = /** @class */ (function (_super) {
             }
             this.gridApi.updateRowData(transaction_1);
         }
-        if (this.paginationDefaultSelectRow && this.paginationDefaultSelectRow >= 0 && targetDataList && targetDataList.length > 0) {
-            this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+        if (this.paginationDefaultSelectRow != undefined && targetDataList && targetDataList.length > 0) {
+            if (this.paginationDefaultSelectRow >= 0) {
+                if (targetDataList.length <= this.paginationDefaultSelectRow) {
+                    this.selectRow(function (node) { return node.rowIndex === targetDataList.length - 1; });
+                }
+                else {
+                    this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+                }
+            }
         }
     };
     /**
@@ -504,8 +511,10 @@ var CtlGrid = /** @class */ (function (_super) {
             onCellFocused: this._cellFocused.bind(this),
             onCellClicked: this._cellClicked.bind(this),
             onFilterChanged: this._filterChanged.bind(this),
+            onSortChanged: this._sortChanged.bind(this),
             enterMovesDown: false,
             enterMovesDownAfterEdit: false,
+            accentedSort: true,
             components: {
                 CtlGridCellButton: CtlGridCellButton,
                 CtlGridCellCheckbox: CtlGridCellCheckbox,
@@ -542,7 +551,18 @@ var CtlGrid = /** @class */ (function (_super) {
                     reload.call(this.dataSourceBind);
                 }
             }
-            console.log('_filterChanged', this.gridApi.getFilterModel());
+            // console.log('_filterChanged', this.gridApi.getFilterModel());
+        }
+    };
+    CtlGrid.prototype._sortChanged = function () {
+        if (this.dataSourceBind) {
+            if ((!_.isEqual(this.gridApi.getSortModel(), this.dataSourceBind.lastSortModel)) || this.refreshMode == GridRefreshMode.refreshAndClearFilter) {
+                var reload = _.get(this.dataSourceBind, 'reload');
+                if (typeof reload === 'function') {
+                    reload.call(this.dataSourceBind);
+                }
+            }
+            // console.log('_sortChanged', this.gridApi.getSortModel());
         }
     };
     CtlGrid.prototype._gridReady = function () {
@@ -974,6 +994,12 @@ var CtlGrid = /** @class */ (function (_super) {
                 //unSortIcon: true,
                 hide: easyuiCol.hidden
             };
+            if (easyuiCol.sortable) {
+                // 走服务端排序，客户端排序可以让其无效
+                col.comparator = function () {
+                    return 0;
+                };
+            }
             if (typeof easyuiCol.width !== 'undefined')
                 col.width = easyuiCol.width;
             if (typeof easyuiCol.minwidth !== 'undefined')
@@ -1100,8 +1126,7 @@ var CtlGrid = /** @class */ (function (_super) {
                         }
                     });
                 }
-                else if (easyuiCol.editMode === 'text' ||
-                    easyuiCol.editMode === 'number') {
+                else if (easyuiCol.editMode === 'text' || easyuiCol.editMode === 'number') {
                     //普通文本框编辑
                     formatable = true;
                     _.assign(col, {
@@ -1128,8 +1153,7 @@ var CtlGrid = /** @class */ (function (_super) {
                         }
                     });
                 }
-                else if (easyuiCol.editMode === 'date' ||
-                    easyuiCol.editMode === 'datetime') {
+                else if (easyuiCol.editMode === 'date' || easyuiCol.editMode === 'datetime') {
                     formatable = true;
                     // _.assign(col, {
                     //     editable: true,
@@ -1220,12 +1244,13 @@ var CtlGrid = /** @class */ (function (_super) {
                             suppressAndOrCondition: true,
                             filterOptions: [
                                 // 服务器已经设置条件，浏览器不进行实际比对
-                                { displayKey: '=', displayName: '等于', test: function () { return true; } },
-                                { displayKey: '<>', displayName: '不等于', test: function () { return true; } },
-                                { displayKey: '<', displayName: '小于', test: function () { return true; } },
-                                { displayKey: '>', displayName: '大于', test: function () { return true; } },
-                                { displayKey: '<=', displayName: '小于等于', test: function () { return true; } },
-                                { displayKey: '>=', displayName: '大于等于', test: function () { return true; } },
+                                { displayKey: 'equals', displayName: '等于', test: function () { return true; } },
+                                { displayKey: 'notEqual', displayName: '不等于', test: function () { return true; } },
+                                { displayKey: 'lessThan', displayName: '小于', test: function () { return true; } },
+                                { displayKey: 'greaterThan', displayName: '大于', test: function () { return true; } },
+                                { displayKey: 'lessThanOrEqual', displayName: '小于等于', test: function () { return true; } },
+                                { displayKey: 'greaterThanOrEqual', displayName: '大于等于', test: function () { return true; } },
+                                { displayKey: 'inRange', displayName: '范围', test: function () { return true; } },
                             ]
                         }
                     });

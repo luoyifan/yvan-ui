@@ -2,6 +2,7 @@ import { __assign } from "tslib";
 import * as YvanUI from './YvanUIExtend';
 import { isDesignMode } from './DesignHelper';
 import { brokerInvoke } from './Service';
+import { YvEventDispatch } from './YvanEvent';
 var YvanDataSourceGrid = /** @class */ (function () {
     function YvanDataSourceGrid(ctl, option) {
         var _this = this;
@@ -9,50 +10,61 @@ var YvanDataSourceGrid = /** @class */ (function () {
         this.isFirstAutoLoad = true; //是否为第一次自动读取
         this.serverQuery = _.debounce(function (option, paramFunction, params) {
             var that = _this;
-            //异步请求数据内容
-            that.ctl.loading = true;
             var needCount = false;
             if (typeof that.rowCount === 'undefined') {
                 //从来没有统计过 rowCount(记录数)
                 needCount = true;
                 that.lastFilterModel = _.cloneDeep(params.filterModel);
+                that.lastSortModel = _.cloneDeep(params.sortModel);
             }
             else {
                 if (!_.isEqual(that.lastFilterModel, params.filterModel)) {
                     //深度对比，如果 filter 模型更改了，需要重新统计 rowCount(记录数)
                     needCount = true;
                     that.lastFilterModel = _.cloneDeep(params.filterModel);
+                    that.lastSortModel = _.cloneDeep(params.sortModel);
                 }
             }
             // 获取所有参数
             var queryParams = __assign({}, (typeof paramFunction === 'function' ? paramFunction() : undefined));
             var ajaxPromise;
             if (option.type === 'SQL') {
-                ajaxPromise = YvanUI.dbs[option.db]
-                    .query({
+                var ajaxParam = {
                     params: queryParams,
                     limit: params.endRow - params.startRow,
                     limitOffset: params.startRow,
                     needCount: needCount,
-                    orderByModel: params.sortModel,
+                    sortModel: params.sortModel,
                     filterModel: params.filterModel,
                     sqlId: option.sqlId
-                });
+                };
+                var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                if (allow === false) {
+                    // 不允许请求
+                    return;
+                }
+                ajaxPromise = YvanUI.dbs[option.db].query(ajaxParam);
             }
             else if (option.type === 'Server') {
                 var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
-                ajaxPromise = brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, {
+                var ajaxParam = {
                     params: queryParams,
                     limit: params.endRow - params.startRow,
                     limitOffset: params.startRow,
                     needCount: needCount,
-                    orderByModel: params.sortModel,
+                    sortModel: params.sortModel,
                     filterModel: params.filterModel,
-                });
+                };
+                var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                if (allow === false) {
+                    // 不允许请求
+                    return;
+                }
+                ajaxPromise = brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, ajaxParam);
             }
             else if (option.type === 'Ajax') {
                 var ajax = _.get(window, 'YvanUI.ajax');
-                ajaxPromise = ajax({
+                var ajaxParam = {
                     url: option.url,
                     method: 'POST-JSON',
                     data: {
@@ -60,17 +72,26 @@ var YvanDataSourceGrid = /** @class */ (function () {
                         limit: params.endRow - params.startRow,
                         limitOffset: params.startRow,
                         needCount: needCount,
-                        orderByModel: params.sortModel,
+                        sortModel: params.sortModel,
                         filterModel: params.filterModel,
                     }
-                });
+                };
+                var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                if (allow === false) {
+                    // 不允许请求
+                    return;
+                }
+                ajaxPromise = ajax(ajaxParam);
             }
             else {
                 console.error('unSupport dataSource mode:', option);
                 params.failCallback();
                 return;
             }
+            //异步请求数据内容
+            that.ctl.loading = true;
             ajaxPromise.then(function (res) {
+                YvEventDispatch(option.onAfter, that.ctl, res);
                 var resultData = res.data, pagination = res.pagination, resParams = res.params;
                 if (needCount) {
                     if (_.has(res, 'totalCount')) {
@@ -202,6 +223,7 @@ var YvanDataSourceGrid = /** @class */ (function () {
                     params.startRow = (currentPage - 1) * pageSize;
                     params.endRow = currentPage * pageSize;
                     params.filterModel = that.ctl.gridApi.getFilterModel();
+                    params.sortModel = that.ctl.gridApi.getSortModel();
                     if (that.isFirstAutoLoad && that.ctl.autoLoad === false) {
                         that.rowCount = 0;
                         params.successCallback([], that.rowCount);
@@ -262,6 +284,7 @@ var YvanDataSourceGrid = /** @class */ (function () {
                         successCallback: function (data, dataLength) {
                             params.successCallback(data, dataLength);
                             that.ctl.loading = false;
+                            that.ctl.gridPage.itemCount = dataLength;
                             that.ctl._bindingComplete();
                             if (that.ctl.entityName) {
                                 _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow());

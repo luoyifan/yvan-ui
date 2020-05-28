@@ -30,22 +30,32 @@ var YvDataSource = /** @class */ (function () {
         });
         this.sqlModeDebounce = _.debounce(function (option) {
             var that = _this;
-            //异步请求数据内容
-            that.ctl.loading = true;
             var ajaxPromise;
             if (option.type === 'SQL') {
-                ajaxPromise = YvanUI.dbs[option.db].query({
+                var ajaxParam = {
                     params: option.params,
                     needCount: false,
                     sqlId: option.sqlId
-                });
+                };
+                var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                if (allow === false) {
+                    // 不允许请求
+                    return;
+                }
+                ajaxPromise = YvanUI.dbs[option.db].query(ajaxParam);
             }
             else if (option.type === 'Server') {
                 var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
-                ajaxPromise = brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, {
+                var ajaxParam = {
                     params: option.params,
                     needCount: false,
-                });
+                };
+                var allow = YvEventDispatch(option.onBefore, that.ctl, ajaxParam);
+                if (allow === false) {
+                    // 不允许请求
+                    return;
+                }
+                ajaxPromise = brokerInvoke(YvanUI.getServerPrefix(serverUrl), method, ajaxParam);
             }
             else {
                 console.error('unSupport dataSource mode:', option);
@@ -53,7 +63,10 @@ var YvDataSource = /** @class */ (function () {
                 that.ctl.loading = false;
                 return;
             }
+            //异步请求数据内容
+            that.ctl.loading = true;
             ajaxPromise.then(function (res) {
+                YvEventDispatch(option.onAfter, that.ctl, res);
                 var resultData = res.data, resParams = res.params;
                 if (_this.dataSourceProcess) {
                     //自定义的数据处理过程

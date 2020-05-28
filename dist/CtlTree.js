@@ -195,6 +195,12 @@ var CtlTree = /** @class */ (function (_super) {
         this._webix.clearAll();
     };
     /**
+     * 选择所有节点
+     */
+    CtlTree.prototype.checkAll = function () {
+        this._webix.checkAll();
+    };
+    /**
      * 取消选择所有节点
      */
     CtlTree.prototype.uncheckAll = function () {
@@ -362,6 +368,7 @@ var CtlTree = /** @class */ (function (_super) {
                 icon: row['icon'],
                 value: row[textField],
                 id: row[idField],
+                disabled: _.get(row, 'disabled'),
                 row: row
             };
         }

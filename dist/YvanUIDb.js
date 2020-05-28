@@ -47,7 +47,7 @@ export var Db;
                     data: {
                         db: _this.defaultDb,
                         filterModel: option.filterModel,
-                        orderByModel: option.orderByModel,
+                        sortModel: option.sortModel,
                         limit: option.limit,
                         limitOffset: option.limitOffset,
                         needCount: option.needCount,

@@ -251,7 +251,9 @@ export class CtlSearch extends CtlInput<CtlSearch> {
 
       //写回
       _.forOwn(searchCtl.widget.bind, (value, key) => {
-        _.set(searchCtl._module, key, _.get(data, value))
+        if (_.has(data, value)) {
+          _.set(searchCtl._module, key, _.get(data, value))
+        }
       })
 
       this.closeDialog()

@@ -63,8 +63,8 @@ var CtlSearch = /** @class */ (function (_super) {
                     YvEventDispatch(that.onFocus, that, undefined);
                 },
                 onBlur: function () {
-                    if (that._validate) {
-                        var result = that._validate(that.value);
+                    if (that.onValidate || that._required) {
+                        var result = that._resultToShowOrHide();
                         if (result) {
                             that._showValidateError();
                         }
@@ -108,11 +108,14 @@ var CtlSearch = /** @class */ (function (_super) {
             return;
         }
         this.supportChangeValue = true;
-        YvEventDispatch(this.widget.onClear, this, undefined);
-        //清空
-        _.forOwn(this.widget.bind, function (value, key) {
-            _.set(_this._module, key, '');
-        });
+        // 发出 onClear 事件，如果事件返回 true，代表不用再清空
+        var hasHandle = YvEventDispatch(this.widget.onClear, this, undefined);
+        if (!hasHandle) {
+            //清空
+            _.forOwn(this.widget.bind, function (value, key) {
+                _.set(_this._module, key, '');
+            });
+        }
     };
     Object.defineProperty(CtlSearch.prototype, "value", {
         get: function () {

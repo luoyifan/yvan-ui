@@ -26,20 +26,28 @@ var BaseModule = /** @class */ (function (_super) {
         return new Promise(function (resolver, reject) {
             var ctlMappings = _.get(_this, '_entityCtlMapping.' + entityName);
             var result = {};
-            if (_.has(ctlMappings, '_validate')) {
-                var validateResult = ctlMappings._validate(ctlMappings.value);
+            if (_.get(ctlMappings, '_required') === true || _.has(ctlMappings, 'onValidate')) {
+                var validateResult = ctlMappings._resultToShowOrHide();
                 if (validateResult) {
-                    _.set(result, ctlMappings.vjson.label, validateResult);
+                    ctlMappings._showTootip(validateResult);
+                    ctlMappings._showValidateError();
+                    ctlMappings.focus();
+                    _.set(result, ctlMappings.entityName, validateResult);
                 }
             }
             else {
+                var isShow_1 = false;
                 _.forEach(ctlMappings, function (ctl, key) {
-                    if (_.has(ctl, '_validate')) {
-                        var validateResult = ctl._validate(ctl.value);
+                    if (_.get(ctl, '_required') === true || _.has(ctl, 'onValidate')) {
+                        var validateResult = ctl._resultToShowOrHide();
                         if (validateResult) {
-                            ctl._showTootip(validateResult);
                             ctl._showValidateError();
                             _.set(result, key, validateResult);
+                            if (!isShow_1) {
+                                isShow_1 = true;
+                                ctl._showTootip(validateResult);
+                                ctl.focus();
+                            }
                         }
                     }
                 });
@@ -64,10 +72,12 @@ var BaseModule = /** @class */ (function (_super) {
          * 获取或设置 window 标题
          */
         set: function (v) {
-            if (this._webixId) {
+            if (this._webixId && _.has(this, '_titleLabel')) {
                 // webix 对象已经出现
                 this._webixId.define('title', v);
-                $(this._webixId.$view).find('.webix_win_head .webix_win_title .webix_el_box').html(v);
+                var _titleLabel = _.get(this, '_titleLabel');
+                _titleLabel.define('label', v);
+                _titleLabel.refresh();
                 return;
             }
             console.error('无法设置 title');
@@ -99,26 +109,6 @@ var BaseDialog = /** @class */ (function (_super) {
      * 关闭后触发
      */
     BaseDialog.prototype.onClose = function () { };
-    Object.defineProperty(BaseDialog.prototype, "title", {
-        /**
-         * 对话框标题
-         */
-        get: function () {
-            return $(this.layero)
-                .find('.layui-layer-title')
-                .html();
-        },
-        /**
-         * 设置对话框标题
-         */
-        set: function (nv) {
-            $(this.layero)
-                .find('.layui-layer-title')
-                .html(nv);
-        },
-        enumerable: true,
-        configurable: true
-    });
     /**
      * 显示进行中的状态
      */
