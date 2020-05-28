@@ -7369,11 +7369,8 @@
                       this.wrapper = that;
                   },
                   onDestruct: function () {
+                      that.connectionClose();
                       that.removeHandle();
-                      if (that._connection) {
-                          console.log('WebSocket closed', that._connection);
-                          that._connection.close();
-                      }
                   }
               }
           });
@@ -7427,6 +7424,7 @@
       };
       CtlXterm.prototype.connectionClose = function () {
           if (this._connection) {
+              console.log('WebSocket closed', this._connection);
               this._connection.close();
           }
       };

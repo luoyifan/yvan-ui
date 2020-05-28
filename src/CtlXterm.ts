@@ -119,11 +119,8 @@ export class CtlXterm extends CtlBase<CtlXterm> {
                     this.wrapper = that
                 },
                 onDestruct(this: any) {
+                    that.connectionClose()
                     that.removeHandle()
-                    if (that._connection) {
-                        console.log('WebSocket closed', that._connection)
-                        that._connection.close();
-                    }
                 }
             }
         })
@@ -199,6 +196,7 @@ export class CtlXterm extends CtlBase<CtlXterm> {
 
     connectionClose() {
         if (this._connection) {
+            console.log('WebSocket closed', this._connection)
             this._connection.close();
         }
     }
