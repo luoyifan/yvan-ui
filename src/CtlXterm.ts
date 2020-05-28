@@ -218,11 +218,13 @@ export class CtlXterm extends CtlBase<CtlXterm> {
     }
 
     private _onSocketClose() {
-        this.term.write("\r\n连接已关闭\r\n");
-        this._connection = undefined;
-        if (this.onClose) {
-            YvEventDispatch(this.onClose, this, undefined);
+        if (this._webix) {
+            this.term.write("\r\n连接已关闭\r\n");
+            if (this.onClose) {
+                YvEventDispatch(this.onClose, this, undefined);
+            }
         }
+        this._connection = undefined;
     }
 
     private _onSocketError() {
