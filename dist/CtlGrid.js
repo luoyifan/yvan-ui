@@ -204,8 +204,15 @@ var CtlGrid = /** @class */ (function (_super) {
             }
             this.gridApi.updateRowData(transaction_1);
         }
-        if (this.paginationDefaultSelectRow && this.paginationDefaultSelectRow >= 0 && targetDataList && targetDataList.length > 0) {
-            this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+        if (this.paginationDefaultSelectRow != undefined && targetDataList && targetDataList.length > 0) {
+            if (this.paginationDefaultSelectRow >= 0) {
+                if (targetDataList.length <= this.paginationDefaultSelectRow) {
+                    this.selectRow(function (node) { return node.rowIndex === targetDataList.length - 1; });
+                }
+                else {
+                    this.selectRow(function (node) { return node.rowIndex === _this.paginationDefaultSelectRow; });
+                }
+            }
         }
     };
     /**
