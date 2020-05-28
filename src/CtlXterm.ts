@@ -166,6 +166,10 @@ export class CtlXterm extends CtlBase<CtlXterm> {
         return this._webix._fitAddon
     }
 
+    clear() {
+        this.term.clear()
+    }
+
     connectHost(host: string) {
         if (!this._connection) {
             let hostUrl = host;
