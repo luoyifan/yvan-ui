@@ -26,6 +26,16 @@ webix.protoUI(
             this._updateScrollSize()
             // this._editor.scrollTo(0, 0) //force repaint, mandatory for IE
         },
+        destructor: function () {
+            if (this.$destructed) {
+                return;
+            }
+
+            this.$destructed = true;
+            if (this.config.on && typeof this.config.on.onDestruct === 'function') {
+                this.config.on.onDestruct.call(this)
+            }
+        },
         _updateScrollSize: function () {
             var box = this._term.element;
             var height = (this.$height || 0) + 'px'
@@ -104,7 +114,8 @@ export class CtlXterm extends CtlBase<CtlXterm> {
                     that.attachHandle(this, { ...vjson, ...yvanProp })
                     this.wrapper = that
                 },
-                onAfterDelete() {
+                onDestruct(this: any) {
+                    console.log('onDes', this.$view);
                     that.removeHandle()
                 }
             }
