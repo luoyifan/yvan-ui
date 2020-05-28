@@ -563,6 +563,8 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
           close: vjson.close === undefined ? true : vjson.close,
           move: vjson.move === undefined ? true : vjson.move,
           modal: vjson.modal === undefined ? true : vjson.modal,
+          left: vjson.left,
+          top: vjson.top,
           position: 'center',
           resize: vjson.resize === undefined ? true : vjson.resize,
           head: {

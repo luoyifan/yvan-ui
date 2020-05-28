@@ -30,11 +30,13 @@ export declare class CtlXterm extends CtlBase<CtlXterm> {
      * 获取填充插件
      */
     get fitAddon(): any;
+    clear(): void;
     connectHost(host: string): void;
     sendMessage(msg: any): void;
     connectionClose(): void;
     /*********************** 私有变量 **********************/
     private _connection?;
+    private _shouldConnectUrl?;
     private _onSocketOpen;
     private _onSocketMessage;
     private _onSocketClose;
