@@ -82,6 +82,10 @@ webix.protoUI(
                             this._term = term;
                             this._fitAddon = fitAddon;
                             this._updateXtermInfo()
+                            if (this.wrapper._shouldConnectUrl) {
+                                this.wrapper.connectHost(this.wrapper._shouldConnectUrl);
+                                delete this.wrapper._shouldConnectUrl
+                            }
                         })
                     }
                 })
@@ -171,6 +175,10 @@ export class CtlXterm extends CtlBase<CtlXterm> {
     }
 
     connectHost(host: string) {
+        if (!this.term) {
+            this._shouldConnectUrl = host
+            return;
+        }
         if (!this._connection) {
             let hostUrl = host;
             if (hostUrl.indexOf("?") === -1) {
@@ -207,6 +215,7 @@ export class CtlXterm extends CtlBase<CtlXterm> {
 
     /*********************** 私有变量 **********************/
     private _connection?: WebSocket
+    private _shouldConnectUrl?: string
 
     private _onSocketOpen() {
         this.term.write('连接已建立，正在等待数据...\r\n');
