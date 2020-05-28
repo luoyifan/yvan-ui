@@ -20,9 +20,6 @@ webix.protoUI(
         },
         _ready: function (this: any) {
             this.isXtermLoad = false;
-            this.$view.addEventListener('DOMNodeRemoved', () => {
-                console.log('ctlXterm DOMNodeRemoved')
-            })
         },
         _set_inner_size: function () {
             if (!this._term || !this.$width) return
@@ -124,6 +121,7 @@ export class CtlXterm extends CtlBase<CtlXterm> {
                 onDestruct(this: any) {
                     that.removeHandle()
                     if (that._connection) {
+                        console.log('WebSocket closed', that._connection)
                         that._connection.close();
                     }
                 }

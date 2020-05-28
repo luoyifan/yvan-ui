@@ -1,14 +1,14 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('webix'), require('reflect-metadata'), require('ag-grid'), require('axios'), require('qs'), require('typescript')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'webix', 'reflect-metadata', 'ag-grid', 'axios', 'qs', 'typescript'], factory) :
-  (global = global || self, factory(global['yvan-ui'] = {}, global.Vue, global.webix, null, global.agGrid, global.axios, global.Qs, global.ts));
-}(this, (function (exports, Vue, webix, reflectMetadata, agGrid, axios, Qs, ts) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('webix'), require('reflect-metadata'), require('ag-grid'), require('qs'), require('axios'), require('typescript')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'webix', 'reflect-metadata', 'ag-grid', 'qs', 'axios', 'typescript'], factory) :
+  (global = global || self, factory(global['yvan-ui'] = {}, global.Vue, global.webix, null, global.agGrid, global.qs, global.axios, global.ts));
+}(this, (function (exports, Vue, webix, reflectMetadata, agGrid, qs, axios, ts) { 'use strict';
 
   Vue = Vue && Object.prototype.hasOwnProperty.call(Vue, 'default') ? Vue['default'] : Vue;
   webix = webix && Object.prototype.hasOwnProperty.call(webix, 'default') ? webix['default'] : webix;
   agGrid = agGrid && Object.prototype.hasOwnProperty.call(agGrid, 'default') ? agGrid['default'] : agGrid;
+  qs = qs && Object.prototype.hasOwnProperty.call(qs, 'default') ? qs['default'] : qs;
   axios = axios && Object.prototype.hasOwnProperty.call(axios, 'default') ? axios['default'] : axios;
-  Qs = Qs && Object.prototype.hasOwnProperty.call(Qs, 'default') ? Qs['default'] : Qs;
   ts = ts && Object.prototype.hasOwnProperty.call(ts, 'default') ? ts['default'] : ts;
 
   /*! *****************************************************************************
@@ -7303,12 +7303,16 @@
           }
       },
       _updateXtermInfo: function () {
-          this.wrapper.xtermInfo = {
-              "cols": this._term.cols,
-              "rows": this._term.rows,
-              "width": this.$width,
-              "height": this.$height
+          var info = {
+              "xtermCols": this._term.cols,
+              "xtermRows": this._term.rows,
+              "xtermWp": this.$width,
+              "xtermHp": this.$height
           };
+          this.wrapper.xtermInfo = info;
+          if (this.wrapper._connection) {
+              this.wrapper._resizeClientData(info);
+          }
       },
       $setSize: function (x, y) {
           var _this = this;
@@ -7320,10 +7324,11 @@
                       //@ts-ignore
                       require(['xterm', 'xterm-addon-fit'], function (xterm, addon) {
                           var term = new xterm.Terminal(_this.config.termConfig);
-                          term.onData(function (data) {
-                              //键盘输入时的回调函数
-                              YvEventDispatch(_this.wrapper.onData, _this.wrapper, data);
-                          });
+                          if (_this.wrapper.allowInput) {
+                              term.onData(function (data) {
+                                  _this.wrapper._sendClientData(data);
+                              });
+                          }
                           var fitAddon = new addon.FitAddon();
                           term.loadAddon(fitAddon);
                           term.open(_this.$view.firstChild);
@@ -7332,9 +7337,6 @@
                           _this._fitAddon = fitAddon;
                           _this._updateXtermInfo();
                       });
-                  }
-                  else {
-                      YvEventDispatch(_this.wrapper.onSizeChange, _this.wrapper, _this.wrapper.xtermInfo);
                   }
               });
           }
@@ -7351,8 +7353,9 @@
           _.defaultsDeep(vjson, CtlXtermDefault);
           var yvanProp = parseYvanPropChangeVJson(vjson, [
               'value',
-              'onData',
-              'onSizeChange'
+              'allowInput',
+              'onOpen',
+              'onClose',
           ]);
           // 将 vjson 存至 _webixConfig
           that._webixConfig = vjson;
@@ -7366,8 +7369,11 @@
                       this.wrapper = that;
                   },
                   onDestruct: function () {
-                      console.log('onDes', this.$view);
                       that.removeHandle();
+                      if (that._connection) {
+                          console.log('WebSocket closed', that._connection);
+                          that._connection.close();
+                      }
                   }
               }
           });
@@ -7393,6 +7399,82 @@
           enumerable: true,
           configurable: true
       });
+      CtlXterm.prototype.connectHost = function (host) {
+          if (!this._connection) {
+              var hostUrl = host;
+              if (hostUrl.indexOf("?") === -1) {
+                  hostUrl = hostUrl + "?" + qs.stringify(this.xtermInfo);
+              }
+              else {
+                  var params = hostUrl.slice(hostUrl.indexOf("?") + 1);
+                  if (params.length > 0) {
+                      hostUrl = hostUrl + "&" + qs.stringify(this.xtermInfo);
+                  }
+                  hostUrl += qs.stringify(this.xtermInfo);
+              }
+              this._connection = new WebSocket(hostUrl);
+              this._connection.onopen = this._onSocketOpen.bind(this);
+              this._connection.onmessage = this._onSocketMessage.bind(this);
+              this._connection.onerror = this._onSocketError.bind(this);
+              this._connection.onclose = this._onSocketClose.bind(this);
+          }
+          else {
+              this.term.write('Error: WebSocket Not Supported\r\n');
+          }
+      };
+      CtlXterm.prototype.sendMessage = function (msg) {
+          this._sendClientData(msg);
+      };
+      CtlXterm.prototype.connectionClose = function () {
+          if (this._connection) {
+              this._connection.close();
+          }
+      };
+      CtlXterm.prototype._onSocketOpen = function () {
+          this.term.write('连接已建立，正在等待数据...\r\n');
+          if (this.onOpen) {
+              YvEventDispatch(this.onOpen, this, undefined);
+          }
+          this._sendInitData({ operate: 'connect' });
+      };
+      CtlXterm.prototype._onSocketMessage = function (msg) {
+          var data = msg.data.toString();
+          this.term.write(data);
+      };
+      CtlXterm.prototype._onSocketClose = function () {
+          this.term.write("\r\n连接已关闭\r\n");
+          this._connection = undefined;
+          if (this.onClose) {
+              YvEventDispatch(this.onClose, this, undefined);
+          }
+      };
+      CtlXterm.prototype._onSocketError = function () {
+          this.term.write("\r\n连接发生异常\r\n");
+      };
+      CtlXterm.prototype._sendInitData = function (options) {
+          if (!this._connection) {
+              console.error('_connection 没有初始化');
+              return;
+          }
+          //连接参数
+          this._connection.send(JSON.stringify(options));
+      };
+      CtlXterm.prototype._resizeClientData = function (data) {
+          if (!this._connection) {
+              console.error('_connection 没有初始化');
+              return;
+          }
+          //发送指令
+          this._connection.send(JSON.stringify(__assign({ "operate": "resize" }, data)));
+      };
+      CtlXterm.prototype._sendClientData = function (data) {
+          if (!this._connection) {
+              console.error('_connection 没有初始化');
+              return;
+          }
+          //发送指令
+          this._connection.send(JSON.stringify({ "operate": "command", "command": data }));
+      };
       return CtlXterm;
   }(CtlBase));
 
@@ -8338,7 +8420,7 @@
       // _.forOwn(data, (v, k) => {
       //     formData.append(k, v);
       // });
-      var formData = data ? Qs.stringify(data) : '';
+      var formData = data ? qs.stringify(data) : '';
       var xhr = new XMLHttpRequest();
       xhr.open('POST', downLoadUrl);
       xhr.responseType = 'blob';
@@ -8413,7 +8495,7 @@
           else if (option.method === 'POST') {
               ax.method = 'POST';
               ax.headers = __assign({ 'Content-Type': 'application/x-www-form-urlencoded' }, option.headers);
-              ax.data = Qs.stringify(option.data);
+              ax.data = qs.stringify(option.data);
           }
           else if (option.method === 'GET') {
               ax.method = 'GET';
