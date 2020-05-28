@@ -9,6 +9,8 @@ export const CtlButtonDefault: any = {
 
 export const CtlDataviewDefault: any = {};
 
+export const CtlDatatableDefault: any = {};
+
 export const CtlTreeDefault: any = {
     showCheckbox: false,
     showLeftIcon: true,
