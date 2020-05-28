@@ -5,6 +5,7 @@ import { CtlTree } from './CtlTree'
 import { CtlTreeTable } from './CtlTreeTable'
 import { CtlTab } from './CtlTab'
 import { CtlDataview } from './CtlDataview'
+import { CtlDatatable } from './CtlDatatable'
 // import { CtlECharts } from './CtlECharts'
 import { CtlButton } from './CtlButton'
 import { CtlText } from './form/input/CtlText'
@@ -355,6 +356,10 @@ export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP
 
         case 'dataview':
           CtlDataview.create(module, obj);
+          break
+
+        case 'datatable':
+          CtlDatatable.create(module, obj);
           break
 
         case 'xterm':
