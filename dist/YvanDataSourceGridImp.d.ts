@@ -1,17 +1,5 @@
-/// <reference types="lodash" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/common" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/array" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/collection" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/date" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/function" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/lang" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/math" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/number" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/object" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/seq" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/string" />
-/// <reference types="node_modules/@types/lodash/ts3.1/common/util" />
 import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSourceAjax, GridDataSourceStaticFunction } from './YvanDataSourceGrid';
+import _ from 'lodash';
 export declare class YvanDataSourceGrid {
     private option;
     private ctl;
@@ -22,7 +10,7 @@ export declare class YvanDataSourceGrid {
     private rowCount;
     lastFilterModel: any;
     lastSortModel: any;
-    serverQuery: ((option: GridDataSourceServer | GridDataSourceAjax | GridDataSourceSql, paramFunction: (() => any) | undefined, params: any) => void) & import("lodash").Cancelable;
+    serverQuery: ((option: GridDataSourceServer | GridDataSourceAjax | GridDataSourceSql, paramFunction: (() => any) | undefined, params: any) => void) & _.Cancelable;
     /**
      * SQL取值
      */

@@ -4,8 +4,8 @@ import { GridDataSource, GridDataSourceSql, GridDataSourceServer, GridDataSource
 import { isDesignMode } from './DesignHelper'
 import { brokerInvoke } from './Service'
 import { Db } from './YvanUIDb'
-import { GridRefreshMode } from "./CtlGrid";
 import { YvEventDispatch } from './YvanEvent'
+import _ from 'lodash'
 
 export class YvanDataSourceGrid {
   private option: GridDataSource

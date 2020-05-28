@@ -1,11 +1,12 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('webix'), require('reflect-metadata'), require('ag-grid'), require('qs'), require('axios'), require('typescript')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'webix', 'reflect-metadata', 'ag-grid', 'qs', 'axios', 'typescript'], factory) :
-  (global = global || self, factory(global['yvan-ui'] = {}, global.Vue, global.webix, null, global.agGrid, global.qs, global.axios, global.ts));
-}(this, (function (exports, Vue, webix, reflectMetadata, agGrid, qs, axios, ts) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('webix'), require('reflect-metadata'), require('lodash'), require('ag-grid'), require('qs'), require('axios'), require('typescript')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'webix', 'reflect-metadata', 'lodash', 'ag-grid', 'qs', 'axios', 'typescript'], factory) :
+  (global = global || self, factory(global['yvan-ui'] = {}, global.Vue, global.webix, null, global._$1, global.agGrid, global.qs, global.axios, global.ts));
+}(this, (function (exports, Vue, webix, reflectMetadata, _$1, agGrid, qs, axios, ts) { 'use strict';
 
   Vue = Vue && Object.prototype.hasOwnProperty.call(Vue, 'default') ? Vue['default'] : Vue;
   webix = webix && Object.prototype.hasOwnProperty.call(webix, 'default') ? webix['default'] : webix;
+  _$1 = _$1 && Object.prototype.hasOwnProperty.call(_$1, 'default') ? _$1['default'] : _$1;
   agGrid = agGrid && Object.prototype.hasOwnProperty.call(agGrid, 'default') ? agGrid['default'] : agGrid;
   qs = qs && Object.prototype.hasOwnProperty.call(qs, 'default') ? qs['default'] : qs;
   axios = axios && Object.prototype.hasOwnProperty.call(axios, 'default') ? axios['default'] : axios;
@@ -384,7 +385,7 @@
       function YvDataSource(ctl, option, dataSourceProcess) {
           var _this = this;
           this.watches = [];
-          this.customFunctionModeDebounce = _.debounce(function (option) {
+          this.customFunctionModeDebounce = _$1.debounce(function (option) {
               var that = _this;
               that.ctl.loading = true;
               option.call(that.module, that.ctl, {
@@ -406,7 +407,7 @@
                   }
               });
           });
-          this.sqlModeDebounce = _.debounce(function (option) {
+          this.sqlModeDebounce = _$1.debounce(function (option) {
               var that = _this;
               var ajaxPromise;
               if (option.type === 'SQL') {
@@ -423,7 +424,7 @@
                   ajaxPromise = dbs[option.db].query(ajaxParam);
               }
               else if (option.type === 'Server') {
-                  var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
+                  var _a = _$1.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
                   var ajaxParam = {
                       params: option.params,
                       needCount: false,
@@ -500,7 +501,7 @@
               this.setCustomFunctionMode(this.option);
               return;
           }
-          if (_.isArray(this.option)) {
+          if (_$1.isArray(this.option)) {
               //结果就是数组
               this.reload = function () {
                   _this.ctl.dataReal = _this.option;
@@ -510,7 +511,7 @@
               return;
           }
           // 使 watch 生效
-          _.each(this.option.watch, function (watchExp) {
+          _$1.each(this.option.watch, function (watchExp) {
               var unwatch = _this.module.$watch(watchExp, function () {
                   if (_this.reload) {
                       _this.reload();
@@ -524,7 +525,7 @@
                   this.setCustomFunctionMode(this.option.bind);
               }
               else {
-                  var bindFunction = _.get(this.module, this.option.bind);
+                  var bindFunction = _$1.get(this.module, this.option.bind);
                   if (!bindFunction) {
                       console.error("\u6CA1\u6709\u627E\u5230\u540D\u79F0\u4E3A " + this.option.bind + " \u7684\u65B9\u6CD5");
                       return;
@@ -541,7 +542,7 @@
       };
       YvDataSource.prototype.destory = function () {
           // 解除全部 watch
-          _.each(this.watches, function (unwatch) {
+          _$1.each(this.watches, function (unwatch) {
               unwatch();
           });
           this.reload = undefined;
@@ -558,6 +559,7 @@
       autowidth: true,
   };
   var CtlDataviewDefault = {};
+  var CtlDatatableDefault = {};
   var CtlTreeDefault = {
       showCheckbox: false,
       showLeftIcon: true,
@@ -1835,6 +1837,171 @@
           this._rebindDataSource();
       };
       return CtlDataview;
+  }(CtlBase));
+
+  var CtlDatatable = /** @class */ (function (_super) {
+      __extends(CtlDatatable, _super);
+      function CtlDatatable() {
+          return _super !== null && _super.apply(this, arguments) || this;
+      }
+      CtlDatatable.create = function (module, vjson) {
+          var that = new CtlDatatable(vjson);
+          that._module = module;
+          _.defaultsDeep(vjson, CtlDatatableDefault);
+          var yvanProp = parseYvanPropChangeVJson(vjson, [
+              // 'data',
+              'dataSource',
+              'onItemSelect',
+              'onItemClick',
+              'onItemDblClick',
+              'onDataComplete'
+          ]);
+          // 将 vjson 存至 _webixConfig
+          that._webixConfig = vjson;
+          // 将 yvanProp 合并至当前 Ctl 对象, 期间会操作 _webixConfig
+          _.assign(that, yvanProp);
+          // 将 事件与 _webixConfig 一起存至 vjson 交给 webix 框架做渲染
+          _.merge(vjson, that._webixConfig, {
+              select: true,
+              on: {
+                  onInited: function () {
+                      that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
+                  },
+                  onAfterDelete: function () {
+                      that.removeHandle();
+                  },
+                  onItemClick: function (id) {
+                      var item = this.getItem(id);
+                      YvEventDispatch(that.onItemClick, that, item);
+                  },
+                  onItemDblClick: function (id) {
+                      var item = this.getItem(id);
+                      YvEventDispatch(that.onItemDblClick, that, item);
+                  },
+                  onAfterSelect: function (id) {
+                      var item = this.getItem(id);
+                      YvEventDispatch(that.onItemSelect, that, item);
+                  }
+              }
+          });
+          return that;
+      };
+      Object.defineProperty(CtlDatatable.prototype, "value", {
+          /**
+           * 获取值
+           */
+          get: function () {
+              if (!this._webix) {
+                  return this._webixConfig.value;
+              }
+              return this._webix.getValue();
+          },
+          /**
+           * 设置值
+           */
+          set: function (nv) {
+              if (!this._webix) {
+                  this._webixConfig.value = nv;
+              }
+              else {
+                  this._webix.setValue(nv);
+              }
+          },
+          enumerable: true,
+          configurable: true
+      });
+      Object.defineProperty(CtlDatatable.prototype, "dataReal", {
+          /**
+           * 设置数据
+           */
+          set: function (nv) {
+              // dataSource call back
+              this._webix.clearAll();
+              this._webix.parse(nv);
+          },
+          enumerable: true,
+          configurable: true
+      });
+      Object.defineProperty(CtlDatatable.prototype, "dataSource", {
+          /**
+           * 获取数据源设置
+           */
+          get: function () {
+              return this._dataSource;
+          },
+          /**
+           * 设置数据源
+           */
+          set: function (nv) {
+              this._dataSource = nv;
+              if (this._module.loadFinished) {
+                  // onLoad 之后会触发 view.onInited -> attachHandle -> refreshState -> _rebindDataSource
+                  // onLoad 之前都不需要主动触发 _rebindDataSource
+                  this._rebindDataSource();
+              }
+          },
+          enumerable: true,
+          configurable: true
+      });
+      /**
+       * 重新请求数据
+       */
+      CtlDatatable.prototype.reload = function () {
+          if (this.dataSourceBind && this.dataSourceBind.reload) {
+              this.dataSourceBind.reload();
+          }
+      };
+      CtlDatatable.prototype.filter = function (func) {
+          this._webix.filter(func);
+      };
+      //重新绑定数据源
+      CtlDatatable.prototype._rebindDataSource = function () {
+          var _this = this;
+          var innerMethod = function () {
+              if (_this.dataSourceBind) {
+                  _this.dataSourceBind.destory();
+                  _this.dataSourceBind = undefined;
+              }
+              if (_this._webix && _this._module) {
+                  _this.dataSourceBind = new YvDataSource(_this, _this.dataSource, _this._dataSourceProcess.bind(_this));
+                  _this.dataSourceBind.init();
+              }
+          };
+          if (!this._module.loadFinished) {
+              // onload 函数还没有执行（模块还没加载完）, 延迟调用 rebind
+              _.defer(innerMethod);
+          }
+          else {
+              // 否则实时调用 rebind
+              innerMethod();
+          }
+      };
+      CtlDatatable.prototype._dataSourceProcess = function (data) {
+          if (!this.dataSource ||
+              _.isArray(this.dataSource) ||
+              _.isFunction(this.dataSource)) {
+              return data;
+          }
+          if (this.dataSource.type !== 'SQL' && this.dataSource.type !== 'function') {
+              return data;
+          }
+          if (!this.dataSource.idField) {
+              return data;
+          }
+          var idField = this.dataSource.idField;
+          data = _.cloneDeep(data);
+          // 第一遍扫描, 建立映射关系
+          _.each(data, function (item) {
+              item.id = item[idField];
+          });
+          return data;
+      };
+      //刷新状态时，自动重绑数据源
+      CtlDatatable.prototype.refreshState = function () {
+          _super.prototype.refreshState.call(this);
+          this._rebindDataSource();
+      };
+      return CtlDatatable;
   }(CtlBase));
 
   /**
@@ -4308,21 +4475,21 @@
           var _this = this;
           this.watches = [];
           this.isFirstAutoLoad = true; //是否为第一次自动读取
-          this.serverQuery = _.debounce(function (option, paramFunction, params) {
+          this.serverQuery = _$1.debounce(function (option, paramFunction, params) {
               var that = _this;
               var needCount = false;
               if (typeof that.rowCount === 'undefined') {
                   //从来没有统计过 rowCount(记录数)
                   needCount = true;
-                  that.lastFilterModel = _.cloneDeep(params.filterModel);
-                  that.lastSortModel = _.cloneDeep(params.sortModel);
+                  that.lastFilterModel = _$1.cloneDeep(params.filterModel);
+                  that.lastSortModel = _$1.cloneDeep(params.sortModel);
               }
               else {
-                  if (!_.isEqual(that.lastFilterModel, params.filterModel)) {
+                  if (!_$1.isEqual(that.lastFilterModel, params.filterModel)) {
                       //深度对比，如果 filter 模型更改了，需要重新统计 rowCount(记录数)
                       needCount = true;
-                      that.lastFilterModel = _.cloneDeep(params.filterModel);
-                      that.lastSortModel = _.cloneDeep(params.sortModel);
+                      that.lastFilterModel = _$1.cloneDeep(params.filterModel);
+                      that.lastSortModel = _$1.cloneDeep(params.sortModel);
                   }
               }
               // 获取所有参数
@@ -4346,7 +4513,7 @@
                   ajaxPromise = dbs[option.db].query(ajaxParam);
               }
               else if (option.type === 'Server') {
-                  var _a = _.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
+                  var _a = _$1.split(option.method, '@'), serverUrl = _a[0], method = _a[1];
                   var ajaxParam = {
                       params: queryParams,
                       limit: params.endRow - params.startRow,
@@ -4363,7 +4530,7 @@
                   ajaxPromise = brokerInvoke(getServerPrefix(serverUrl), method, ajaxParam);
               }
               else if (option.type === 'Ajax') {
-                  var ajax = _.get(window, 'YvanUI.ajax');
+                  var ajax = _$1.get(window, 'YvanUI.ajax');
                   var ajaxParam = {
                       url: option.url,
                       method: 'POST-JSON',
@@ -4394,9 +4561,9 @@
                   YvEventDispatch(option.onAfter, that.ctl, res);
                   var resultData = res.data, pagination = res.pagination, resParams = res.params;
                   if (needCount) {
-                      if (_.has(res, 'totalCount')) {
+                      if (_$1.has(res, 'totalCount')) {
                           // 兼容老模式
-                          that.rowCount = _.get(res, 'totalCount');
+                          that.rowCount = _$1.get(res, 'totalCount');
                       }
                       else {
                           that.rowCount = pagination.total;
@@ -4409,7 +4576,7 @@
                   }
                   that.ctl._bindingComplete();
                   if (that.ctl.entityName) {
-                      _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow());
+                      _$1.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow());
                   }
               }).catch(function (r) {
                   params.failCallback();
@@ -4428,7 +4595,7 @@
               this.reload = undefined;
               return;
           }
-          if (_.isArray(option)) {
+          if (_$1.isArray(option)) {
               this.setCodeArrayMode(option);
               return;
           }
@@ -4438,8 +4605,8 @@
               return;
           }
           // 使 watch 生效
-          _.forOwn(option.params, function (value) {
-              if (!_.has(value, '$watch')) {
+          _$1.forOwn(option.params, function (value) {
+              if (!_$1.has(value, '$watch')) {
                   return;
               }
               var watchOption = value;
@@ -4452,14 +4619,14 @@
           // params 函数
           var paramFunction = function () {
               var result = {};
-              _.forOwn(option.params, function (value, key) {
-                  if (_.has(value, '$get')) {
+              _$1.forOwn(option.params, function (value, key) {
+                  if (_$1.has(value, '$get')) {
                       var getOption = value;
-                      result[key] = _.get(_this.module, getOption.$get);
+                      result[key] = _$1.get(_this.module, getOption.$get);
                   }
-                  else if (_.has(value, '$watch')) {
+                  else if (_$1.has(value, '$watch')) {
                       var watchOption = value;
-                      result[key] = _.get(_this.module, watchOption.$watch);
+                      result[key] = _$1.get(_this.module, watchOption.$watch);
                   }
                   else {
                       result[key] = value;
@@ -4473,7 +4640,7 @@
               }
               else {
                   // 取 bind 函数
-                  var bindFunction = _.get(this.module, option.bind);
+                  var bindFunction = _$1.get(this.module, option.bind);
                   if (!bindFunction) {
                       console.error("\u6CA1\u6709\u627E\u5230\u540D\u79F0\u4E3A " + option.bind + " \u7684\u65B9\u6CD5");
                       return;
@@ -4498,7 +4665,7 @@
               _this.ctl.loading = true;
               that.clearRowCount();
               if (that.ctl.entityName) {
-                  _.set(that.module, that.ctl.entityName + '.selectedRow', undefined);
+                  _$1.set(that.module, that.ctl.entityName + '.selectedRow', undefined);
               }
               that.ctl.gridApi.hasDataSource = true;
               if (that.ctl.pagination) {
@@ -4562,7 +4729,7 @@
           this.reload = function () {
               that.clearRowCount();
               if (that.ctl.entityName) {
-                  _.set(that.module, that.ctl.entityName + '.selectedRow', undefined);
+                  _$1.set(that.module, that.ctl.entityName + '.selectedRow', undefined);
               }
               that.ctl.loading = true;
               // rowModelType = infinite
@@ -4587,7 +4754,7 @@
                               that.ctl.gridPage.itemCount = dataLength;
                               that.ctl._bindingComplete();
                               if (that.ctl.entityName) {
-                                  _.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow());
+                                  _$1.set(that.module, that.ctl.entityName + '.selectedRow', that.ctl.getSelectedRow());
                               }
                           }
                       });
@@ -4604,7 +4771,7 @@
               _this.ctl.loading = true;
               that.clearRowCount();
               if (that.ctl.entityName) {
-                  _.set(that.module, that.ctl.entityName + '.selectedRow', undefined);
+                  _$1.set(that.module, that.ctl.entityName + '.selectedRow', undefined);
               }
               that.ctl.gridApi.hasDataSource = true;
               if (that.ctl.pagination) {
@@ -4636,7 +4803,7 @@
        */
       YvanDataSourceGrid.prototype.destory = function () {
           // 解除全部 watch
-          _.each(this.watches, function (unwatch) {
+          _$1.each(this.watches, function (unwatch) {
               unwatch();
           });
           this.reload = undefined;
@@ -7454,7 +7621,7 @@
           this._domid = webix.uid();
           this.$view.innerHTML = "<div id='" + this._domid + "' class=\"vc-log\"></div>";
           this.$ready.push(this._ready);
-          _.extend(this.config, config);
+          _$1.extend(this.config, config);
           if (config.on && typeof config.on.onInited === 'function') {
               config.on.onInited.call(this);
           }
@@ -7484,7 +7651,7 @@
       function CtlConsoleLog() {
           var _this = _super !== null && _super.apply(this, arguments) || this;
           _this._realHtml = new Array();
-          _this.realRender = _.debounce(function () {
+          _this.realRender = _$1.debounce(function () {
               $(_this._webix.$view).find('.vc-log').append(_this._realHtml.join(''));
               _this._realHtml = [];
           });
@@ -7493,19 +7660,19 @@
       CtlConsoleLog.create = function (module, vjson) {
           var that = new CtlConsoleLog(vjson);
           that._module = module;
-          _.defaultsDeep(vjson, CtlConsoleLogDefault);
+          _$1.defaultsDeep(vjson, CtlConsoleLogDefault);
           var yvanProp = parseYvanPropChangeVJson(vjson, ['value']);
           // 将 vjson 存至 _webixConfig
           that._webixConfig = vjson;
           // 将 yvanProp 合并至当前 Ctl 对象, 期间会操作 _webixConfig
-          _.assign(that, yvanProp);
+          _$1.assign(that, yvanProp);
           // 将 事件与 _webixConfig 一起存至 vjson 交给 webix 框架做渲染
-          _.merge(vjson, that._webixConfig, {
+          _$1.merge(vjson, that._webixConfig, {
               on: {
                   onInited: function () {
                       var _this = this;
                       that.attachHandle(this, __assign(__assign({}, vjson), yvanProp));
-                      _.defer(function () {
+                      _$1.defer(function () {
                           $(_this.$view).on('click', '.vc-fold', function (e) {
                               that.vcfoldclick(this);
                           });
@@ -8102,6 +8269,9 @@
                   case 'dataview':
                       CtlDataview.create(module, obj);
                       break;
+                  case 'datatable':
+                      CtlDatatable.create(module, obj);
+                      break;
                   case 'xterm':
                       CtlXterm.create(module, obj);
                       break;
@@ -8273,6 +8443,8 @@
                       close: vjson.close === undefined ? true : vjson.close,
                       move: vjson.move === undefined ? true : vjson.move,
                       modal: vjson.modal === undefined ? true : vjson.modal,
+                      left: vjson.left,
+                      top: vjson.top,
                       position: 'center',
                       resize: vjson.resize === undefined ? true : vjson.resize,
                       head: {
@@ -9350,6 +9522,7 @@
   exports.CtlCodeMirror = CtlCodeMirror;
   exports.CtlCombo = CtlCombo;
   exports.CtlConsoleLog = CtlConsoleLog;
+  exports.CtlDatatable = CtlDatatable;
   exports.CtlDataview = CtlDataview;
   exports.CtlDatePicker = CtlDatePicker;
   exports.CtlDateRangePicker = CtlDateRangePicker;
