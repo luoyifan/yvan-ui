@@ -3,6 +3,7 @@ import { CtlXtermDefault } from './CtlDefaultValue'
 import { parseYvanPropChangeVJson } from './CtlUtils'
 import { YvEvent, YvEventDispatch } from './YvanEvent'
 import webix from 'webix'
+import qs from "qs";
 
 webix.protoUI(
     {
@@ -19,6 +20,9 @@ webix.protoUI(
         },
         _ready: function (this: any) {
             this.isXtermLoad = false;
+            this.$view.addEventListener('DOMNodeRemoved', () => {
+                console.log('ctlXterm DOMNodeRemoved')
+            })
         },
         _set_inner_size: function () {
             if (!this._term || !this.$width) return
@@ -39,11 +43,15 @@ webix.protoUI(
             }
         },
         _updateXtermInfo: function () {
-            this.wrapper.xtermInfo = {
-                "cols": this._term.cols,
-                "rows": this._term.rows,
-                "width": this.$width,
-                "height": this.$height
+            const info = {
+                "xtermCols": this._term.cols,
+                "xtermRows": this._term.rows,
+                "xtermWp": this.$width,
+                "xtermHp": this.$height
+            }
+            this.wrapper.xtermInfo = info;
+            if (this.wrapper._connection) {
+                this.wrapper._resizeClientData(info);
             }
         },
         $setSize: function (x: any, y: any) {
@@ -55,10 +63,11 @@ webix.protoUI(
                         //@ts-ignore
                         require(['xterm', 'xterm-addon-fit'], (xterm: any, addon: any) => {
                             const term = new xterm.Terminal(this.config.termConfig);
-                            term.onData((data: any) => {
-                                //键盘输入时的回调函数
-                                YvEventDispatch(this.wrapper.onData, this.wrapper, data)
-                            });
+                            if (this.wrapper.allowInput) {
+                                term.onData((data: any) => {
+                                    this.wrapper._sendClientData(data);
+                                });
+                            }
                             const fitAddon = new addon.FitAddon();
                             term.loadAddon(fitAddon);
                             term.open(this.$view.firstChild);
@@ -67,9 +76,6 @@ webix.protoUI(
                             this._fitAddon = fitAddon;
                             this._updateXtermInfo()
                         })
-                    }
-                    else {
-                        YvEventDispatch(this.wrapper.onSizeChange, this.wrapper, this.wrapper.xtermInfo)
                     }
                 })
             }
@@ -87,8 +93,9 @@ export class CtlXterm extends CtlBase<CtlXterm> {
 
         const yvanProp = parseYvanPropChangeVJson(vjson, [
             'value',
-            'onData',
-            'onSizeChange'
+            'allowInput',
+            'onOpen',
+            'onClose',
         ])
 
         // 将 vjson 存至 _webixConfig
@@ -103,6 +110,15 @@ export class CtlXterm extends CtlBase<CtlXterm> {
                 onInited(this: any) {
                     that.attachHandle(this, { ...vjson, ...yvanProp })
                     this.wrapper = that
+                },
+                onAfterRender: function (this: any) {
+                    console.log("执行onAfterRender");
+                },
+                onDestruct: function (this: any) {
+                    console.log("执行onDestruct");
+                    if (that._connection) {
+                        that._connection.close();
+                    }
                 },
                 onAfterDelete() {
                     that.removeHandle()
@@ -123,11 +139,19 @@ export class CtlXterm extends CtlBase<CtlXterm> {
     xtermInfo?: any
 
     /**
-     * size 改变时触发
+     * 是否允许从 xterm 接收指令，给 websocket
      */
-    onSizeChange?: YvEvent<CtlXterm, any>
+    allowInput?: boolean
 
-    onData?: YvEvent<CtlXterm, any>
+    /**
+     * socket打开时的事件
+     */
+    onOpen?: YvEvent<CtlXterm, any>
+
+    /**
+     * socket关闭时的事件
+     */
+    onClose?: YvEvent<CtlXterm, any>
 
     /**
      * 获取终端
@@ -141,5 +165,94 @@ export class CtlXterm extends CtlBase<CtlXterm> {
      */
     get fitAddon(): any {
         return this._webix._fitAddon
+    }
+
+    connectHost(host: string) {
+        if (!this._connection) {
+            let hostUrl = host;
+            if (hostUrl.indexOf("?") === -1) {
+                hostUrl = hostUrl + "?" + qs.stringify(this.xtermInfo);
+            }
+            else {
+                const params = hostUrl.slice(hostUrl.indexOf("?") + 1)
+                if (params.length > 0) {
+                    hostUrl = hostUrl + "&" + qs.stringify(this.xtermInfo);
+                }
+                hostUrl += qs.stringify(this.xtermInfo);
+            }
+            this._connection = new WebSocket(hostUrl)
+            this._connection.onopen = this._onSocketOpen.bind(this);
+            this._connection.onmessage = this._onSocketMessage.bind(this);
+            this._connection.onerror = this._onSocketError.bind(this);
+            this._connection.onclose = this._onSocketClose.bind(this);
+        }
+        else {
+            this.term.write('Error: WebSocket Not Supported\r\n');
+        }
+    }
+
+    sendMessage(msg: any) {
+        this._sendClientData(msg)
+    }
+
+    connectionClose() {
+        if (this._connection) {
+            this._connection.close();
+        }
+    }
+
+    /*********************** 私有变量 **********************/
+    private _connection?: WebSocket
+
+    private _onSocketOpen() {
+        this.term.write('连接已建立，正在等待数据...\r\n');
+        if (this.onOpen) {
+            YvEventDispatch(this.onOpen, this, undefined);
+        }
+        this._sendInitData({ operate: 'connect' });
+    }
+
+    private _onSocketMessage(msg: any) {
+        const data = msg.data.toString();
+        this.term.write(data);
+    }
+
+    private _onSocketClose() {
+        this.term.write("\r\n连接已关闭\r\n");
+        this._connection = undefined;
+        if (this.onClose) {
+            YvEventDispatch(this.onClose, this, undefined);
+        }
+    }
+
+    private _onSocketError() {
+        this.term.write("\r\n连接发生异常\r\n");
+    }
+
+    private _sendInitData(options: any) {
+        if (!this._connection) {
+            console.error('_connection 没有初始化')
+            return;
+        }
+        //连接参数
+        this._connection.send(JSON.stringify(options));
+    }
+
+    private _resizeClientData(data: any) {
+        if (!this._connection) {
+            console.error('_connection 没有初始化')
+            return;
+        }
+        //发送指令
+        this._connection.send(JSON.stringify({ "operate": "resize", ...data }))
+    }
+
+    private _sendClientData(data: any) {
+        if (!this._connection) {
+            console.error('_connection 没有初始化')
+            return;
+        }
+        //发送指令
+        this._connection.send(JSON.stringify({ "operate": "command", "command": data }))
     }
 }
