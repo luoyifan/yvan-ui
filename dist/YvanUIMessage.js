@@ -52,7 +52,7 @@ export function loading(msg) {
         msg = '请稍后';
     }
     var $body = $('body');
-    $body.append("<div class=\"load-view\" style=\"z-index: 19850224;\"><div class=\"load-an-view\"><div class=\"fading-circle\">\n  <div class=\"sk-circle1 sk-circle\"></div>\n  <div class=\"sk-circle2 sk-circle\"></div>\n  <div class=\"sk-circle3 sk-circle\"></div>\n  <div class=\"sk-circle4 sk-circle\"></div>\n  <div class=\"sk-circle5 sk-circle\"></div>\n  <div class=\"sk-circle6 sk-circle\"></div>\n  <div class=\"sk-circle7 sk-circle\"></div> \n  <div class=\"sk-circle8 sk-circle\"></div>\n  <div class=\"sk-circle9 sk-circle\"></div>\n  <div class=\"sk-circle10 sk-circle\"></div>\n  <div class=\"sk-circle11 sk-circle\"></div>\n  <div class=\"sk-circle12 sk-circle\"></div>\n</div></div><div class=\"load-tip\">" + msg + "</div></div>");
+    $body.append("<div class=\"load-view\" style=\"z-index: 119850224;\"><div class=\"load-an-view\"><div class=\"fading-circle\">\n  <div class=\"sk-circle1 sk-circle\"></div>\n  <div class=\"sk-circle2 sk-circle\"></div>\n  <div class=\"sk-circle3 sk-circle\"></div>\n  <div class=\"sk-circle4 sk-circle\"></div>\n  <div class=\"sk-circle5 sk-circle\"></div>\n  <div class=\"sk-circle6 sk-circle\"></div>\n  <div class=\"sk-circle7 sk-circle\"></div> \n  <div class=\"sk-circle8 sk-circle\"></div>\n  <div class=\"sk-circle9 sk-circle\"></div>\n  <div class=\"sk-circle10 sk-circle\"></div>\n  <div class=\"sk-circle11 sk-circle\"></div>\n  <div class=\"sk-circle12 sk-circle\"></div>\n</div></div><div class=\"load-tip\">" + msg + "</div></div>");
     $body.append($("<div class=\"webix_modal load-view-masker\" style=\"z-index: 19850223;\"></div>"));
 }
 /**
@@ -99,6 +99,8 @@ export function showTooltip(obj, message) {
     var $body = $('body');
     var tooptipId = obj.id + '_tooltip';
     if ($body.find("#" + tooptipId).length > 0) {
+        var ddiv = $body.find("#" + tooptipId)[0].children[1];
+        _.set(ddiv, 'innerText', message);
         return;
     }
     var $w = $('<div xtype="tooltip" class="yvan-tooltip">' +
@@ -234,6 +236,12 @@ export function msgError(content) {
         webix.message({ type: 'error', text: content, expire: -1 });
     }
     else {
+        toastr.options = {
+            "closeButton": true,
+            "positionClass": "toast-bottom-left",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
         toastr.error(content, '错误');
     }
 }
@@ -247,6 +255,13 @@ export function msgSuccess(content) {
         webix.message({ type: 'success', text: content, expire: 2000 });
     }
     else {
+        toastr.options = {
+            "closeButton": true,
+            "positionClass": "toast-bottom-left",
+            "hideDuration": "3000",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
         toastr.success(content, '成功');
     }
 }
@@ -260,6 +275,13 @@ export function msgInfo(content) {
         webix.message({ type: 'info', text: content, expire: 2000 });
     }
     else {
+        toastr.options = {
+            "closeButton": true,
+            "positionClass": "toast-bottom-left",
+            "hideDuration": "3000",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
         toastr.info(content);
     }
     // https://docs.webix.com/desktop__message_boxes.html

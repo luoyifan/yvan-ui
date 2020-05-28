@@ -170,10 +170,46 @@ var CtlTreeTable = /** @class */ (function (_super) {
         return this._webix.getItem(id);
     };
     /**
+     * 获取某 id 下树节点所有的子节点
+     */
+    CtlTreeTable.prototype.getChildItems = function (id) {
+        var ret = [];
+        var c = this._webix.getFirstChildId(id);
+        while (c) {
+            ret.push(this._webix.getItem(c));
+            c = this._webix.getNextSiblingId(c);
+        }
+        return ret;
+    };
+    /**
+     * 获取某 id 下树节点所有的子节点的编号
+     */
+    CtlTreeTable.prototype.getChildIds = function (id) {
+        var ret = [];
+        var c = this._webix.getFirstChildId(id);
+        while (c) {
+            ret.push(c);
+            c = this._webix.getNextSiblingId(c);
+        }
+        return ret;
+    };
+    /**
      * 勾选选中一行
      */
     CtlTreeTable.prototype.checkItem = function (id) {
         this._webix.checkItem(id);
+    };
+    /**
+     * 获取被选中的一行编号
+     */
+    CtlTreeTable.prototype.getSelectedId = function () {
+        return this._webix.getSelectedId();
+    };
+    /**
+     * 获取被选中的一行
+     */
+    CtlTreeTable.prototype.getSelectedItem = function () {
+        return this._webix.getSelectedItem();
     };
     /**
      * 选中一行
