@@ -570,7 +570,7 @@ export function componentFactory<M, Refs, INP>(Component: BaseModule<M, Refs, IN
           modal: vjson.modal === undefined ? true : vjson.modal,
           left: vjson.left,
           top: vjson.top,
-          position: 'center',
+          position: vjson.position ? vjson.position : 'center',
           resize: vjson.resize === undefined ? true : vjson.resize,
           head: {
             view: "toolbar", margin: -4, cols: [
