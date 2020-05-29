@@ -6,6 +6,7 @@ import { brokerInvoke } from './Service'
 import { Db } from './YvanUIDb'
 import { GridRefreshMode } from "./CtlGrid";
 import { YvEventDispatch } from './YvanEvent'
+import * as _ from 'lodash'
 
 export class YvanDataSourceGrid {
   private option: GridDataSource

@@ -1,5 +1,6 @@
 export declare const CtlButtonDefault: any;
 export declare const CtlDataviewDefault: any;
+export declare const CtlDatatableDefault: any;
 export declare const CtlTreeDefault: any;
 export declare const CtlSidebarDefault: any;
 export declare const CtlXtermDefault: any;

@@ -2,6 +2,7 @@ import { CtlBase } from './CtlBase'
 import { CtlConsoleLogDefault } from './CtlDefaultValue'
 import { parseYvanPropChangeVJson } from './CtlUtils'
 import webix from 'webix'
+import * as _ from 'lodash'
 
 webix.protoUI(
   {
