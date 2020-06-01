@@ -504,12 +504,20 @@ export class CtlGrid extends CtlBase<CtlGrid> {
    * 获取被勾选的所有行
    */
   getCheckedRows() {
+    // const selected: any[] = []
+    // this._findNode((node: any) => {
+    //   if (_.indexOf(this.checkedIds, this._getIdByRow(node.data)) >= 0) {
+    //     selected.push(node.data)
+    //   }
+    //   return false
+    // })
+    // return selected
     const selected: any[] = []
-    this._findNode((node: any) => {
+
+    this.gridApi.forEachNode((node: any) => {
       if (_.indexOf(this.checkedIds, this._getIdByRow(node.data)) >= 0) {
-        selected.push(node.data)
+        selected.push(node.data);
       }
-      return false
     })
     return selected
   }

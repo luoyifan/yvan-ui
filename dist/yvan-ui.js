@@ -5729,12 +5729,19 @@
        */
       CtlGrid.prototype.getCheckedRows = function () {
           var _this = this;
+          // const selected: any[] = []
+          // this._findNode((node: any) => {
+          //   if (_.indexOf(this.checkedIds, this._getIdByRow(node.data)) >= 0) {
+          //     selected.push(node.data)
+          //   }
+          //   return false
+          // })
+          // return selected
           var selected = [];
-          this._findNode(function (node) {
+          this.gridApi.forEachNode(function (node) {
               if (_.indexOf(_this.checkedIds, _this._getIdByRow(node.data)) >= 0) {
                   selected.push(node.data);
               }
-              return false;
           });
           return selected;
       };
