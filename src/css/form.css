@@ -3,13 +3,14 @@
 .webix_el_search input,
 .webix_el_combo input,
 .webix_el_datepicker input,
-.webix_el_colorpicker input {
+.webix_el_colorpicker input{
   font: 500 13px/20px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
     sans-serif;
   padding: 0 6px;
   height: 28px;
   border-radius: 2px;
   transition: all .3s ease;
+  line-height: 28px;
 }
 .webix_inp_label,
 .webix_inp_top_label,
@@ -20,7 +21,17 @@ legend.webix_forminput_label,
   font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
     sans-serif;
 }
-.webix_el_text input:focus, .webix_el_search input:focus, .webix_el_combo input:focus, .webix_el_datepicker input:focus, .webix_el_colorpicker input:focus{
+.webix_el_textarea .webix_inp_label{
+  padding-top:0
+}
+.webix_el_textarea textarea{
+  padding:0 6px;
+  line-height: 28px;
+  transition: all .3s ease;
+  border-radius: 2px;
+  overflow:auto
+}
+.webix_el_text input:focus, .webix_el_search input:focus, .webix_el_combo input:focus, .webix_el_datepicker input:focus, .webix_el_colorpicker input:focus,.webix_el_textarea textarea:focus{
   outline: 0;
   box-shadow: 0 0 0 2px rgba(24,144,255,.2);
   border-color:#1890ff
@@ -29,7 +40,8 @@ legend.webix_forminput_label,
 .yvan-validate-error.webix_el_search input,
 .yvan-validate-error.webix_el_combo input,
 .yvan-validate-error.webix_el_datepicker input,
-.yvan-validate-error.webix_el_colorpicker input {
+.yvan-validate-error.webix_el_colorpicker input,
+.yvan-validate-error.webix_el_textarea input{
   border:1px solid #ff8400
 }
 .yvan-validate-error input:focus, 
@@ -98,15 +110,15 @@ legend.webix_forminput_label,
   background: #e6f7ff;
   box-shadow: inset 2px 0 #1890ff;
 }
-input::-webkit-input-placeholder{
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{
   color:#e4e4e4;
   font-size: 12px
 }
-input::-moz-placeholder{
+input::-moz-placeholder,textarea::-moz-placeholder{
   color:#e4e4e4;
   font-size: 12px
 }
-input:-ms-input-placeholder{
+input:-ms-input-placeholder,textarea:-ms-input-placeholder{
   color:#e4e4e4;
   font-size: 12px
 }
@@ -140,8 +152,10 @@ input:-ms-input-placeholder{
   width: 14px;
   height: 14px;
 }
-.webix_switch_box.webix_switch_on,.webix_switch_box{
+.webix_switch_box .webix_switch_on,.webix_switch_box{
   width: 44px!important;
+}
+.webix_switch_box.webix_switch_on{
   background-color: #1890ff;
 }
 .webix_switch_box{
@@ -165,4 +179,27 @@ input:-ms-input-placeholder{
 }
 .webix_cal_icon:hover, .webix_cal_time:hover, .webix_cal_month_name:hover, .webix_cal_icon:focus, .webix_cal_time:focus, .webix_cal_month_name:focus{
   color: #1890ff;
+}
+.webix_el_text .webix_multicombo_input{
+    border:none!important;
+    height: 26px!important;
+    margin-left:6px;
+}
+.webix_multicombo .webix_inp_static{
+  height: 28px!important;
+}
+.webix_multicombo .webix_inp_static input{
+  height: 26px;
+}
+.webix_multicombo_value{
+  line-height: 20px!important;
+}
+.webix_multicombo_value .webix_multicombo_delete{
+  margin: 0 0 0 4px;
+}
+.webix_focused .webix_inp_static{
+  border:1px solid #1890ff;
+}
+.webix_layout_line .webix_el_textarea .webix_el_box{
+  padding-bottom: 5px;
 }
