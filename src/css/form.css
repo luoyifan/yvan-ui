@@ -42,13 +42,13 @@ legend.webix_forminput_label,
 .yvan-validate-error.webix_el_datepicker input,
 .yvan-validate-error.webix_el_colorpicker input,
 .yvan-validate-error.webix_el_textarea input{
-  border:1px solid #ff8400
+  border:1px solid #ff8400!important
 }
 .yvan-validate-error input:focus, 
 .yvan-validate-error input:focus, 
 .yvan-validate-error input:focus, 
 .yvan-validate-error input:focus, 
-.yvan-validate-error input:focus{
+.yvan-validate-error textarea:focus{
   outline: 0;
   box-shadow: 0 0 0 2px rgba(255,132,0,.2);
   border-color:#ff8400
