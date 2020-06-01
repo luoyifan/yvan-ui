@@ -16,7 +16,7 @@ import { CtlDateRangePicker } from './form/input/CtlDateRangePicker'
 import { CtlForm } from './form/CtlForm'
 import { CtlMultiCombo } from './form/select/CtlMultiCombo'
 import { CtlSearch } from './form/input/CtlSearch'
-export { CtlTextarea } from './form/input/CtlTextarea'
+import { CtlTextarea } from './form/input/CtlTextarea'
 import { CtlCarousel } from './CtlCarousel'
 import { CtlGrid } from './CtlGrid'
 import { CtlSwitch } from './form/other/CtlSwitch'
@@ -399,6 +399,10 @@ export function wrapperWebixConfig<M, Refs, INP>(module: BaseModule<M, Refs, INP
           CtlSearch.create(module, obj);
           break
 
+        case 'textarea':
+          CtlTextarea.create(module, obj);
+          break
+          
         case 'check':
         case 'checkbox':
           CtlCheckBox.create(module, obj);

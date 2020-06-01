@@ -1,14 +1,14 @@
 import * as YvanUI from '../../YvanUIExtend'
 import { CtlInput } from './CtlInput'
 import { parseYvanPropChangeVJson } from '../../CtlUtils'
-import { CtlTextDefault } from '../../CtlDefaultValue'
+import { CtlTextareaDefault } from '../../CtlDefaultValue'
 
 export class CtlTextarea extends CtlInput<CtlTextarea> {
   static create(module: any, vjson: any): CtlTextarea {
     const that = new CtlTextarea(vjson)
     that._module = module
 
-    _.defaultsDeep(vjson, CtlTextDefault)
+    _.defaultsDeep(vjson, CtlTextareaDefault)
 
     // 基础属性先执行
     that._create(vjson, that)
