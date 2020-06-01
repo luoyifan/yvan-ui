@@ -56,6 +56,11 @@ export const CtlTextDefault: any = {
     ...CtlInputDefault
 };
 
+export const CtlTextareaDefault: any = {
+    placeholder:'请输入',
+    ...CtlInputDefault
+};
+
 export const CtlNumberDefault: any = {
     ...CtlInputDefault,
     precision: 0,

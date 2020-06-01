@@ -101,16 +101,15 @@ body,
   font-size: 13px
 }
 .mainLeft .webix_form{
-  border-bottom:1px solid #f0f0f0!important;
-  border-right:1px solid #f0f0f0!important
+  border-right:1px solid #f0f0f0
 }
 .mainLeft .webix_form .webix_el_box{
   -webkit-transition: all .3s ease;
   transition: all .3s ease;
-  border-bottom:1px solid #f0f0f0!important
+  border-bottom:1px solid #f0f0f0
 }
 .mainLeft .webix_form .webix_el_box:hover{
-  border-bottom:1px solid #1890ff!important
+  border-bottom:1px solid #1890ff
 }
 .mainLeft .webix_tree{
   border-right:1px solid #f0f0f0
@@ -119,7 +118,6 @@ body,
   padding:0!important;
 }
 .mainLeft .webix_tree .webix_tree_item{
-  /* padding:8px; */
   cursor: pointer;
   -webkit-transition: all .3s ease;
   transition: all .3s ease;
@@ -163,7 +161,7 @@ body,
   top:-1px
 }
 .maintab .webix_el_tabbar .webix_all_tabs {
-  border-bottom:1px solid #f0f0f0!important
+  border-bottom:1px solid #f0f0f0
 }
 .mainTabBar .webix_item_tab{
   background: none!important;
@@ -192,47 +190,44 @@ body,
   overflow: hidden
 }
 .mainTabBar .webix_item_tab:hover{
-  border-color:#f0f0f0!important;
-  color:#1890ff!important
+  border-color:#f0f0f0;
+  color:#1890ff
 }
 .mainTabBar .webix_selected{
-  background: none!important;
-  color:#1890ff!important;
-  position: relative;
-  top: 1px;
-  box-shadow: 0 0 0 0!important;
-  -webkit-box-shadow: 0 0 0 0!important
+  background: none;
+  color:#1890ff;
+  box-shadow: 0 0 0 0;
+  -webkit-box-shadow: 0 0 0 0
 }
 .mainTabBar .webix_selected .myTabDiv{
-  background: #fff!important;
-  color:#1890ff!important;
-  border-top:1px solid #1890ff!important
+  background: #fff;
+  color:#1890ff;
+  border-top:1px solid #1890ff
 }
 .mainTabBar .webix_item_tab .webix_tab_close{
-  color:#666!important;
-  width: 20px!important;
-  top:20px!important;
-  right:6px!important
+  color:#666;
+  width: 20px;
+  top:20px;
+  right:6px
 }
 .mainTabBar .webix_selected .webix_tab_close{
-  color:#1890ff!important
+  color:#1890ff
 }
 /*======================== mainView-mainTab =======================*/
 .maintab > .webix_el_tabbar > .webix_all_tabs .webix_item_tab {
   position: relative;
+  top:1px;
   padding: 0 28px 0 6px;
 }
-.maintab
-  > .webix_el_tabbar
-  > .webix_all_tabs
-  .webix_item_tab
-  .webix_icon.webix_tab_close {
+.maintab  > .webix_el_tabbar  > .webix_all_tabs  .webix_item_tab .webix_icon.webix_tab_close {
   position: absolute;
   top: 50%;
   right: 0;
   height: 28px;
   line-height: 28px;
   margin-top: -14px;
+  font-weight: bold;
+  font-size: 13px;
 }
 
 .maintab > .webix_el_tabbar > .webix_all_tabs .webix_item_tab.webix_selected,
@@ -240,8 +235,8 @@ body,
   > .webix_el_tabbar
   > .webix_all_tabs
   .webix_item_tab.webix_selected:active {
-  -webkit-box-shadow: inset 0 -2px #fff;
-          box-shadow: inset 0 -2px #fff;
+  box-shadow: 0 0 0;
+  -webkit-box-shadow: 0 0 0;
   color: #4c82b1;
   background-color: #fff;
 }
@@ -250,32 +245,13 @@ body,
   border-color: #000;
   background-color: rgba(0, 0, 0, .08);
 }
-.maintab
-  > .webix_el_tabbar
-  > .webix_all_tabs
-  .webix_item_tab.webix_selected:hover {
+.maintab > .webix_el_tabbar > .webix_all_tabs .webix_item_tab.webix_selected:hover {
   border-color: #000;
   background-color: #fff;
 }
 
-.maintab
-  > .webix_el_tabbar
-  > .webix_all_tabs
-  .webix_item_tab.webix_selected
-  .webix_icon.webix_tab_close {
+.maintab  > .webix_el_tabbar  > .webix_all_tabs  .webix_item_tab.webix_selected  .webix_icon.webix_tab_close {
   color: #919191;
-  font-weight: bold;
-  font-size: 13px;
-}
-
-.maintab
-  > .webix_el_tabbar
-  > .webix_all_tabs
-  .webix_item_tab
-  .webix_icon.webix_tab_close {
-  color: #fff;
-  font-weight: bold;
-  font-size: 13px;
 }
 
 .maintab > .webix_el_tabbar > .webix_all_tabs {
@@ -680,9 +656,6 @@ input.ag-cell-edit-input {
 /*表格内行*/
 .ag-theme-blue .ag-row {
   border:1px solid #f0f0f0
-  /* border-width: 1px 0 0;
-  border-bottom-style: solid;
-  border-color: #e9e9e9; */
 }
 
 /*行分割线*/
@@ -813,8 +786,9 @@ input[type='number']::-webkit-outer-spin-button {
 
 /*表头颜色*/
 .ag-theme-blue .ag-header {
-  background-color: #fff;
   color: #404040;
+  background: #e7e7e7!important;
+  border-bottom: 1px solid #cdcdcd!important;
 }
 
 /*表头右边框*/
@@ -823,10 +797,6 @@ input[type='number']::-webkit-outer-spin-button {
     sans-serif;
 }
 
-/*表头底边框*/
-.ag-theme-blue .ag-header {
-  border-bottom: 2px solid #d0d0d0;
-}
 
 /*表头鼠标悬停*/
 .ag-theme-blue .ag-cell{
@@ -840,10 +810,6 @@ input[type='number']::-webkit-outer-spin-button {
 }
 .ag-theme-blue .ag-body-viewport{
   background: #fff!important;
-}
-.ag-theme-blue .ag-header{
-  background: #e7e7e7!important;
-  border-bottom: 1px solid #cdcdcd!important;
 }
 .ag-theme-blue .ag-header-row{
   color:#666
@@ -1115,7 +1081,6 @@ input[type='number']::-webkit-outer-spin-button {
 .yv-grid-button{
   background-color:#1890ff
 }
-
 /* ====================== checkbox =========================*/
 .yvan-checkbox {
   display: inline-block;
@@ -1759,7 +1724,7 @@ input[type='number']::-webkit-outer-spin-button {
 .webix_el_search input,
 .webix_el_combo input,
 .webix_el_datepicker input,
-.webix_el_colorpicker input {
+.webix_el_colorpicker input{
   font: 500 13px/20px 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
     sans-serif;
   padding: 0 6px;
@@ -1767,6 +1732,7 @@ input[type='number']::-webkit-outer-spin-button {
   border-radius: 2px;
   -webkit-transition: all .3s ease;
   transition: all .3s ease;
+  line-height: 28px;
 }
 .webix_inp_label,
 .webix_inp_top_label,
@@ -1777,7 +1743,18 @@ legend.webix_forminput_label,
   font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana,
     sans-serif;
 }
-.webix_el_text input:focus, .webix_el_search input:focus, .webix_el_combo input:focus, .webix_el_datepicker input:focus, .webix_el_colorpicker input:focus{
+.webix_el_textarea .webix_inp_label{
+  padding-top:0
+}
+.webix_el_textarea textarea{
+  padding:0 6px;
+  line-height: 26px;
+  -webkit-transition: all .3s ease;
+  transition: all .3s ease;
+  border-radius: 2px;
+  overflow:auto
+}
+.webix_el_text input:focus, .webix_el_search input:focus, .webix_el_combo input:focus, .webix_el_datepicker input:focus, .webix_el_colorpicker input:focus,.webix_el_textarea textarea:focus{
   outline: 0;
   -webkit-box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
           box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
@@ -1787,14 +1764,15 @@ legend.webix_forminput_label,
 .yvan-validate-error.webix_el_search input,
 .yvan-validate-error.webix_el_combo input,
 .yvan-validate-error.webix_el_datepicker input,
-.yvan-validate-error.webix_el_colorpicker input {
-  border:1px solid #ff8400
+.yvan-validate-error.webix_el_colorpicker input,
+.yvan-validate-error.webix_el_textarea input{
+  border:1px solid #ff8400!important
 }
 .yvan-validate-error input:focus, 
 .yvan-validate-error input:focus, 
 .yvan-validate-error input:focus, 
 .yvan-validate-error input:focus, 
-.yvan-validate-error input:focus{
+.yvan-validate-error textarea:focus{
   outline: 0;
   -webkit-box-shadow: 0 0 0 2px rgba(255, 132, 0, .2);
           box-shadow: 0 0 0 2px rgba(255, 132, 0, .2);
@@ -1858,15 +1836,15 @@ legend.webix_forminput_label,
   -webkit-box-shadow: inset 2px 0 #1890ff;
           box-shadow: inset 2px 0 #1890ff;
 }
-input::-webkit-input-placeholder{
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{
   color:#e4e4e4;
   font-size: 12px
 }
-input::-moz-placeholder{
+input::-moz-placeholder,textarea::-moz-placeholder{
   color:#e4e4e4;
   font-size: 12px
 }
-input:-ms-input-placeholder{
+input:-ms-input-placeholder,textarea:-ms-input-placeholder{
   color:#e4e4e4;
   font-size: 12px
 }
@@ -1901,8 +1879,10 @@ input:-ms-input-placeholder{
   width: 14px;
   height: 14px;
 }
-.webix_switch_box.webix_switch_on,.webix_switch_box{
+.webix_switch_box .webix_switch_on,.webix_switch_box{
   width: 44px!important;
+}
+.webix_switch_box.webix_switch_on{
   background-color: #1890ff;
 }
 .webix_switch_box{
@@ -1926,6 +1906,29 @@ input:-ms-input-placeholder{
 }
 .webix_cal_icon:hover, .webix_cal_time:hover, .webix_cal_month_name:hover, .webix_cal_icon:focus, .webix_cal_time:focus, .webix_cal_month_name:focus{
   color: #1890ff;
+}
+.webix_el_text .webix_multicombo_input{
+    border:none!important;
+    height: 26px!important;
+    margin-left:6px;
+}
+.webix_multicombo .webix_inp_static{
+  height: 28px!important;
+}
+.webix_multicombo .webix_inp_static input{
+  height: 26px;
+}
+.webix_multicombo_value{
+  line-height: 20px!important;
+}
+.webix_multicombo_value .webix_multicombo_delete{
+  margin: 0 0 0 4px;
+}
+.webix_focused .webix_inp_static{
+  border:1px solid #1890ff;
+}
+.webix_layout_line .webix_el_textarea .webix_el_box{
+  padding-bottom: 7px;
 }
 .vc-log {
   /* padding-bottom: 100px; */

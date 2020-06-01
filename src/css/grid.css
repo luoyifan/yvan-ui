@@ -45,9 +45,6 @@ input.ag-cell-edit-input {
 /*表格内行*/
 .ag-theme-blue .ag-row {
   border:1px solid #f0f0f0
-  /* border-width: 1px 0 0;
-  border-bottom-style: solid;
-  border-color: #e9e9e9; */
 }
 
 /*行分割线*/
@@ -173,8 +170,9 @@ input[type='number']::-webkit-outer-spin-button {
 
 /*表头颜色*/
 .ag-theme-blue .ag-header {
-  background-color: #fff;
   color: #404040;
+  background: #e7e7e7!important;
+  border-bottom: 1px solid #cdcdcd!important;
 }
 
 /*表头右边框*/
@@ -183,10 +181,6 @@ input[type='number']::-webkit-outer-spin-button {
     sans-serif;
 }
 
-/*表头底边框*/
-.ag-theme-blue .ag-header {
-  border-bottom: 2px solid #d0d0d0;
-}
 
 /*表头鼠标悬停*/
 .ag-theme-blue .ag-cell{
@@ -200,10 +194,6 @@ input[type='number']::-webkit-outer-spin-button {
 }
 .ag-theme-blue .ag-body-viewport{
   background: #fff!important;
-}
-.ag-theme-blue .ag-header{
-  background: #e7e7e7!important;
-  border-bottom: 1px solid #cdcdcd!important;
 }
 .ag-theme-blue .ag-header-row{
   color:#666

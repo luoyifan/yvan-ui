@@ -1,8 +1,8 @@
 import { CtlBase } from './CtlBase'
 import { CtlConsoleLogDefault } from './CtlDefaultValue'
 import { parseYvanPropChangeVJson } from './CtlUtils'
-import _ from 'lodash'
 import webix from 'webix'
+import _ from 'lodash'
 
 webix.protoUI(
   {

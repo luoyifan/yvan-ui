@@ -590,6 +590,7 @@
       prompt: '请输入'
   };
   var CtlTextDefault = __assign({}, CtlInputDefault);
+  var CtlTextareaDefault = __assign({ placeholder: '请输入' }, CtlInputDefault);
   var CtlNumberDefault = __assign(__assign({}, CtlInputDefault), { precision: 0 });
   var CtlDateDefault = __assign(__assign({}, CtlInputDefault), { prompt: '请选择' });
   var CtlDateTimeDefault = __assign(__assign({}, CtlInputDefault), { 
@@ -3847,6 +3848,26 @@
           // YvanUI.showDialogWidget(this, new searchCtl.widget.content(), widgetParamter);
       };
       return CtlSearch;
+  }(CtlInput));
+
+  var CtlTextarea = /** @class */ (function (_super) {
+      __extends(CtlTextarea, _super);
+      function CtlTextarea() {
+          return _super !== null && _super.apply(this, arguments) || this;
+      }
+      CtlTextarea.create = function (module, vjson) {
+          var that = new CtlTextarea(vjson);
+          that._module = module;
+          _.defaultsDeep(vjson, CtlTextareaDefault);
+          // 基础属性先执行
+          that._create(vjson, that);
+          var yvanProp = parseYvanPropChangeVJson(vjson, ['validate']);
+          // 将 yvanProp 合并至当前 Ctl 对象
+          _.assign(that, yvanProp);
+          _.merge(vjson, that._webixConfig);
+          return that;
+      };
+      return CtlTextarea;
   }(CtlInput));
 
   var CtlCarousel = /** @class */ (function (_super) {
@@ -8307,6 +8328,9 @@
                   case 'searchbox':
                       CtlSearch.create(module, obj);
                       break;
+                  case 'textarea':
+                      CtlTextarea.create(module, obj);
+                      break;
                   case 'check':
                   case 'checkbox':
                       CtlCheckBox.create(module, obj);
@@ -8452,7 +8476,7 @@
                       modal: vjson.modal === undefined ? true : vjson.modal,
                       left: vjson.left,
                       top: vjson.top,
-                      position: 'center',
+                      position: vjson.position ? vjson.position : 'center',
                       resize: vjson.resize === undefined ? true : vjson.resize,
                       head: {
                           view: "toolbar", margin: -4, cols: [
@@ -9544,6 +9568,7 @@
   exports.CtlSwitch = CtlSwitch;
   exports.CtlTab = CtlTab;
   exports.CtlText = CtlText;
+  exports.CtlTextarea = CtlTextarea;
   exports.CtlTree = CtlTree;
   exports.CtlTreeTable = CtlTreeTable;
   exports.CtlXterm = CtlXterm;

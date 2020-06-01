@@ -23,6 +23,7 @@ export declare const CtlCodeMirrorDefault: {
     };
 };
 export declare const CtlTextDefault: any;
+export declare const CtlTextareaDefault: any;
 export declare const CtlNumberDefault: any;
 export declare const CtlDateDefault: any;
 export declare const CtlDateTimeDefault: any;
