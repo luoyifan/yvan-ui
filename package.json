@@ -27,7 +27,7 @@
     "@types/vue": "^2.0.0",
     "@types/webix": "^5.1.1",
     "ag-grid": "^18.1.2",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cssnano": "^4.1.10",
     "jest": "^24.5.0",
     "jest-extended": "^0.11.1",
